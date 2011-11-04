@@ -5,10 +5,10 @@ guard 'bundler' do
 end
 
 #guard 'shell' do
-#  watch(%r{^(lib|spec)/.+\.rb$}) { `rspec spec` }
+#  watch(%r{^(lib|spec)/.+\.rb$}) { `rspec spec 2>&1` }
 #end
 
-guard 'rspec' do
+guard 'rspec', :notification => false do
   watch(%r{^spec/.+_spec\.rb$})
   watch(%r{^lib/(.+)\.rb$})     { |m| "spec/lib/#{m[1]}_spec.rb" }
   watch('spec/spec_helper.rb')  { "spec" }

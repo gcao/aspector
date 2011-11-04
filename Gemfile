@@ -1,15 +1,18 @@
 source "http://rubygems.org"
-# Add dependencies required to use your gem here.
-# Example:
-#   gem "activesupport", ">= 2.3.5"
 
-# Add dependencies to develop your gem here.
-# Include everything needed to run rake, tests, features, etc.
 group :development do
   gem "rspec", "~> 2.3.0"
+  gem "mocha", "~> 0.10.0"
   gem "bundler", "~> 1.0.0"
   gem "jeweler", "~> 1.6.4"
   gem "rcov", ">= 0"
   gem "reek", "~> 1.2.8"
   gem "roodi", "~> 2.1.0"
+
+  gem "guard", "~> 0.8.4"
+  gem "guard-bundler", "~> 0.1.3"
+  gem "guard-rspec", "~> 0.5.2"
+  gem "guard-shell", "~> 0.1.1"
+  gem 'rb-fsevent', "~> 0.4.3.1"
+  gem 'growl', "~> 1.0.3"
 end

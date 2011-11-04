@@ -1,7 +1,8 @@
 module Aspector
   module ObjectExtension
 
-    def aspector target
+    def aspector *args, &block
+      Helper.handle_aspect *args, &block
     end
 
   end

@@ -1,8 +1,8 @@
 require 'aspector/object_extension'
 
-require 'aspector/model/aspect'
-require 'aspector/model/advice'
-require 'aspector/model/advice_metadata'
-require 'aspector/model/method_matcher'
+require 'aspector/aspect'
+require 'aspector/advice'
+require 'aspector/advice_metadata'
+require 'aspector/method_matcher'
 
 require 'aspector/return_this'

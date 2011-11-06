@@ -5,7 +5,7 @@ module Aspector
       options = {}
       options = args.pop if args.last.is_a? Hash
 
-      aspect = Aspector::Model::Aspect.new(options, &block)
+      aspect = Aspector::Aspect.new(options, &block)
 
       aspect.apply(self) if self.is_a? Module
       args.each {|target| aspect.apply(target) }
@@ -14,7 +14,7 @@ module Aspector
     end
 
     def Aspector options = {}, &block
-      Aspector::Model::Aspect.new(options, &block)
+      Aspector::Aspect.new(options, &block)
     end
 
   end

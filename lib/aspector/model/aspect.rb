@@ -54,7 +54,6 @@ module Aspector
 <% end %>
         result
       end
-
       CODE
 
       def initialize options = {}, &block
@@ -63,6 +62,11 @@ module Aspector
       end
 
       def apply target
+        each do |advice|
+          next unless advice.advice_block
+          target.send :define_method, advice.with_method, advice.advice_block
+        end
+
         target.instance_methods.each do |method|
           advices = advices_for_method method
           next if advices.empty?
@@ -83,7 +87,8 @@ module Aspector
         around_advice  = first if advices.first.around?
 
         code = METHOD_TEMPLATE.result(binding)
-        # puts code
+        #puts code
+        # line no is the actual line no of METHOD_TEMPLATE + 5
         target.class_eval code, __FILE__, 12
       end
 
@@ -107,12 +112,14 @@ module Aspector
           methods[i] = methods[i].to_s if methods[i].is_a? Symbol
         end
 
-        with_method = block_given? ? block.to_proc : methods.pop
+        with_method = methods.pop unless block_given?
 
-        Aspector::Model::Advice.new(meta_data.advice_type,
+        Aspector::Model::Advice.new(self,
+                                    meta_data.advice_type,
                                     Aspector::Model::MethodMatcher.new(*methods),
                                     with_method,
-                                    options)
+                                    options,
+                                    &block)
       end
 
     end

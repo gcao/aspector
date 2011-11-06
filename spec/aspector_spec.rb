@@ -20,10 +20,11 @@ describe "Aspector" do
 
     aspector(klass) do
       before :test, :do_this
+      before(:test){ @value << 'do_block' }
     end
 
     obj = klass.new
     obj.test
-    obj.value.should == %w"do_this test"
+    obj.value.should == %w"do_this do_block test"
   end
 end

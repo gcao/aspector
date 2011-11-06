@@ -6,17 +6,19 @@ module Aspector
       AFTER  = 2
       AROUND = 3
 
-      attr_accessor :type, :method_matcher, :with_method, :options
+      attr_reader :type, :method_matcher, :options, :advice_block
 
-      def initialize type, method_matcher, with_method, options = {}
+      def initialize parent, type, method_matcher, with_method, options = {}, &block
+        @parent         = parent
         @type           = type
         @method_matcher = method_matcher
         @with_method    = with_method
         @options        = options
+        @advice_block   = block.to_proc if block_given?
       end
 
-      def name
-        options[:name] || with_method
+      def with_method
+        @with_method ||= "aspect_#{@parent.hash}_#{@parent.index(self)}"
       end
 
       def match? method

@@ -16,6 +16,7 @@ end
 
 aspector(A) do
   before :test, :do_this
+  before(:test) { puts 'do_that' }
 end
 
 A.new.test

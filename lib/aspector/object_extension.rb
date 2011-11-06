@@ -2,7 +2,15 @@ module Aspector
   module ObjectExtension
 
     def aspector *args, &block
-      Helper.handle_aspect self, *args, &block
+      options = {}
+      options = args.pop if args.last.is_a? Hash
+
+      aspect = Aspector::Model::Aspect.new(options, &block)
+
+      aspect.apply(self) if self.is_a? Module
+      args.each {|target| aspect.apply(target) }
+
+      aspect
     end
 
     def Aspector options = {}, &block

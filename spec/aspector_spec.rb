@@ -24,6 +24,6 @@ describe "Aspector" do
 
     obj = klass.new
     obj.test
-    obj.value.should == %"do_this test"
+    obj.value.should == %w"do_this test"
   end
 end

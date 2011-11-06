@@ -1,19 +1,18 @@
 module Aspector
   module Model
     class Advice
+
       BEFORE = 1
       AFTER  = 2
       AROUND = 3
 
-      attr :group
       attr_accessor :type, :method_matcher, :with_method, :options
 
-      def initialize type, method_matcher, with_method, group, options = {}
-        @type        = type
+      def initialize type, method_matcher, with_method, options = {}
+        @type           = type
         @method_matcher = method_matcher
-        @with_method = with_method
-        @group       = group
-        @options     = options
+        @with_method    = with_method
+        @options        = options
       end
 
       def name
@@ -52,7 +51,7 @@ module Aspector
       end
 
       def to_s
-        s = "<" << @group << "> "
+        s = ""
         case @type
         when BEFORE
           if @options[:skip_if_false]
@@ -74,6 +73,7 @@ module Aspector
         end
         s
       end
+
     end
   end
 end

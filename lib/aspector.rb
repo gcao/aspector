@@ -4,3 +4,6 @@ require 'aspector/model/aspect'
 require 'aspector/model/advice'
 require 'aspector/model/advice_metadata'
 require 'aspector/model/method_matcher'
+
+require 'aspector/return_this'
+require 'aspector/helper'

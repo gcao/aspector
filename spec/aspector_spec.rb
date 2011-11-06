@@ -40,4 +40,30 @@ describe "Aspector" do
     obj.test
     obj.value.should == %w"do_around_before do_before test do_after do_around_after"
   end
+
+  it "multiple aspects should work together" do
+    klass = Class.new do
+      attr :value
+
+      def initialize
+        @value = []
+      end
+
+      def test
+        @value << "test"
+      end
+    end
+
+    aspector(klass) do
+      before(:test) { @value << 'first_aspect' }
+    end
+
+    aspector(klass) do
+      before(:test) { @value << 'second_aspect' }
+    end
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"second_aspect first_aspect test"
+  end
 end

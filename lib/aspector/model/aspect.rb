@@ -100,6 +100,14 @@ module Aspector
         push(create_advice(Aspector::Model::AdviceMetadata::BEFORE_FILTER, self, methods, &block))
       end
 
+      def after *methods, &block
+        push(create_advice(Aspector::Model::AdviceMetadata::AFTER, self, methods, &block))
+      end
+
+      def around *methods, &block
+        push(create_advice(Aspector::Model::AdviceMetadata::AROUND, self, methods, &block))
+      end
+
       def create_advice meta_data, klass_or_module, *methods, &block
         methods.flatten!
 

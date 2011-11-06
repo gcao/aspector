@@ -13,23 +13,31 @@ describe "Aspector" do
         @value << "test"
       end
 
-      def do_this
-        @value << "do_this"
+      def do_before
+        @value << "do_before"
       end
 
-      def do_that result
-        @value << "do_that"
+      def do_after result
+        @value << "do_after"
+        result
+      end
+
+      def do_around &block
+        @value << "do_around_before"
+        result = block.call
+        @value << "do_around_after"
         result
       end
     end
 
     aspector(klass) do
-      before :test, :do_this
-      after  :test, :do_that
+      before :test, :do_before
+      after  :test, :do_after
+      around :test, :do_around
     end
 
     obj = klass.new
     obj.test
-    obj.value.should == %w"do_this test do_that"
+    obj.value.should == %w"do_around_before do_before test do_after do_around_after"
   end
 end

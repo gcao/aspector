@@ -52,26 +52,23 @@ module Aspector
         obj.send with_method, *args, &block
       end
 
-      def to_s
-        s = ""
+      def type_name
         case @type
-        when BEFORE
-          if @options[:skip_if_false]
-            s << "BEFORE_FILTER: "
-          else
-            s << "BEFORE: "
-          end
-        when AFTER
-          s << "AFTER : "
-        when AROUND
-          s << "AROUND: "
+        when BEFORE then @options[:skip_if_false] ? "BEFORE_FILTER" : "BEFORE"
+        when AFTER  then "AFTER"
+        when AROUND then "AROUND"
+        else "UNKNOWN?!"
         end
-        s << "[" << @method_matcher.to_s << "] DO "
+      end
+
+      def to_s
+        s = type_name
+        s << " [" << @method_matcher.to_s << "] DO "
         s << @with_method.to_s
         s << " WITH OPTIONS "
         @options.each do |key, value|
           next if key == :skip_if_false
-          s << key.to_s << ":" << value.to_s
+          s << key.to_s << ":" << value.to_s << " "
         end
         s
       end

@@ -71,7 +71,7 @@ module Aspector
           advices = advices_for_method method
           next if advices.empty?
 
-          wrap_method target, method, advices
+          recreate_method target, method, advices
         end
       end
 
@@ -81,10 +81,27 @@ module Aspector
         end
       end
 
-      def wrap_method target, method, advices
-        before_advices = select {|advice| advice.before? or advice.before_filter? }
-        after_advices  = select {|advice| advice.after?  }
-        around_advice  = first if advices.first.around?
+      def recreate_method target, method, advices
+        grouped_advices = []
+
+        advices.each do |advice|
+          if advice.around? and not grouped_advices.empty?
+            recreate_method_with_advices target, method, grouped_advices
+
+            grouped_advices = []
+          end
+
+          grouped_advices << advice
+        end
+
+        # create wrap method for before/after advices which are not wrapped inside around advice.
+        recreate_method_with_advices target, method, grouped_advices unless grouped_advices.empty?
+      end
+
+      def recreate_method_with_advices target, method, advices
+        before_advices = advices.select {|advice| advice.before? or advice.before_filter? }
+        after_advices  = advices.select {|advice| advice.after?  }
+        around_advice  = advices.first if advices.first.around?
 
         code = METHOD_TEMPLATE.result(binding)
         #puts code

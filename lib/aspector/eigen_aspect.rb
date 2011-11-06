@@ -1,8 +1,8 @@
 module Aspector
-  class Aspect < AbstractAspect
+  class EigenAspect < Aspect
 
     def real_target target
-      target
+      class << target; self; end
     end
 
   end

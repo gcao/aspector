@@ -18,7 +18,7 @@ module Aspector
       end
 
       def with_method
-        @with_method ||= "aspect_#{@parent.hash}_#{@parent.index(self)}"
+        @with_method ||= "aspect_#{@parent.hash}_#{@parent.advices.index(self)}"
       end
 
       def match? method

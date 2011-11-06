@@ -2,7 +2,7 @@ require 'erb'
 
 module Aspector
   module Model
-    class Aspect < Array
+    class Aspect
 
       METHOD_TEMPLATE = ERB.new <<-CODE
       wrapped_method = instance_method(:<%= method %>)
@@ -56,13 +56,16 @@ module Aspector
       end
       CODE
 
+      attr :advices
+
       def initialize options = {}, &block
         @options = options
+        @advices = []
         instance_eval &block
       end
 
       def apply target
-        each do |advice|
+        @advices.each do |advice|
           next unless advice.advice_block
           target.send :define_method, advice.with_method, advice.advice_block
         end
@@ -76,7 +79,7 @@ module Aspector
       end
 
       def advices_for_method method
-        select do |advice|
+        @advices.select do |advice|
           advice.match?(method)
         end
       end
@@ -110,19 +113,19 @@ module Aspector
       end
 
       def before *methods, &block
-        push(create_advice(Aspector::Model::AdviceMetadata::BEFORE, self, methods, &block))
+        @advices << create_advice(Aspector::Model::AdviceMetadata::BEFORE, self, methods, &block)
       end
 
       def before_filter *methods, &block
-        push(create_advice(Aspector::Model::AdviceMetadata::BEFORE_FILTER, self, methods, &block))
+        @advices << create_advice(Aspector::Model::AdviceMetadata::BEFORE_FILTER, self, methods, &block)
       end
 
       def after *methods, &block
-        push(create_advice(Aspector::Model::AdviceMetadata::AFTER, self, methods, &block))
+        @advices << create_advice(Aspector::Model::AdviceMetadata::AFTER, self, methods, &block)
       end
 
       def around *methods, &block
-        push(create_advice(Aspector::Model::AdviceMetadata::AROUND, self, methods, &block))
+        @advices << create_advice(Aspector::Model::AdviceMetadata::AROUND, self, methods, &block)
       end
 
       def create_advice meta_data, klass_or_module, *methods, &block

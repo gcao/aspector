@@ -16,6 +16,7 @@ module Aspector
     def Aspector options = {}, &block
       Aspector::Model::Aspect.new(options, &block)
     end
+
   end
 end
 

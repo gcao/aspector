@@ -18,11 +18,11 @@ end
 
 aspector(A) do
   around :test, :do_this
-  #around(:test) do |&block|
-  #  puts 'before(block)'
-  #  block.call
-  #  puts 'after(block)'
-  #end
+  around(:test) do |&block|
+    puts 'before(block)'
+    block.call
+    puts 'after(block)'
+  end
 end
 
 A.new.test

@@ -18,7 +18,7 @@ describe "Aspector for object" do
 
     obj = klass.new
 
-    eigen_aspector(obj) do
+    aspector(obj) do
       before :test, :do_before
     end
 

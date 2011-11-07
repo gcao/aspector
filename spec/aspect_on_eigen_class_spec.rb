@@ -30,7 +30,7 @@ describe "Aspector for eigen class" do
       end
     end
 
-    eigen_aspector(klass) do
+    aspector(klass, :eigen_class => true) do
       before :test, :do_before
       after  :test, :do_after
       around :test, :do_around

@@ -14,30 +14,16 @@ describe "Aspector for object" do
       def do_before
         value << "do_before"
       end
-
-      def do_after result
-        value << "do_after"
-        result
-      end
-
-      def do_around &block
-        value << "do_around_before"
-        result = block.call
-        value << "do_around_after"
-        result
-      end
     end
 
     obj = klass.new
 
     eigen_aspector(obj) do
       before :test, :do_before
-      after  :test, :do_after
-      around :test, :do_around
     end
 
     obj.test
-    obj.value.should == %w"do_around_before do_before test do_after do_around_after"
+    obj.value.should == %w"do_before test"
 
     obj2 = klass.new
     obj2.test

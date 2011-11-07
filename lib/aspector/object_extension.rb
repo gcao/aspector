@@ -2,8 +2,7 @@ module Aspector
   module ObjectExtension
 
     def eigen_aspector *args, &block
-      options = {}
-      options = args.pop if args.last.is_a? Hash
+      options = args.last.is_a?(Hash) ? args.pop : {}
 
       aspect = Aspector::EigenAspect.new(options, &block)
 
@@ -16,8 +15,7 @@ module Aspector
     end
 
     def aspector *args, &block
-      options = {}
-      options = args.pop if args.last.is_a? Hash
+      options = args.last.is_a?(Hash) ? args.pop : {}
 
       aspect = Aspector::Aspect.new(options, &block)
 

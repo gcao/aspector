@@ -3,29 +3,27 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 describe "Aspector" do
   it "should work" do
     klass = Class.new do
-      attr :value
-
-      def initialize
-        @value = []
+      def value
+        @value ||= []
       end
 
       def test
-        @value << "test"
+        value << "test"
       end
 
       def do_before
-        @value << "do_before"
+        value << "do_before"
       end
 
       def do_after result
-        @value << "do_after"
+        value << "do_after"
         result
       end
 
       def do_around &block
-        @value << "do_around_before"
+        value << "do_around_before"
         result = block.call
-        @value << "do_around_after"
+        value << "do_around_after"
         result
       end
     end
@@ -43,23 +41,21 @@ describe "Aspector" do
 
   it "multiple aspects should work together" do
     klass = Class.new do
-      attr :value
-
-      def initialize
-        @value = []
+      def value
+        @value ||= []
       end
 
       def test
-        @value << "test"
+        value << "test"
       end
     end
 
     aspector(klass) do
-      before(:test) { @value << 'first_aspect' }
+      before(:test) { value << 'first_aspect' }
     end
 
     aspector(klass) do
-      before(:test) { @value << 'second_aspect' }
+      before(:test) { value << 'second_aspect' }
     end
 
     obj = klass.new

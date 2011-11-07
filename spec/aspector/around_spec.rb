@@ -3,20 +3,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe "Around advices" do
   it "should work" do
     klass = Class.new do
-      attr :value
-
-      def initialize
-        @value = []
+      def value
+        @value ||= []
       end
 
       def test
-        @value << "test"
+        value << "test"
       end
 
       def do_this &block
-        @value << "before"
+        value << "before"
         result = block.call
-        @value << "after"
+        value << "after"
         result
       end
     end
@@ -32,22 +30,20 @@ describe "Around advices" do
 
   it "logic in block" do
     klass = Class.new do
-      attr :value
-
-      def initialize
-        @value = []
+      def value
+        @value ||= []
       end
 
       def test
-        @value << "test"
+        value << "test"
       end
     end
 
     aspector(klass) do
       around :test do |&block|
-        @value << "before"
+        value << "before"
         result = block.call
-        @value << "after"
+        value << "after"
         result
       end
     end

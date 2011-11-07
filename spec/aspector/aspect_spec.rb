@@ -3,18 +3,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe "Aspector::Aspect" do
   it "#apply" do
     klass = Class.new do
-      attr :value
-
-      def initialize
-        @value = []
+      def value
+        @value ||= []
       end
 
       def test
-        @value << "test"
+        value << "test"
       end
 
       def do_this
-        @value << "do_this"
+        value << "do_this"
       end
     end
 

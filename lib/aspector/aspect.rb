@@ -3,58 +3,6 @@ require 'erb'
 module Aspector
   class Aspect
 
-    METHOD_TEMPLATE = ERB.new <<-CODE
-    wrapped_method = instance_method(:<%= method %>)
-
-    define_method :<%= method %> do |*args, &block|
-      result = nil
-
-      # Before advices
-<% before_advices.each do |definition| %>
-<% if definition.options[:method_name_arg] %>
-      result = <%= definition.with_method %> '<%= method %>', *args
-<% else %>
-      result = <%= definition.with_method %> *args
-<% end %>
-
-      return result.value if result.is_a? ::Aspector::ReturnThis
-<% if definition.options[:skip_if_false] %>
-      return unless result
-<% end %>
-<% end %>
-
-<% if around_advice %>
-      # around advice
-<%   if around_advice.options[:method_name_arg] %>
-      result = <%= around_advice.with_method %> '<%= method %>', *args do |*args|
-        wrapped_method.bind(self).call *args, &block
-      end
-<%   else %>
-      result = <%= around_advice.with_method %> *args do |*args|
-        wrapped_method.bind(self).call *args, &block
-      end
-<%   end %>
-<% else %>
-      # Invoke wrapped method
-      result = wrapped_method.bind(self).call *args, &block
-<% end %>
-
-      # After advices
-<% after_advices.each do |definition| %>
-<% if definition.options[:method_name_arg] and definition.options[:result_arg] %>
-      result = <%= definition.with_method %> '<%= method %>', result, *args
-<% elsif definition.options[:method_name_arg] %>
-      <%= definition.with_method %> '<%= method %>', *args
-<% elsif definition.options[:result_arg] %>
-      result = <%= definition.with_method %> result, *args
-<% else %>
-      <%= definition.with_method %> *args
-<% end %>
-<% end %>
-      result
-    end
-    CODE
-
     attr_reader :advices, :deferred_logics
 
     def initialize options = {}, &block
@@ -73,13 +21,8 @@ module Aspector
         target.send :define_method, advice.with_method, advice.advice_block
       end
 
-      target.instance_methods.each do |method|
-        advices = advices_for_method method, aspect_instance
-        next if advices.empty?
-
-        recreate_method target, method, advices
-      end
-    end
+      aspect_instance.apply_to_methods
+   end
 
     def get_target target
       return target if target.is_a?(Module) and not @options[:eigen_class]
@@ -145,6 +88,15 @@ module Aspector
       @deferred_logics << logic
       logic
     end
+
+    def to_hash
+      { "type" => self.class.name,
+        "options" => @options,
+        "advices" => @advices.map {|advice| advice.to_s }
+      }
+    end
+
+    private
 
     def create_advice meta_data, klass_or_module, *methods, &block
       methods.flatten!

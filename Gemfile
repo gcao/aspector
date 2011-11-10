@@ -15,4 +15,6 @@ group :development do
   gem "guard-shell", "~> 0.1.1"
   gem 'rb-fsevent', "~> 0.4.3.1"
   gem 'growl', "~> 1.0.3"
+
+  gem 'awesome_print'
 end

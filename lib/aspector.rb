@@ -1,4 +1,5 @@
 require 'aspector/object_extension'
+require 'aspector/module_extension'
 
 require 'aspector/aspect'
 require 'aspector/advice'

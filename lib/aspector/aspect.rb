@@ -32,40 +32,6 @@ module Aspector
       end
     end
 
-    def advices_for_method method, context
-      @advices.select do |advice|
-        advice.match?(method, context)
-      end
-    end
-
-    def recreate_method target, method, advices
-      grouped_advices = []
-
-      advices.each do |advice|
-        if advice.around? and not grouped_advices.empty?
-          recreate_method_with_advices target, method, grouped_advices
-
-          grouped_advices = []
-        end
-
-        grouped_advices << advice
-      end
-
-      # create wrap method for before/after advices which are not wrapped inside around advice.
-      recreate_method_with_advices target, method, grouped_advices unless grouped_advices.empty?
-    end
-
-    def recreate_method_with_advices target, method, advices
-      before_advices = advices.select {|advice| advice.before? or advice.before_filter? }
-      after_advices  = advices.select {|advice| advice.after?  }
-      around_advice  = advices.first if advices.first.around?
-
-      code = METHOD_TEMPLATE.result(binding)
-      #puts code
-      # line no is the actual line no of METHOD_TEMPLATE + 5
-      target.class_eval code, __FILE__, 12
-    end
-
     def before *methods, &block
       @advices << create_advice(Aspector::AdviceMetadata::BEFORE, self, methods, &block)
     end

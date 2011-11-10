@@ -78,7 +78,7 @@ module Aspector
       advices = advices_for_method method
       return if advices.empty?
 
-      recreate_method @context, method, advices
+      recreate_method method, advices
     end
 
     def to_hash
@@ -130,13 +130,13 @@ module Aspector
       end
     end
 
-    def recreate_method target, method, advices
-      @aspector_creating_method = true
+    def recreate_method method, advices
+      @context.instance_variable_set(:@aspector_creating_method, true)
       grouped_advices = []
 
       advices.each do |advice|
         if advice.around? and not grouped_advices.empty?
-          recreate_method_with_advices target, method, grouped_advices
+          recreate_method_with_advices method, grouped_advices
 
           grouped_advices = []
         end
@@ -145,12 +145,12 @@ module Aspector
       end
 
       # create wrap method for before/after advices which are not wrapped inside around advice.
-      recreate_method_with_advices target, method, grouped_advices unless grouped_advices.empty?
+      recreate_method_with_advices method, grouped_advices unless grouped_advices.empty?
     ensure
-      @aspector_creating_method = nil
+      @context.instance_variable_set(:@aspector_creating_method, nil)
     end
 
-    def recreate_method_with_advices target, method, advices
+    def recreate_method_with_advices method, advices
       before_advices = advices.select {|advice| advice.before? or advice.before_filter? }
       after_advices  = advices.select {|advice| advice.after?  }
       around_advice  = advices.first if advices.first.around?
@@ -158,7 +158,7 @@ module Aspector
       code = METHOD_TEMPLATE.result(binding)
       #puts code
       # line no is the actual line no of METHOD_TEMPLATE + 5
-      target.class_eval code, __FILE__, 5
+      @context.class_eval code, __FILE__, 5
     end
 
   end

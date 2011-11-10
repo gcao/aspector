@@ -3,7 +3,7 @@ require 'erb'
 module Aspector
   class Aspect
 
-    attr_reader :advices, :deferred_logics
+    attr_reader :advices, :options, :deferred_logics
 
     def initialize options = {}, &block
       @options = options
@@ -12,24 +12,8 @@ module Aspector
     end
 
     def apply target, options = {}
-      target = get_target(target)
-
       aspect_instance = AspectInstance.new(target, self, options)
-
-      @advices.each do |advice|
-        next unless advice.advice_block
-        target.send :define_method, advice.with_method, advice.advice_block
-      end
-
-      aspect_instance.apply_to_methods
-   end
-
-    def get_target target
-      return target if target.is_a?(Module) and not @options[:eigen_class]
-
-      class << target
-        self
-      end
+      aspect_instance.apply
     end
 
     def before *methods, &block

@@ -54,14 +54,19 @@ module Aspector
     CODE
 
 
-    def initialize context, aspect, options = {}
-      @context = context
+    def initialize target, aspect, options = {}
+      @target = target
       @aspect = aspect
-      @options = options
+      @options = options.merge(aspect.options)
+      @context = get_context # Context is where advices will be applied (i.e. where methods are modified)
+    end
 
+    def apply
       invoke_deferred_logics
+      define_methods_for_advice_blocks
       add_to_instances
       add_hooks
+      apply_to_methods
     end
 
     def deferred_logic_results logic
@@ -95,12 +100,27 @@ module Aspector
 
     private
 
+    def get_context
+      return @target if @target.is_a?(Module) and not @options[:eigen_class]
+
+      class << @target
+        self
+      end
+    end
+
     def invoke_deferred_logics
       return unless @aspect.deferred_logics
 
       @deferred_logic_results ||= {}
       @aspect.deferred_logics.each do |logic|
         @deferred_logic_results[logic] = @context.class_eval(logic.code)
+      end
+    end
+
+    def define_methods_for_advice_blocks
+      @aspect.advices.each do |advice|
+        next unless advice.advice_block
+        @context.send :define_method, advice.with_method, advice.advice_block
       end
     end
 

@@ -55,7 +55,7 @@ module Aspector
     end
     CODE
 
-    attr :advices
+    attr_reader :advices, :deferred_logics
 
     def initialize options = {}, &block
       @options = options
@@ -63,8 +63,10 @@ module Aspector
       instance_eval &block
     end
 
-    def apply target
+    def apply target, options = {}
       target = get_target(target)
+
+      aspect_instance = AspectInstance.new(target, self, options)
 
       @advices.each do |advice|
         next unless advice.advice_block
@@ -72,7 +74,7 @@ module Aspector
       end
 
       target.instance_methods.each do |method|
-        advices = advices_for_method method
+        advices = advices_for_method method, aspect_instance
         next if advices.empty?
 
         recreate_method target, method, advices
@@ -87,9 +89,9 @@ module Aspector
       end
     end
 
-    def advices_for_method method
+    def advices_for_method method, context
       @advices.select do |advice|
-        advice.match?(method)
+        advice.match?(method, context)
       end
     end
 
@@ -135,6 +137,13 @@ module Aspector
 
     def around *methods, &block
       @advices << create_advice(Aspector::AdviceMetadata::AROUND, self, methods, &block)
+    end
+
+    def target code
+      logic = DeferredLogic.new(code)
+      @deferred_logics ||= []
+      @deferred_logics << logic
+      logic
     end
 
     def create_advice meta_data, klass_or_module, *methods, &block

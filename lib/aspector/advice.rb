@@ -20,9 +20,9 @@ module Aspector
       @with_method ||= "aspect_#{@parent.hash}_#{@parent.advices.index(self)}"
     end
 
-    def match? method
+    def match? method, context = nil
       return if method == with_method
-      return unless @method_matcher.match?(method)
+      return unless @method_matcher.match?(method, context)
 
       return true unless @options[:except]
 

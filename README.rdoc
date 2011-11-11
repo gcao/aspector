@@ -1,9 +1,58 @@
 = aspector
 
-Description goes here.
+aspector = ASPECT Oriented Ruby programming
+
+== Highlights
+
+* Encapsulate logic as aspects and apply to multiple targets easily
+* Support before/before_filter/after/around advices
+* Work anywhere - inside/outside the target class, before/after methods are created
+* Small codebase, intuitive API
+
+== Installation
+
+gem install aspector
+
+== Examples
+
+<pre>
+require 'aspector'
+
+class A
+  def test
+    puts 'test'
+  end
+end
+
+##############################
+
+TestAspect = Aspector do
+  target "
+    def do_this
+      puts 'do_this'
+    end
+  "
+
+  before :test, :do_this
+  before :test do
+    puts 'do_that'
+  end
+end
+
+TestAspect.apply(A)
+
+##############################
+
+A.new.test
+
+# Expected output:
+# do_this
+# do_that
+# test
+</pre>
 
 == Contributing to aspector
- 
+
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
 * Fork the project

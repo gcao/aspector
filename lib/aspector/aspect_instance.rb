@@ -87,15 +87,12 @@ module Aspector
     end
 
     def to_hash
-      { "type" => self.class.name,
+      {
+        "type" => self.class.name,
         "context" => @context.name,
         "options" => @options,
         "aspect" => @aspect.to_hash
       }
-    end
-
-    def to_s
-      to_hash.inspect
     end
 
     private

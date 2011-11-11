@@ -40,7 +40,8 @@ module Aspector
     end
 
     def to_hash
-      { "type" => self.class.name,
+      {
+        "type" => self.class.name,
         "options" => @options,
         "advices" => @advices.map {|advice| advice.to_s }
       }

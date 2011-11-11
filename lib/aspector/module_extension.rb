@@ -29,7 +29,7 @@ module Aspector
       aspect_instances = eigen_class.instance_variable_get(:@aspect_instances)
       return yield(method) if aspect_instances.nil? or aspect_instances.empty?
 
-      aspects_applied_flag = :"@singleton_aspects_applied_#{method}"
+      aspects_applied_flag = :"@aspects_applied_#{method}"
       return yield(method) if eigen_class.instance_variable_get(aspects_applied_flag)
 
       begin

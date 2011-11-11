@@ -15,41 +15,39 @@ gem install aspector
 
 == Examples
 
-<pre>
-require 'aspector'
+  require 'aspector'
 
-class A
-  def test
-    puts 'test'
-  end
-end
-
-##############################
-
-TestAspect = Aspector do
-  target "
-    def do_this
-      puts 'do_this'
+  class A
+    def test
+      puts 'test'
     end
-  "
-
-  before :test, :do_this
-  before :test do
-    puts 'do_that'
   end
-end
 
-TestAspect.apply(A)
+  ##############################
 
-##############################
+  TestAspect = Aspector do
+    target "
+      def do_this
+        puts 'do_this'
+      end
+    "
 
-A.new.test
+    before :test, :do_this
+    before :test do
+      puts 'do_that'
+    end
+  end
 
-# Expected output:
-# do_this
-# do_that
-# test
-</pre>
+  TestAspect.apply(A)
+
+  ##############################
+
+  A.new.test
+
+  # Expected output:
+  # do_this
+  # do_that
+  # test
 
 == Contributing to aspector
 

@@ -137,9 +137,9 @@ module Aspector
         eigen_class = class << @target; self; end
         orig_singleton_method_added = @target.method(:singleton_method_added)
 
-        eigen_class.send :define_method, :singleton_method_added do |m|
-          singleton_method_added_aspector(m) do |method|
-            orig_singleton_method_added.call method
+        eigen_class.send :define_method, :singleton_method_added do |method|
+          singleton_method_added_aspector(method) do
+            orig_singleton_method_added.call(method)
           end
         end
      else
@@ -151,9 +151,9 @@ module Aspector
           orig_method_added = eigen_class.method(:method_added)
         end
 
-        eigen_class.send :define_method, :method_added do |m|
-          method_added_aspector(m) do |method|
-            orig_method_added.call method
+        eigen_class.send :define_method, :method_added do |method|
+          method_added_aspector(method) do
+            orig_method_added.call(method)
           end
         end
       end

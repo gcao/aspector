@@ -65,7 +65,7 @@ module Aspector
       invoke_deferred_logics
       define_methods_for_advice_blocks
       add_to_instances
-      add_hooks
+      add_method_hooks
       apply_to_methods
     end
 
@@ -133,13 +133,31 @@ module Aspector
       aspect_instances << self
     end
 
-    def add_hooks
-      eigen_class = class << @context; self; end
-      orig_method_added = eigen_class.instance_method(:method_added)
+    def add_method_hooks
+      if @options[:eigen_class]
+        return unless @target.is_a?(Module)
 
-      eigen_class.send :define_method, :method_added do |m|
-        method_added_aspector(m) do |method|
-          orig_method_added.bind(self).call method
+        eigen_class = class << @target; self; end
+        orig_singleton_method_added = @target.method(:singleton_method_added)
+
+        eigen_class.send :define_method, :singleton_method_added do |m|
+          singleton_method_added_aspector(m) do |method|
+            orig_singleton_method_added.call method
+          end
+        end
+     else
+        eigen_class = class << @target; self; end
+
+        if @target.is_a? Module
+          orig_method_added = @target.method(:method_added)
+        else
+          orig_method_added = eigen_class.method(:method_added)
+        end
+
+        eigen_class.send :define_method, :method_added do |m|
+          method_added_aspector(m) do |method|
+            orig_method_added.call method
+          end
         end
       end
     end

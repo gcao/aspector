@@ -4,15 +4,15 @@ module Aspector
 
     def method_added_aspector method
       return yield(method) if @aspector_creating_method or
-                              @aspect_instances.nil? or @aspect_instances.empty?
+                              @aspector_instances.nil? or @aspector_instances.empty?
 
-      aspects_applied_flag = :"@aspects_applied_#{method}"
+      aspects_applied_flag = :"@aspector_applied_#{method}"
       return yield(method) if instance_variable_get(aspects_applied_flag)
 
       begin
         instance_variable_set(aspects_applied_flag, true)
 
-        @aspect_instances.apply_to_method(method.to_s)
+        @aspector_instances.apply_to_method(method.to_s)
 
         yield(method)
       ensure
@@ -26,10 +26,10 @@ module Aspector
 
       return yield(method) if eigen_class.instance_variable_get(:@aspector_creating_method)
 
-      aspect_instances = eigen_class.instance_variable_get(:@aspect_instances)
+      aspect_instances = eigen_class.instance_variable_get(:@aspector_instances)
       return yield(method) if aspect_instances.nil? or aspect_instances.empty?
 
-      aspects_applied_flag = :"@aspects_applied_#{method}"
+      aspects_applied_flag = :"@aspector_applied_#{method}"
       return yield(method) if eigen_class.instance_variable_get(aspects_applied_flag)
 
       begin

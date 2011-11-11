@@ -122,10 +122,10 @@ module Aspector
     end
 
     def add_to_instances
-      aspect_instances = @context.instance_variable_get(:@aspect_instances)
+      aspect_instances = @context.instance_variable_get(:@aspector_instances)
       unless aspect_instances
         aspect_instances = AspectInstances.new
-        @context.instance_variable_set(:@aspect_instances, aspect_instances)
+        @context.instance_variable_set(:@aspector_instances, aspect_instances)
       end
       aspect_instances << self
     end

@@ -3,7 +3,7 @@ module Aspector
     Module.send :include, self
 
     def method_added_aspector method
-      return (block_given? and yield) if 
+      return (block_given? and yield) if
         @aspector_creating_method or
         @aspector_instances.nil? or @aspector_instances.empty?
 

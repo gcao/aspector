@@ -65,8 +65,8 @@ module Aspector
       invoke_deferred_logics
       define_methods_for_advice_blocks
       add_to_instances
-      add_method_hooks
       apply_to_methods
+      add_method_hooks
     end
 
     def deferred_logic_results logic
@@ -142,7 +142,7 @@ module Aspector
             orig_singleton_method_added.call(method)
           end
         end
-     else
+      else
         eigen_class = class << @target; self; end
 
         if @target.is_a? Module

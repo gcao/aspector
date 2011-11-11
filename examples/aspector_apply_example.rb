@@ -10,7 +10,7 @@ end
 
 ##############################
 
-aspector(A) do
+TestAspect = Aspector do
   target "
     def do_this
       puts 'do_this'
@@ -22,6 +22,8 @@ aspector(A) do
     puts 'do_that'
   end
 end
+
+TestAspect.apply(A)
 
 ##############################
 

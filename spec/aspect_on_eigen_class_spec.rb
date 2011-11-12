@@ -37,7 +37,7 @@ describe "Aspector for eigen class" do
     end
 
     klass.test
-    klass.value.should == %w"do_around_before do_before test do_after do_around_after"
+    klass.value.should == %w"do_before do_around_before test do_around_after do_after"
   end
 
   it "new methods" do
@@ -80,7 +80,7 @@ describe "Aspector for eigen class" do
     end
 
     klass.test
-    klass.value.should == %w"do_around_before do_before test do_after do_around_after"
+    klass.value.should == %w"do_before do_around_before test do_around_after do_after"
   end
 
 end

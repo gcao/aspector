@@ -32,8 +32,8 @@ end
 A.new.test
 
 # Expected output:
-# before(block)
 # before
+# before(block)
 # test
-# after
 # after(block)
+# after

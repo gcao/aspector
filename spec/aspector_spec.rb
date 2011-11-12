@@ -36,7 +36,7 @@ describe "Aspector" do
 
     obj = klass.new
     obj.test
-    obj.value.should == %w"do_around_before do_before test do_after do_around_after"
+    obj.value.should == %w"do_before do_around_before test do_around_after do_after"
   end
 
   it "multiple aspects should work together" do

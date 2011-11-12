@@ -41,15 +41,22 @@ describe "Around advices" do
 
     aspector(klass) do
       around :test do |&block|
-        value << "before"
+        value << "before1"
         result = block.call
-        value << "after"
+        value << "after1"
+        result
+      end
+
+      around :test do |&block|
+        value << "before2"
+        result = block.call
+        value << "after2"
         result
       end
     end
 
     obj = klass.new
     obj.test
-    obj.value.should == %w"before test after"
+    obj.value.should == %w"before1 before2 test after2 after1"
   end
 end

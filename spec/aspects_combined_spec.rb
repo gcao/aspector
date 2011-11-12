@@ -50,6 +50,6 @@ describe "Aspects combined" do
 
     obj = klass.new
     obj.test
-    obj.value.should == %w"do_before_block do_around_before do_before new_test do_after do_around_after"
+    obj.value.should == %w"do_before_block do_before do_around_before new_test do_around_after do_after"
   end
 end

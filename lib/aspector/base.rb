@@ -193,6 +193,9 @@ module Aspector
     end
 
     class << self
+
+      attr_writer :options
+
       def advices
         @advices ||= []
       end
@@ -263,8 +266,8 @@ module Aspector
                              options,
                              &block)
       end
-    end
 
+    end
   end
 end
 

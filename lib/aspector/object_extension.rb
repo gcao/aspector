@@ -14,6 +14,7 @@ module Aspector
 
     def Aspector options = {}, &block
       klass = Class.new(Aspector::Base)
+      klass.options = options
       klass.class_eval &block if block_given?
       klass
     end

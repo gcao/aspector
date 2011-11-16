@@ -1,13 +1,12 @@
 require 'aspector/object_extension'
 require 'aspector/module_extension'
 
-require 'aspector/aspect'
+require 'aspector/base'
 require 'aspector/advice'
 require 'aspector/advice_metadata'
 require 'aspector/method_matcher'
 require 'aspector/deferred_logic'
 
-require 'aspector/aspect_instance'
-require 'aspector/aspect_instances'
+require 'aspector/aspects'
 
 require 'aspector/return_this'

@@ -1,7 +1,7 @@
 require 'erb'
 
 module Aspector
-  class AspectInstance
+  class Base
 
     METHOD_TEMPLATE = ERB.new <<-CODE
     wrapped_method = instance_method(:<%= method %>)
@@ -56,10 +56,9 @@ module Aspector
     CODE
 
 
-    def initialize target, aspect, options = {}
+    def initialize target, options = {}
       @target = target
-      @aspect = aspect
-      @options = options.merge(aspect.options)
+      @options = options.merge(self.class.options)
       @context = get_context # Context is where advices will be applied (i.e. where methods are modified)
     end
 
@@ -93,7 +92,7 @@ module Aspector
         "type" => self.class.name,
         "context" => @context.name,
         "options" => @options,
-        "aspect" => @aspect.to_hash
+        "aspect" => self.class.to_hash
       }
     end
 
@@ -108,16 +107,16 @@ module Aspector
     end
 
     def invoke_deferred_logics
-      return unless @aspect.deferred_logics
+      return unless self.class.deferred_logics
 
       @deferred_logic_results ||= {}
-      @aspect.deferred_logics.each do |logic|
+      self.class.deferred_logics.each do |logic|
         @deferred_logic_results[logic] = logic.apply @context
       end
     end
 
     def define_methods_for_advice_blocks
-      @aspect.advices.each do |advice|
+      self.class.advices.each do |advice|
         next unless advice.advice_block
         @context.send :define_method, advice.with_method, advice.advice_block
       end
@@ -162,7 +161,7 @@ module Aspector
     end
 
     def advices_for_method method
-      @aspect.advices.select do |advice|
+      self.class.advices.select do |advice|
         advice.match?(method, self)
       end
     end
@@ -193,5 +192,79 @@ module Aspector
       @context.class_eval code, __FILE__, 7
     end
 
+    class << self
+      def advices
+        @advices ||= []
+      end
+
+      def options
+        @options ||= {}
+      end
+
+      def deferred_logics
+        @deferred_logics ||= []
+      end
+
+      def apply target, options = {}
+        aspect_instance = new(target, options)
+        aspect_instance.apply
+      end
+
+      def before *methods, &block
+        advices << create_advice(Aspector::AdviceMetadata::BEFORE, self, methods, &block)
+      end
+
+      def before_filter *methods, &block
+        advices << create_advice(Aspector::AdviceMetadata::BEFORE_FILTER, self, methods, &block)
+      end
+
+      def after *methods, &block
+        advices << create_advice(Aspector::AdviceMetadata::AFTER, self, methods, &block)
+      end
+
+      def around *methods, &block
+        advices << create_advice(Aspector::AdviceMetadata::AROUND, self, methods, &block)
+      end
+
+      def target code = nil, &block
+        logic = DeferredLogic.new(code || block)
+        deferred_logics << logic
+        logic
+      end
+
+      def to_hash
+        {
+          "type" => self.name,
+          "options" => options,
+          "advices" => advices.map {|advice| advice.to_s }
+        }
+      end
+
+      private
+
+      def create_advice meta_data, klass_or_module, *methods, &block
+        methods.flatten!
+
+        options = meta_data.default_options.clone
+        options.merge!(methods.pop) if methods.last.is_a? Hash
+        options.merge!(meta_data.mandatory_options)
+
+        # Convert symbols to strings to avoid inconsistencies
+        methods.size.times do |i|
+          methods[i] = methods[i].to_s if methods[i].is_a? Symbol
+        end
+
+        with_method = methods.pop unless block_given?
+
+        Aspector::Advice.new(self,
+                             meta_data.advice_type,
+                             Aspector::MethodMatcher.new(*methods),
+                             with_method,
+                             options,
+                             &block)
+      end
+    end
+
   end
 end
+

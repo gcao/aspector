@@ -1,5 +1,3 @@
-require 'erb'
-
 module Aspector
   class Aspect
 

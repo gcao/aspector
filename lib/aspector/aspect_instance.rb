@@ -1,3 +1,5 @@
+require 'erb'
+
 module Aspector
   class AspectInstance
 
@@ -188,7 +190,7 @@ module Aspector
       code = METHOD_TEMPLATE.result(binding)
       #puts code
       # line no is the actual line no of METHOD_TEMPLATE + 5
-      @context.class_eval code, __FILE__, 5
+      @context.class_eval code, __FILE__, 7
     end
 
   end

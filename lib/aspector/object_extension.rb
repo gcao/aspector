@@ -4,7 +4,7 @@ module Aspector
     def aspector *args, &block
       options = args.last.is_a?(Hash) ? args.pop : {}
 
-      aspect = Aspector::Aspect.new(options, &block)
+      aspect = Aspector(options, &block)
 
       aspect.apply(self) if self.is_a? Module
       args.each {|target| aspect.apply(target) }
@@ -13,7 +13,10 @@ module Aspector
     end
 
     def Aspector options = {}, &block
-      Aspector::Aspect.new(options, &block)
+      klass = Class.new(Aspector::Base)
+      klass.options = options
+      klass.class_eval &block if block_given?
+      klass
     end
 
   end

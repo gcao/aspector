@@ -32,8 +32,8 @@ module Aspector
       @advices << create_advice(Aspector::AdviceMetadata::AROUND, self, methods, &block)
     end
 
-    def target code
-      logic = DeferredLogic.new(code)
+    def target code = nil, &block
+      logic = DeferredLogic.new(code || block)
       @deferred_logics ||= []
       @deferred_logics << logic
       logic

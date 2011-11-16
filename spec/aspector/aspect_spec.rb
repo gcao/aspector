@@ -39,6 +39,34 @@ describe "Aspector::Aspect" do
     end
 
     aspect = Aspector do
+      target do
+        def do_this
+          value << "do_this"
+        end
+      end
+
+      before :test, :do_this
+    end
+
+    aspect.apply(klass)
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"do_this test"
+  end
+
+  it "target takes String too" do
+     klass = Class.new do
+      def value
+        @value ||= []
+      end
+
+      def test
+        value << "test"
+      end
+    end
+
+    aspect = Aspector do
       target '
         def do_this
           value << "do_this"
@@ -54,4 +82,5 @@ describe "Aspector::Aspect" do
     obj.test
     obj.value.should == %w"do_this test"
   end
+
 end

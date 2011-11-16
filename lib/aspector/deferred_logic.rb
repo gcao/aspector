@@ -8,7 +8,11 @@ module Aspector
     end
 
     def apply target
-      @value = target.class_eval(@code)
+      if @code.is_a? String
+        @value = target.class_eval(@code)
+      else
+        @value = target.class_eval(&@code)
+      end
     end
 
   end

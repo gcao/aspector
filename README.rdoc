@@ -26,11 +26,11 @@ gem install aspector
   ##############################
 
   TestAspect = Aspector do
-    target "
+    target do
       def do_this
         puts 'do_this'
       end
-    "
+    end
 
     before :test, :do_this
     before :test do

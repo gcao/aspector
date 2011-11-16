@@ -1,7 +1,3 @@
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-
-require 'aspector'
-
 class A
   def test
     puts 'test'
@@ -11,11 +7,11 @@ end
 ##############################
 
 aspector(A) do
-  target "
+  target do
     def do_this
       puts 'do_this'
     end
-  "
+  end
 
   before :test, :do_this
   before :test do

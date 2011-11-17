@@ -78,13 +78,19 @@ module Aspector
       @context.instance_methods.each do |method|
         apply_to_method(method)
       end
+
+      if @options[:private_methods]
+        @context.private_instance_methods.each do |method|
+          apply_to_method(method, true)
+        end
+      end
     end
 
-    def apply_to_method method
+    def apply_to_method method, is_private = false
       advices = advices_for_method method
       return if advices.empty?
 
-      recreate_method method, advices
+      recreate_method method, advices, is_private
     end
 
     def to_hash
@@ -166,7 +172,7 @@ module Aspector
       end
     end
 
-    def recreate_method method, advices
+    def recreate_method method, advices, is_private
       @context.instance_variable_set(:@aspector_creating_method, true)
 
       before_advices = advices.select {|advice| advice.before? or advice.before_filter? }
@@ -181,6 +187,8 @@ module Aspector
       end
 
       recreate_method_with_advices method, before_advices, after_advices, around_advices.first
+
+      @context.send :private, method if is_private
     ensure
       @context.instance_variable_set(:@aspector_creating_method, nil)
     end

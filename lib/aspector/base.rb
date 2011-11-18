@@ -76,22 +76,35 @@ module Aspector
     end
 
     def apply_to_methods
-      @context.instance_methods.each do |method|
-        apply_to_method(method)
+      @context.public_instance_methods.each do |method|
+        apply_to_method(method, :public)
+      end
+
+      @context.protected_instance_methods.each do |method|
+        apply_to_method(method, :protected)
       end
 
       if @options[:private_methods]
         @context.private_instance_methods.each do |method|
-          apply_to_method(method, true)
+          apply_to_method(method, :private)
         end
       end
     end
 
-    def apply_to_method method, is_private = false
+    def apply_to_method method, scope = nil
       advices = advices_for_method method
       return if advices.empty?
 
-      recreate_method method, advices, is_private
+      scope ||=
+        if @context.private_instance_methods.include?(method.to_s)
+          :private
+        elsif @context.protected_instance_methods.include?(method.to_s)
+          :protected
+        else
+          :public
+        end
+
+      recreate_method method, advices, scope
     end
 
     def to_hash
@@ -126,6 +139,7 @@ module Aspector
       self.class.advices.each do |advice|
         next unless advice.advice_block
         @context.send :define_method, advice.with_method, advice.advice_block
+        @context.send :private, advice.with_method
       end
     end
 
@@ -173,7 +187,7 @@ module Aspector
       end
     end
 
-    def recreate_method method, advices, is_private
+    def recreate_method method, advices, scope
       @context.instance_variable_set(:@aspector_creating_method, true)
 
       before_advices = advices.select {|advice| advice.before? or advice.before_filter? }
@@ -189,7 +203,7 @@ module Aspector
 
       recreate_method_with_advices method, before_advices, after_advices, around_advices.first
 
-      @context.send :private, method if is_private
+      @context.send scope, method if scope != :public
     ensure
       @context.instance_variable_set(:@aspector_creating_method, nil)
     end

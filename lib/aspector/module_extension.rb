@@ -2,6 +2,8 @@ module Aspector
   module ModuleExtension
     Module.send :include, self
 
+    private
+
     def method_added_aspector method
       return (block_given? and yield) if
         @aspector_creating_method or

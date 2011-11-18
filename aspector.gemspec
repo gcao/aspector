@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{aspector}
-  s.version = "0.5.0"
+  s.version = "0.6.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Guoliang Cao"]
-  s.date = %q{2011-11-11}
+  s.date = %q{2011-11-18}
   s.description = %q{}
   s.email = %q{gcao99@gmail.com}
   s.extra_rdoc_files = [
@@ -28,28 +28,33 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "aspector.gemspec",
+    "examples/activerecord_hooks.rb",
     "examples/around_example.rb",
     "examples/aspector_apply_example.rb",
     "examples/aspector_example.rb",
     "lib/aspector.rb",
     "lib/aspector/advice.rb",
     "lib/aspector/advice_metadata.rb",
-    "lib/aspector/aspect.rb",
-    "lib/aspector/aspect_instance.rb",
-    "lib/aspector/aspect_instances.rb",
+    "lib/aspector/aspects.rb",
+    "lib/aspector/base.rb",
     "lib/aspector/deferred_logic.rb",
+    "lib/aspector/deferred_option.rb",
     "lib/aspector/method_matcher.rb",
     "lib/aspector/module_extension.rb",
     "lib/aspector/object_extension.rb",
     "lib/aspector/return_this.rb",
+    "spec/advices_on_private_methods_spec.rb",
     "spec/aspect_on_eigen_class_spec.rb",
     "spec/aspect_on_object_spec.rb",
     "spec/aspector/after_spec.rb",
     "spec/aspector/around_spec.rb",
     "spec/aspector/aspect_spec.rb",
+    "spec/aspector/base_spec.rb",
     "spec/aspector/before_spec.rb",
     "spec/aspector_spec.rb",
     "spec/aspects_combined_spec.rb",
+    "spec/execution_order_spec.rb",
     "spec/spec_helper.rb"
   ]
   s.homepage = %q{http://github.com/gcao/aspector}

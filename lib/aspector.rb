@@ -2,6 +2,7 @@ require 'aspector/object_extension'
 require 'aspector/module_extension'
 
 require 'aspector/base'
+require 'aspector/base_class_methods'
 require 'aspector/advice'
 require 'aspector/advice_metadata'
 require 'aspector/method_matcher'

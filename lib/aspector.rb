@@ -8,6 +8,6 @@ require 'aspector/method_matcher'
 require 'aspector/deferred_logic'
 require 'aspector/deferred_option'
 
-require 'aspector/aspects'
+require 'aspector/aspect_instances'
 
 require 'aspector/return_this'

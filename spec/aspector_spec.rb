@@ -83,7 +83,6 @@ describe "Aspector" do
     obj = klass.new
     obj.test
     obj.value.should == %w"before_test test"
-
   end
 
   it "should apply only once if called multiple times" do

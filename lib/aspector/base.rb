@@ -55,6 +55,7 @@ module Aspector
     end
     CODE
 
+    attr :options
 
     def initialize target, options = {}
       @target = target
@@ -202,8 +203,6 @@ module Aspector
 
     class << self
 
-      attr_writer :options
-
       def advices
         @advices ||= []
       end
@@ -217,8 +216,19 @@ module Aspector
       end
 
       def apply target, options = {}
+        instances = target.instance_variable_get(:@aspector_instances)
+        return if instances and instances.detect {|instance| instance.is_a?(self) }
+
         aspect_instance = new(target, options)
         aspect_instance.apply
+      end
+
+      def default options
+        if @options
+          @options.merge! options
+        else
+          @options = options
+        end
       end
 
       def before *methods, &block
@@ -241,6 +251,10 @@ module Aspector
         logic = DeferredLogic.new(code || block)
         deferred_logics << logic
         logic
+      end
+
+      def deferred_option key
+        DeferredOption.new(key)
       end
 
       def to_hash

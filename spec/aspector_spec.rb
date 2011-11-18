@@ -62,4 +62,51 @@ describe "Aspector" do
     obj.test
     obj.value.should == %w"second_aspect first_aspect test"
   end
+
+  it "treating Aspect as regular class should work" do
+    klass = Class.new do
+      def value
+        @value ||= []
+      end
+
+      def test
+        value << "test"
+      end
+    end
+
+    class TestAspect < Aspector::Base
+      before(:test) { value << 'before_test' }
+    end
+
+    TestAspect.apply(klass)
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"before_test test"
+
+  end
+
+  it "should apply only once if called multiple times" do
+    klass = Class.new do
+      def value
+        @value ||= []
+      end
+
+      def test
+        value << "test"
+      end
+    end
+
+    aspect = Aspector do
+      before(:test) { value << 'before_test' }
+    end
+
+    aspect.apply(klass)
+    aspect.apply(klass)
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"before_test test"
+  end
+
 end

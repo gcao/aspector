@@ -14,8 +14,17 @@ module Aspector
         when Symbol
           item.to_s == method
         when DeferredLogic
-          new_matcher = MethodMatcher.new(context.deferred_logic_results[item])
-          new_matcher.match?(item)
+          value = context.deferred_logic_results[item]
+          if value
+            new_matcher = MethodMatcher.new(*[value].flatten)
+            new_matcher.match?(method)
+          end
+        when DeferredOption
+          value = context.options[item.key]
+          if value
+            new_matcher = MethodMatcher.new(*[value].flatten)
+            new_matcher.match?(method)
+          end
         end
       end
     end

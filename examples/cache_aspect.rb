@@ -14,20 +14,17 @@ class SimpleCache
     found = @data[key]  # found is like [time, value]
 
     if found
+      puts "Found in cache: #{key}"
       insertion_time, value = *found
 
-      if insertion_time < Time.now - ttl
-        found = nil
-      end
+      return value if Time.now < insertion_time + ttl
+
+      puts "Expired: #{key}"
     end
 
-    if found
-      value
-    else
-      value = yield
-      @data[key] = [Time.now, value]
-      value
-    end
+    value = yield
+    @data[key] = [Time.now, value]
+    value
   end
 end
 

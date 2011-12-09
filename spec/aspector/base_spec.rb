@@ -6,7 +6,7 @@ describe "Aspector::Base" do
       default :test => 'value'
     end
 
-    aspect.options[:test].should == 'value'
+    aspect.default_options[:test].should == 'value'
   end
 
   it "deferred_option" do
@@ -21,7 +21,7 @@ describe "Aspector::Base" do
     end
 
     aspect = Aspector do
-      before deferred_option(:methods) do
+      before options[:methods] do
         value << "do_this"
       end
     end

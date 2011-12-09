@@ -34,7 +34,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'aspector'
 
 class CacheAspect < Aspector::Base
-  around deferred_option(:method), :context_arg => true do |context, &block|
+  around options[:method], :context_arg => true do |context, &block|
     SimpleCache.cache 'test', context.options[:ttl] do
       block.call
     end

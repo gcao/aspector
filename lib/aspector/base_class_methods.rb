@@ -7,8 +7,8 @@ module Aspector
         @advices ||= []
       end
 
-      def options
-        @options ||= {}
+      def default_options
+        @default_options ||= {}
       end
 
       def deferred_logics
@@ -24,10 +24,10 @@ module Aspector
       end
 
       def default options
-        if @options
-          @options.merge! options
+        if @default_options
+          @default_options.merge! options
         else
-          @options = options
+          @default_options = options
         end
       end
 
@@ -53,8 +53,8 @@ module Aspector
         logic
       end
 
-      def deferred_option key
-        DeferredOption.new(key)
+      def options
+        DeferredOption.new
       end
 
       private

@@ -7,7 +7,7 @@ module Aspector
 
     def initialize target, options = {}
       @target = target
-      @options = options.merge(self.class.options)
+      @options = options.merge(self.class.default_options)
       @context = get_context # Context is where advices will be applied (i.e. where methods are modified)
     end
 

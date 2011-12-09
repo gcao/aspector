@@ -3,8 +3,9 @@ module Aspector
 
     attr_reader :key
 
-    def initialize key
+    def [] key
       @key = key
+      self
     end
 
   end

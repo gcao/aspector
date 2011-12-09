@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe "Aspector::Aspect" do
+describe "Miscellaneous" do
   it "#apply" do
     klass = Class.new do
       def value

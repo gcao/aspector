@@ -15,8 +15,6 @@ gem install aspector
 
 == Examples
 
-  require 'aspector'
-
   class A
     def test
       puts 'test'
@@ -24,6 +22,8 @@ gem install aspector
   end
 
   ##############################
+
+  require 'aspector'
 
   class TestAspect < Aspector::Base
     target do

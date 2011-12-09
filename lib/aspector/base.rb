@@ -154,29 +154,32 @@ module Aspector
     end
 
     METHOD_TEMPLATE = ERB.new <<-CODE
+    target = self
     wrapped_method = instance_method(:<%= method %>)
 
     define_method :<%= method %> do |*args, &block|
       result = nil
 
       # Before advices
-<% before_advices.each do |definition| %>
-<% if definition.options[:method_name_arg] %>
-      result = <%= definition.with_method %> '<%= method %>', *args
+<% before_advices.each do |advice| %>
+<% if advice.options[:context_arg] %>
+      context = Aspector::Context.new(target, <%= self.hash %>, <%= advice.hash %>)
+      result = <%= advice.with_method %> context, *args
 <% else %>
-      result = <%= definition.with_method %> *args
+      result = <%= advice.with_method %> *args
 <% end %>
 
       return result.value if result.is_a? ::Aspector::ReturnThis
-<% if definition.options[:skip_if_false] %>
+<% if advice.options[:skip_if_false] %>
       return unless result
 <% end %>
 <% end %>
 
 <% if around_advice %>
       # around advice
-<%   if around_advice.options[:method_name_arg] %>
-      result = <%= around_advice.with_method %> '<%= method %>', *args do |*args|
+<%   if around_advice.options[:context_arg] %>
+      context = Aspector::Context.new(target, <%= self.hash %>, <%= around_advice.hash %>)
+      result = <%= around_advice.with_method %> context, *args do |*args|
         wrapped_method.bind(self).call *args, &block
       end
 <%   else %>
@@ -190,15 +193,16 @@ module Aspector
 <% end %>
 
       # After advices
-<% after_advices.each do |definition| %>
-<% if definition.options[:method_name_arg] and definition.options[:result_arg] %>
-      result = <%= definition.with_method %> '<%= method %>', result, *args
-<% elsif definition.options[:method_name_arg] %>
-      <%= definition.with_method %> '<%= method %>', *args
-<% elsif definition.options[:result_arg] %>
-      result = <%= definition.with_method %> result, *args
+<% after_advices.each do |advice| %>
+<% if advice.options[:context_arg] and advice.options[:result_arg] %>
+      context = Aspector::Context.new(target, <%= self.hash %>, <%= advice.hash %>)
+      result = <%= advice.with_method %> context, result, *args
+<% elsif advice.options[:context_arg] %>
+      <%= advice.with_method %> context, *args
+<% elsif advice.options[:result_arg] %>
+      result = <%= advice.with_method %> result, *args
 <% else %>
-      <%= definition.with_method %> *args
+      <%= advice.with_method %> *args
 <% end %>
 <% end %>
       result

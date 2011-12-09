@@ -8,7 +8,9 @@ module Aspector
     def initialize target, options = {}
       @target = target
       @options = options.merge(self.class.default_options)
-      @context = get_context # Context is where advices will be applied (i.e. where methods are modified)
+      # @context is where advices will be applied (i.e. where methods are modified), can be different from target
+      @context = get_context
+      after_initialization
     end
 
     def apply
@@ -17,6 +19,7 @@ module Aspector
       add_to_instances
       apply_to_methods
       add_method_hooks
+      after_application
     end
 
     def deferred_logic_results logic
@@ -53,6 +56,16 @@ module Aspector
         end
 
       recreate_method method, advices, scope
+    end
+
+    protected
+
+    # Hook method that runs after an aspect is instantiated
+    def after_initialization
+    end
+
+    # Hook method that runs after an aspect is applied
+    def after_application
     end
 
     private

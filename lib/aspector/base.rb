@@ -164,6 +164,7 @@ module Aspector
 <% before_advices.each do |advice| %>
 <% if advice.options[:context_arg] %>
       context = Aspector::Context.new(target, <%= self.hash %>, <%= advice.hash %>)
+      context.method_name = '<%= method %>'
       result = <%= advice.with_method %> context, *args
 <% else %>
       result = <%= advice.with_method %> *args
@@ -179,6 +180,7 @@ module Aspector
       # around advice
 <%   if around_advice.options[:context_arg] %>
       context = Aspector::Context.new(target, <%= self.hash %>, <%= around_advice.hash %>)
+      context.method_name = '<%= method %>'
       result = <%= around_advice.with_method %> context, *args do |*args|
         wrapped_method.bind(self).call *args, &block
       end
@@ -196,6 +198,7 @@ module Aspector
 <% after_advices.each do |advice| %>
 <% if advice.options[:context_arg] and advice.options[:result_arg] %>
       context = Aspector::Context.new(target, <%= self.hash %>, <%= advice.hash %>)
+      context.method_name = '<%= method %>'
       result = <%= advice.with_method %> context, result, *args
 <% elsif advice.options[:context_arg] %>
       <%= advice.with_method %> context, *args

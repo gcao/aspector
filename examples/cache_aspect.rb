@@ -35,13 +35,13 @@ require 'aspector'
 
 class CacheAspect < Aspector::Base
   around options[:method], :context_arg => true do |context, &block|
-    SimpleCache.cache 'test', context.options[:ttl] do
+    SimpleCache.cache context.method_name, context.options[:ttl] do
       block.call
     end
   end
 end
 
-CacheAspect.apply A, :method => :test, :ttl => 2 # 2 seconds
+CacheAspect.apply A, :method => :test, :ttl => 2  # 2 seconds
 
 ##############################
 

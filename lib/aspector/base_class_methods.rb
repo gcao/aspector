@@ -16,11 +16,9 @@ module Aspector
       end
 
       def apply target, options = {}
-        instances = target.instance_variable_get(:@aspector_instances)
-        return if instances and instances.detect {|instance| instance.is_a?(self) }
-
         aspect_instance = new(target, options)
         aspect_instance.apply
+        aspect_instance
       end
 
       def default options

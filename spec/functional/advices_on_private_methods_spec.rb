@@ -1,11 +1,13 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe "Aspector for object" do
+describe "Advices on private methods" do
   it "should work" do
     klass = Class.new do
       def value
         @value ||= []
       end
+
+      private
 
       def test
         value << "test"
@@ -16,17 +18,12 @@ describe "Aspector for object" do
       end
     end
 
-    obj = klass.new
-
-    aspector(obj) do
+    aspector(klass, :private_methods => true) do
       before :test, :do_before
     end
 
-    obj.test
+    obj = klass.new
+    obj.send :test
     obj.value.should == %w"do_before test"
-
-    obj2 = klass.new
-    obj2.test
-    obj2.value.should == %w"test"
   end
 end

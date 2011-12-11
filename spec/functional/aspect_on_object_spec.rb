@@ -2,24 +2,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Aspector for object" do
   it "should work" do
-    klass = Class.new do
-      def value
-        @value ||= []
-      end
-
-      def test
-        value << "test"
-      end
-
-      def do_before
-        value << "do_before"
-      end
-    end
+    klass = create_test_class
 
     obj = klass.new
 
     aspector(obj) do
-      before :test, :do_before
+      before :test do value << "do_before" end
     end
 
     obj.test

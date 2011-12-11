@@ -11,29 +11,20 @@ describe "Aspector for eigen class" do
         def test
           value << "test"
         end
-
-        def do_before
-          value << "do_before"
-        end
-
-        def do_after result
-          value << "do_after"
-          result
-        end
-
-        def do_around &block
-          value << "do_around_before"
-          result = block.call
-          value << "do_around_after"
-          result
-        end
       end
     end
 
     aspector(klass, :eigen_class => true) do
-      before :test, :do_before
-      after  :test, :do_after
-      around :test, :do_around
+      before :test do value << "do_before" end
+
+      after  :test do value << "do_after"  end
+
+      around :test do |&block|
+        value   <<  "do_around_before"
+        result  =   block.call
+        value   <<  "do_around_after"
+        result
+      end
     end
 
     klass.test
@@ -46,36 +37,25 @@ describe "Aspector for eigen class" do
         def value
           @value ||= []
         end
-
-        def do_before
-          value << "do_before"
-        end
-
-        def do_after result
-          value << "do_after"
-          result
-        end
-
-        def do_around &block
-          value << "do_around_before"
-          result = block.call
-          value << "do_around_after"
-          result
-        end
       end
     end
 
     aspector(klass, :eigen_class => true) do
-      before :test, :do_before
-      after  :test, :do_after
-      around :test, :do_around
+      before :test do value << "do_before" end
+
+      after  :test do value << "do_after"  end
+
+      around :test do |&block|
+        value   <<  "do_around_before"
+        result  =   block.call
+        value   <<  "do_around_after"
+        result
+      end
     end
 
-    klass.class_eval do
-      class << self
-        def test
-          value << "test"
-        end
+    klass.instance_eval do
+      def test
+        value << "test"
       end
     end
 

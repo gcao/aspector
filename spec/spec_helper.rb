@@ -10,3 +10,19 @@ Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 RSpec.configure do |config|
   config.mock_with :mocha
 end
+
+def create_test_class &block
+  klass = Class.new do
+    def value
+      @value ||= []
+    end
+
+    def test
+      value << "test"
+    end
+  end
+
+  klass.class_eval &block if block_given?
+  klass
+end
+

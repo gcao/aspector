@@ -2,54 +2,41 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Aspects combined" do
   it "should work" do
-    klass = Class.new do
-      def value
-        @value ||= []
-      end
+    klass = create_test_class
 
-      def test
-        value << "test"
-      end
+    aspector(klass) do
+      before :test do value << "do_before" end
 
-      def do_before
-        value << "do_before"
-      end
+      after  :test do value << "do_after"  end
 
-      def do_after result
-        value << "do_after"
-        result
-      end
-
-      def do_around &block
-        value << "do_around_before"
-        result = block.call
-        value << "do_around_after"
+      around :test do |&block|
+        value   <<  "do_around_before"
+        result  =   block.call
+        value   <<  "do_around_after"
         result
       end
     end
 
     aspector(klass) do
-      before :test, :do_before
-      after  :test, :do_after
-      around :test, :do_around
-    end
+      before :test do value << "do_before2" end
 
-    klass.class_eval do
-      aspector do
-        before(:test) { value << "do_before_block" }
-      end
+      after  :test do value << "do_after2"  end
 
-      def self.method_added method
-        method_added_aspector(method)
-      end
-
-      def test
-        value << "new_test"
+      around :test do |&block|
+        value   <<  "do_around_before2"
+        result  =   block.call
+        value   <<  "do_around_after2"
+        result
       end
     end
 
     obj = klass.new
     obj.test
-    obj.value.should == %w"do_before_block do_before do_around_before new_test do_around_after do_after"
+    obj.value.should == %w"
+      do_before2 do_around_before2
+      do_before do_around_before
+      test
+      do_around_after do_after
+      do_around_after2 do_after2"
   end
 end

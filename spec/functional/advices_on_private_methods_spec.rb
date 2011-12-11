@@ -2,24 +2,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Advices on private methods" do
   it "should work" do
-    klass = Class.new do
-      def value
-        @value ||= []
-      end
+    klass = create_test_class do
+      private :test
+    end
 
-      private
-
-      def test
-        value << "test"
-      end
-
-      def do_before
-        value << "do_before"
-      end
+    aspector(klass) do
+      before :test do value << "do_before(public_methods_only)" end
     end
 
     aspector(klass, :private_methods => true) do
-      before :test, :do_before
+      before :test do value << "do_before" end
     end
 
     obj = klass.new

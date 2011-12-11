@@ -2,9 +2,10 @@ module Aspector
   class MethodMatcher
     def initialize *match_data
       @match_data = match_data
+      @match_data.flatten!
     end
 
-    def match? method, context = nil
+    def match? method, aspect = nil
       @match_data.detect do |item|
         case item
         when String
@@ -14,15 +15,15 @@ module Aspector
         when Symbol
           item.to_s == method
         when DeferredLogic
-          value = context.deferred_logic_results[item]
+          value = aspect.deferred_logic_results[item]
           if value
             new_matcher = MethodMatcher.new(*[value].flatten)
             new_matcher.match?(method)
           end
         when DeferredOption
-          value = context.options[item.key]
+          value = aspect.options[item.key]
           if value
-            new_matcher = MethodMatcher.new(*[value].flatten)
+            new_matcher = MethodMatcher.new(value)
             new_matcher.match?(method)
           end
         end

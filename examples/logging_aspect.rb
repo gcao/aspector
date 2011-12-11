@@ -13,6 +13,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'aspector'
 
 class LoggingAspect < Aspector::Base
+
   ALL_METHODS = /.*/
 
   around ALL_METHODS, :except => :class, :context_arg => true do |context, *args, &block|

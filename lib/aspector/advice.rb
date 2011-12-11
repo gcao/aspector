@@ -26,7 +26,7 @@ module Aspector
 
       return true unless @options[:except]
 
-      @except ||= MethodMatcher.new([@options[:except]].flatten)
+      @except ||= MethodMatcher.new(*([@options[:except]].flatten))
 
       not @except.match?(method)
     end

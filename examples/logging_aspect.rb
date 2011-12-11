@@ -14,7 +14,7 @@ require 'aspector'
 
 class LoggingAspect < Aspector::Base
 
-  around :test, :context_arg => true do |context, *args, &block|
+  around /.*/, :except => [:class], :context_arg => true do |context, *args, &block|
     class_method = "#{self.class}.#{context.method_name}"
     puts "Entering #{class_method}: #{args.join(',')}"
     result = block.call *args

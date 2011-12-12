@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Aspector::Base" do
-  it "Default options" do
+  it "default options" do
     aspect = Aspector do
       default :test => 'value'
     end
@@ -9,16 +9,8 @@ describe "Aspector::Base" do
     aspect.default_options[:test].should == 'value'
   end
 
-  it "deferred_option" do
-    klass = Class.new do
-      def value
-        @value ||= []
-      end
-
-      def test
-        value << "test"
-      end
-    end
+  it "#options is used to access options set when aspect is applied" do
+    klass = create_test_class
 
     aspect = Aspector do
       before options[:methods] do
@@ -26,10 +18,64 @@ describe "Aspector::Base" do
       end
     end
 
-    aspect.apply(klass, :methods => [:test])
+    aspect.apply(klass, :methods => :test)
 
     obj = klass.new
     obj.test
     obj.value.should == %w"do_this test"
   end
+
+  it "#apply" do
+    klass = create_test_class
+
+    aspect = Aspector do
+      before :test do value << "do_before" end
+    end
+
+    aspect.apply(klass)
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"do_before test"
+  end
+
+  it "use #target to add method to target class/module" do
+    klass = create_test_class
+
+    aspector(klass) do
+      target do
+        def do_this
+          value << "do_this"
+        end
+      end
+
+      before :test, :do_this
+    end
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"do_this test"
+  end
+
+  it "#target takes String too" do
+    klass = create_test_class
+
+    aspect = Aspector do
+      target '
+        def do_this
+          value << "do_this"
+        end
+      '
+
+      before :test, :do_this
+    end
+
+    aspect.apply(klass)
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"do_this test"
+  end
+
 end
+

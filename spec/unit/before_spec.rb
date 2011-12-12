@@ -2,15 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Before advices" do
   it "should work" do
-    klass = Class.new do
-      def value
-        @value ||= []
-      end
-
-      def test
-        value << "test"
-      end
-
+    klass = create_test_class do
       def do_this
         value << "do_this"
       end
@@ -26,15 +18,7 @@ describe "Before advices" do
   end
 
   it "logic in block" do
-    klass = Class.new do
-      def value
-        @value ||= []
-      end
-
-      def test
-        value << "test"
-      end
-    end
+    klass = create_test_class
 
     aspector(klass) do
       before(:test){ value << 'do_block' }
@@ -70,3 +54,4 @@ describe "Before advices" do
   end
 
 end
+

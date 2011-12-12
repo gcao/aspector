@@ -1,10 +1,11 @@
 module Aspector
   class Context
 
+    attr :target
     attr_accessor :method_name
 
     def initialize(target, aspect_hash, advice_hash)
-      @target = target
+      @target      = target
       @aspect_hash = aspect_hash
       @advice_hash = advice_hash
     end

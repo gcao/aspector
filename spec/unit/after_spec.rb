@@ -2,15 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "After advices" do
   it "should work" do
-    klass = Class.new do
-      def value
-        @value ||= []
-      end
-
-      def test
-        value << "test"
-      end
-
+    klass = create_test_class do
       def do_this result
         value << "do_this"
         result
@@ -27,15 +19,7 @@ describe "After advices" do
   end
 
   it "context_arg" do
-    klass = Class.new do
-      def value
-        @value ||= []
-      end
-
-      def test
-        value << "test"
-      end
-
+    klass = create_test_class do
       def do_this context, result
         value << "do_this"
         result
@@ -51,41 +35,43 @@ describe "After advices" do
     obj.value.should == %w"test do_this"
   end
 
-  it "result_arg set to false" do
-    klass = Class.new do
-      def value
-        @value ||= []
-      end
+  it "new result will be returned by default" do
+    klass = create_test_class
 
+    aspector(klass) do
+      after :test do |result|
+        value << "do_after"
+        'do_after'
+      end
+    end
+
+    obj = klass.new
+    obj.test.should == 'do_after'
+    obj.value.should == %w"test do_after"
+  end
+
+  it "result_arg set to false" do
+    klass = create_test_class do
       def test
         value << "test"
         'test'
       end
-
-      def do_this
-        value << "do_this"
-      end
     end
 
     aspector(klass) do
-      after :test, :do_this, :result_arg => false
+      after :test, :result_arg => false do
+        value << "do_after"
+        'do_after'
+      end
     end
 
     obj = klass.new
     obj.test.should == 'test'
-    obj.value.should == %w"test do_this"
+    obj.value.should == %w"test do_after"
   end
 
   it "logic in block" do
-    klass = Class.new do
-      def value
-        @value ||= []
-      end
-
-      def test
-        value << "test"
-      end
-    end
+    klass = create_test_class
 
     aspector(klass) do
       after(:test) do |result|
@@ -99,3 +85,4 @@ describe "After advices" do
     obj.value.should == %w"test do_block"
   end
 end
+

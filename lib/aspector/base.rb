@@ -150,8 +150,8 @@ module Aspector
     def recreate_method method, advices, scope
       @context.instance_variable_set(:@aspector_creating_method, true)
 
-      before_advices = advices.select {|advice| advice.before? or advice.before_filter? }
-      after_advices  = advices.select {|advice| advice.after? }
+      before_advices = advices.select {|advice| advice.before? }
+      after_advices  = advices.select {|advice| advice.after?  }
       around_advices = advices.select {|advice| advice.around? }
 
       if around_advices.size > 1

@@ -13,7 +13,7 @@ module Aspector
       @method_matcher = method_matcher
       @with_method    = with_method
       @options        = options
-      @advice_block   = block.to_proc if block_given?
+      @advice_block   = block
     end
 
     def with_method
@@ -32,11 +32,7 @@ module Aspector
     end
 
     def before?
-      type == BEFORE and not options[:skip_if_false]
-    end
-
-    def before_filter?
-      type == BEFORE and options[:skip_if_false]
+      type == BEFORE
     end
 
     def after?

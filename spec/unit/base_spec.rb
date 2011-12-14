@@ -57,6 +57,26 @@ describe "Aspector::Base" do
     obj.value.should == %w"do_this test"
   end
 
+  it "#target takes aspect as argument" do
+    klass = create_test_class
+
+    class TargetArgumentTestAspect < Aspector::Base
+      target do |aspect|
+        define_method :do_this do
+          value << "do_this(#{aspect.class})"
+        end
+      end
+
+      before :test, :do_this
+    end
+
+    TargetArgumentTestAspect.apply(klass)
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"do_this(TargetArgumentTestAspect) test"
+  end
+
   it "#target takes String too" do
     klass = create_test_class
 

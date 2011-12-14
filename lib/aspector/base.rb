@@ -91,7 +91,7 @@ module Aspector
 
       @deferred_logic_results ||= {}
       self.class.deferred_logics.each do |logic|
-        @deferred_logic_results[logic] = logic.apply @context
+        @deferred_logic_results[logic] = logic.apply @context, self
       end
     end
 

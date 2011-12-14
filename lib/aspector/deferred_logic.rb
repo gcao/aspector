@@ -7,8 +7,8 @@ module Aspector
       @code = code
     end
 
-    def apply target
-      @code.is_a?(String) ? target.class_eval(@code) : target.class_eval(&@code)
+    def apply target, *args
+      @code.is_a?(String) ? target.class_eval(@code) : target.class_exec(*args, &@code)
     end
 
   end

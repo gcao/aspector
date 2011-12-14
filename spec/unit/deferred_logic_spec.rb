@@ -12,6 +12,12 @@ module Aspector
       logic.apply(klass).should == 'test'
     end
 
+    it "block can take an argument" do
+      logic = DeferredLogic.new(lambda{|arg| arg })
+
+      logic.apply(Class.new, 'test').should == 'test'
+    end
+
     it "should work with string" do
       klass = Class.new do
         def self.test; 'test'; end

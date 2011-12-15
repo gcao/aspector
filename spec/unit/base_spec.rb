@@ -77,25 +77,5 @@ describe "Aspector::Base" do
     obj.value.should == %w"do_this(TargetArgumentTestAspect) test"
   end
 
-  it "#target takes String too" do
-    klass = create_test_class
-
-    aspect = Aspector do
-      target '
-        def do_this
-          value << "do_this"
-        end
-      '
-
-      before :test, :do_this
-    end
-
-    aspect.apply(klass)
-
-    obj = klass.new
-    obj.test
-    obj.value.should == %w"do_this test"
-  end
-
 end
 

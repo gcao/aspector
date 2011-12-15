@@ -18,16 +18,6 @@ module Aspector
       logic.apply(Class.new, 'test').should == 'test'
     end
 
-    it "should work with string" do
-      klass = Class.new do
-        def self.test; 'test'; end
-      end
-
-      logic = DeferredLogic.new('test')
-
-      logic.apply(klass).should == 'test'
-    end
-
   end
 end
 

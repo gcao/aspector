@@ -183,33 +183,38 @@ module Aspector
 
       # Before advices
 <% before_advices.each do |advice| %>
-<% if advice.options[:context_arg] %>
+  <% if advice.options[:context_arg] %>
       context = Aspector::Context.new(target, <%= self.hash %>, <%= advice.hash %>)
       context.method_name = '<%= method %>'
       result = <%= advice.with_method %> context, *args
-<% else %>
+  <% elsif advice.options[:method_name_arg] %>
+      result = <%= advice.with_method %> '<%= method %>', *args
+  <% else %>
       result = <%= advice.with_method %> *args
-<% end %>
+  <% end %>
 
       return result.value if result.is_a? ::Aspector::ReturnThis
-<% if advice.options[:skip_if_false] %>
+  <% if advice.options[:skip_if_false] %>
       return unless result
-<% end %>
+  <% end %>
 <% end %>
 
 <% if around_advice %>
-      # around advice
-<%   if around_advice.options[:context_arg] %>
+  <% if around_advice.options[:context_arg] %>
       context = Aspector::Context.new(target, <%= self.hash %>, <%= around_advice.hash %>)
       context.method_name = '<%= method %>'
       result = <%= around_advice.with_method %> context, *args do |*args|
         wrapped_method.bind(self).call *args, &block
       end
-<%   else %>
+  <% elsif around_advice.options[:method_name_arg] %>
+      result = <%= around_advice.with_method %> '<%= method %>', *args do |*args|
+        wrapped_method.bind(self).call *args, &block
+      end
+  <% else %>
       result = <%= around_advice.with_method %> *args do |*args|
         wrapped_method.bind(self).call *args, &block
       end
-<%   end %>
+  <% end %>
 <% else %>
       # Invoke wrapped method
       result = wrapped_method.bind(self).call *args, &block
@@ -217,17 +222,27 @@ module Aspector
 
       # After advices
 <% after_advices.each do |advice| %>
-<% if advice.options[:context_arg] and advice.options[:result_arg] %>
+  <% if advice.options[:context_arg] %>
+    <% if advice.options[:result_arg] %>
       context = Aspector::Context.new(target, <%= self.hash %>, <%= advice.hash %>)
       context.method_name = '<%= method %>'
       result = <%= advice.with_method %> context, result, *args
-<% elsif advice.options[:context_arg] %>
+    <% else %>
       <%= advice.with_method %> context, *args
-<% elsif advice.options[:result_arg] %>
-      result = <%= advice.with_method %> result, *args
-<% else %>
-      <%= advice.with_method %> *args
-<% end %>
+    <% end %>
+  <% elsif advice.options[:method_name_arg] %>
+    <% if advice.options[:result_arg] %>
+        result = <%= advice.with_method %> '<%= method %>', result, *args
+    <% else %>
+        <%= advice.with_method %> '<%= method %>', *args
+    <% end %>
+  <% else %>
+    <% if advice.options[:result_arg] %>
+        result = <%= advice.with_method %> result, *args
+    <% else %>
+        <%= advice.with_method %> *args
+    <% end %>
+  <% end %>
 <% end %>
       result
     end

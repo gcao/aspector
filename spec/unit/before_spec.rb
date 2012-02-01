@@ -53,5 +53,29 @@ describe "Before advices" do
     obj.value.should == %w"do_this test"
   end
 
+  it "method_name_arg" do
+    klass = Class.new do
+      aspector do
+        before :test, :do_this, :method_name_arg => true
+      end
+
+      def value
+        @value ||= []
+      end
+
+      def test
+        value << "test"
+      end
+
+      def do_this method
+        value << "do_this(#{method})"
+      end
+    end
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"do_this(test) test"
+  end
+
 end
 

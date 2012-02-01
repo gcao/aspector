@@ -32,15 +32,16 @@ gem install aspector
       end
     end
 
-    before :test, :do_this
-    before :test do
+    before options[:method], :do_this
+
+    before options[:method] do
       puts 'do_that'
     end
   end
 
   ##############################
 
-  TestAspect.apply(A)
+  TestAspect.apply A, :method => :test
 
   A.new.test
 

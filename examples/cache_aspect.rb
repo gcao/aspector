@@ -57,10 +57,10 @@ class CacheAspect < Aspector::Base
 
 end
 
+##############################
+
 CacheAspect.apply A, :method => :test, :ttl => 2  # 2 seconds
 CacheAspect.apply A, :method => :test2
-
-##############################
 
 a = A.new
 

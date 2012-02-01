@@ -18,6 +18,7 @@ aspector(A) do
   end
 
   before :test, :do_this
+
   before :test do
     puts 'do_that'
   end

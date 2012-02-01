@@ -26,9 +26,9 @@ class LoggingAspect < Aspector::Base
 
 end
 
-LoggingAspect.apply(A)
-
 ##############################
+
+LoggingAspect.apply(A)
 
 a = A.new
 a.test 'input'

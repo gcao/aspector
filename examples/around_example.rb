@@ -20,6 +20,7 @@ aspector(A) do
   end
 
   around :test, :do_this
+
   around :test do |&block|
     puts 'before(block)'
     block.call

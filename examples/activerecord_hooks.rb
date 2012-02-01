@@ -26,9 +26,9 @@ class ActiveRecordHooks < Aspector::Base
   end
 end
 
-ActiveRecordHooks.apply(A)
-
 ##############################
+
+ActiveRecordHooks.apply(A)
 
 a = A.new
 a.save

@@ -15,20 +15,20 @@ require 'aspector'
 class ExceptionHandler < Aspector::Base
 
   target do
-    def handle_exception input, &block
-      block.call input
+    def handle_exception *args, &block
+      block.call *args
     rescue => e
       puts "Rescued: #{e}"
     end
   end
 
-  around :test, :handle_exception
+  around options[:method], :handle_exception
 
 end
 
-ExceptionHandler.apply(A)
-
 ##############################
+
+ExceptionHandler.apply(A, :method => :test)
 
 a = A.new
 a.test 'good'

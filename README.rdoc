@@ -38,9 +38,9 @@ gem install aspector
     end
   end
 
-  TestAspect.apply(A)
-
   ##############################
+
+  TestAspect.apply(A)
 
   A.new.test
 

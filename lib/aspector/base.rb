@@ -237,16 +237,16 @@ module Aspector
       elsif advice.options[:method_name_arg]
         if advice.options[:result_arg]
 %>
-        result = <%= advice.with_method %> '<%= method %>', result, *args
+      result = <%= advice.with_method %> '<%= method %>', result, *args
 <%      else %>
-        <%= advice.with_method %> '<%= method %>', *args
+      <%= advice.with_method %> '<%= method %>', *args
 <%      end
       else
         if advice.options[:result_arg]
 %>
-        result = <%= advice.with_method %> result, *args
+      result = <%= advice.with_method %> result, *args
 <%      else %>
-        <%= advice.with_method %> *args
+      <%= advice.with_method %> *args
 <%      end
       end
     end

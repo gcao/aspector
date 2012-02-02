@@ -179,8 +179,6 @@ module Aspector
     wrapped_method = instance_method(:<%= method %>)
 
     define_method :<%= method %> do |*args, &block|
-      result = nil
-
       # Before advices
 <% before_advices.each do |advice|
     if advice.options[:context_arg]
@@ -225,34 +223,36 @@ module Aspector
 <% end %>
 
       # After advices
-<% after_advices.each do |advice|
-    if advice.options[:context_arg]
-      if advice.options[:result_arg]
+<% unless after_advices.empty?
+    after_advices.each do |advice|
+      if advice.options[:context_arg]
+        if advice.options[:result_arg]
 %>
       context = Aspector::Context.new(target, <%= self.hash %>, <%= advice.hash %>)
       context.method_name = '<%= method %>'
       result = <%= advice.with_method %> context, result, *args
-<%    else %>
+<%      else %>
       <%= advice.with_method %> context, *args
-<%    end
-    elsif advice.options[:method_name_arg]
-      if advice.options[:result_arg]
+<%      end
+      elsif advice.options[:method_name_arg]
+        if advice.options[:result_arg]
 %>
         result = <%= advice.with_method %> '<%= method %>', result, *args
-<%    else %>
+<%      else %>
         <%= advice.with_method %> '<%= method %>', *args
-<%    end
-    else
-      if advice.options[:result_arg]
+<%      end
+      else
+        if advice.options[:result_arg]
 %>
         result = <%= advice.with_method %> result, *args
-<%    else %>
+<%      else %>
         <%= advice.with_method %> *args
-<%    end
+<%      end
+      end
     end
-  end
 %>
       result
+<% end %>
     end
     CODE
 

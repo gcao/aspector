@@ -11,13 +11,7 @@ class CombinedTest < Test::Unit::TestCase
       around :test, :around_test
     end
 
-    def test_no_aspect
-      before_test
-
-      result = nil
-
-      after_test result
-    end
+    def test_no_aspect; end
 
     def test; end
 
@@ -36,3 +30,4 @@ class CombinedTest < Test::Unit::TestCase
     o.test
   end
 end
+

@@ -9,9 +9,7 @@ class BeforeTest < Test::Unit::TestCase
       before :test, :before_test
     end
 
-    def test_no_aspect
-      before_test
-    end
+    def test_no_aspect; end
 
     def test; end
 

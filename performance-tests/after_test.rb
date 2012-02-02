@@ -9,11 +9,7 @@ class AfterTest < Test::Unit::TestCase
       after :test, :after_test
     end
 
-    def test_no_aspect
-      result = nil
-
-      after_test result
-    end
+    def test_no_aspect; end
 
     def test; end
 

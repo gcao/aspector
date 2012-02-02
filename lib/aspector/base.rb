@@ -170,7 +170,7 @@ module Aspector
 
     def recreate_method_with_advices method, before_advices, after_advices, around_advice
       code = METHOD_TEMPLATE.result(binding)
-      #puts code
+      puts code
       @context.class_eval code, __FILE__, __LINE__ + 4
     end
 

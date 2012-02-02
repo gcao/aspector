@@ -7,6 +7,8 @@ group :development do
   gem "reek", "~> 1.2.8"
   gem "roodi", "~> 2.1.0"
 
+  gem 'ruby-prof'
+
   gem "guard", "~> 0.8.4"
   gem "guard-bundler", "~> 0.1.3"
   gem "guard-rspec", "~> 0.5.2"

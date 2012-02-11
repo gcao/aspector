@@ -23,7 +23,7 @@ module Aspector
       matcher = MethodMatcher.new(logic)
 
       aspect = mock(Aspector::Base)
-      aspect.should_receive(:_deferred_logic_results_).with(logic).once.and_return(/test/)
+      aspect.should_receive(:aop_deferred_logic_results).with(logic).once.and_return(/test/)
 
       matcher.match?('test', aspect).should_not be_nil
     end

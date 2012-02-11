@@ -5,38 +5,38 @@ module Aspector
 
       def apply target, options = {}
         aspect_instance = new(target, options)
-        aspect_instance.send :_apply_
-        aspect_instance.send :_add_method_hooks_
+        aspect_instance.send :aop_apply
+        aspect_instance.send :aop_add_method_hooks
         aspect_instance
       end
 
       def default options
-        if @default_options
-          @default_options.merge! options
+        if @aop_default_options
+          @aop_default_options.merge! options
         else
-          @default_options = options
+          @aop_default_options = options
         end
       end
 
       def before *methods, &block
-        _advices_ << _create_advice_(Aspector::AdviceMetadata::BEFORE, self, methods, &block)
+        aop_advices << aop_create_advice(Aspector::AdviceMetadata::BEFORE, self, methods, &block)
       end
 
       def before_filter *methods, &block
-        _advices_ << _create_advice_(Aspector::AdviceMetadata::BEFORE_FILTER, self, methods, &block)
+        aop_advices << aop_create_advice(Aspector::AdviceMetadata::BEFORE_FILTER, self, methods, &block)
       end
 
       def after *methods, &block
-        _advices_ << _create_advice_(Aspector::AdviceMetadata::AFTER, self, methods, &block)
+        aop_advices << aop_create_advice(Aspector::AdviceMetadata::AFTER, self, methods, &block)
       end
 
       def around *methods, &block
-        _advices_ << _create_advice_(Aspector::AdviceMetadata::AROUND, self, methods, &block)
+        aop_advices << aop_create_advice(Aspector::AdviceMetadata::AROUND, self, methods, &block)
       end
 
       def target code = nil, &block
         logic = DeferredLogic.new(code || block)
-        _deferred_logics_ << logic
+        aop_deferred_logics << logic
         logic
       end
 
@@ -46,19 +46,19 @@ module Aspector
 
       private
 
-      def _advices_
-        @advices ||= []
+      def aop_advices
+        @aop_advices ||= []
       end
 
-      def _default_options_
-        @default_options ||= {}
+      def aop_default_options
+        @aop_default_options ||= {}
       end
 
-      def _deferred_logics_
-        @deferred_logics ||= []
+      def aop_deferred_logics
+        @aop_deferred_logics ||= []
       end
 
-      def _create_advice_ meta_data, klass_or_module, *methods, &block
+      def aop_create_advice meta_data, klass_or_module, *methods, &block
         methods.flatten!
 
         options = meta_data.default_options.clone

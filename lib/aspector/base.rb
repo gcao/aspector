@@ -3,24 +3,26 @@ require 'erb'
 module Aspector
   class Base
 
-    attr :options
-
     def initialize target, options = {}
-      @target = target
+      @aop_target = target
 
-      default_options = self.class.send :_default_options_
+      default_options = self.class.send :aop_default_options
       if default_options and not default_options.empty?
-        @options = default_options.merge(options)
+        @aop_options = default_options.merge(options)
       else
-        @options = options
+        @aop_options = options
       end
 
-      # @context is where advices will be applied (i.e. where methods are modified), can be different from target
-      @context = _get_context_
+      # @aop_context is where advices will be applied (i.e. where methods are modified), can be different from target
+      @aop_context = aop_get_context
 
-      _invoke_deferred_logics_
+      aop_invoke_deferred_logics
 
       after_initialize
+    end
+
+    def options
+      @aop_options
     end
 
     protected
@@ -35,89 +37,93 @@ module Aspector
 
     private
 
-    def _apply_
-      _define_methods_for_advice_blocks_
-      _add_to_instances_
-      _apply_to_methods_
+    def aop_apply
+      aop_define_methods_for_advice_blocks
+      aop_add_to_instances
+      aop_apply_to_methods
       after_apply
     end
 
-    def _deferred_logic_results_ logic
-      @deferred_logic_results[logic]
+    def aop_advices
+      self.class.send(:aop_advices)
     end
 
-    def _apply_to_methods_
-      @context.public_instance_methods.each do |method|
-        _apply_to_method_(method, :public)
+    def aop_deferred_logic_results logic
+      @aop_deferred_logic_results[logic]
+    end
+
+    def aop_apply_to_methods
+      @aop_context.public_instance_methods.each do |method|
+        aop_apply_to_method(method, :public)
       end
 
-      @context.protected_instance_methods.each do |method|
-        _apply_to_method_(method, :protected)
+      @aop_context.protected_instance_methods.each do |method|
+        aop_apply_to_method(method, :protected)
       end
 
-      if @options[:private_methods]
-        @context.private_instance_methods.each do |method|
-          _apply_to_method_(method, :private)
+      if @aop_options[:private_methods]
+        @aop_context.private_instance_methods.each do |method|
+          aop_apply_to_method(method, :private)
         end
       end
     end
 
-    def _apply_to_method_ method, scope = nil
-      advices = _advices_for_method_ method
+    def aop_apply_to_method method, scope = nil
+      advices = aop_advices_for_method method
       return if advices.empty?
 
       scope ||=
-          if @context.private_instance_methods.include?(method.to_s)
+          if @aop_context.private_instance_methods.include?(method.to_s)
             :private
-          elsif @context.protected_instance_methods.include?(method.to_s)
+          elsif @aop_context.protected_instance_methods.include?(method.to_s)
             :protected
           else
             :public
           end
 
-      _recreate_method_ method, advices, scope
+      aop_recreate_method method, advices, scope
     end
 
-    def _get_context_
-      return @target if @target.is_a?(Module) and not @options[:eigen_class]
+    def aop_get_context
+      return @aop_target if @aop_target.is_a?(Module) and not @aop_options[:eigen_class]
 
-      class << @target
+      class << @aop_target
         self
       end
     end
 
-    def _invoke_deferred_logics_
-      return unless (logics = self.class.send :_deferred_logics_)
+    def aop_invoke_deferred_logics
+      return unless (logics = self.class.send :aop_deferred_logics)
 
-      @deferred_logic_results ||= {}
+      @aop_deferred_logic_results ||= {}
       logics.each do |logic|
-        @deferred_logic_results[logic] = logic.apply @context, self
+        @aop_deferred_logic_results[logic] = logic.apply @aop_context, self
       end
     end
 
-    def _define_methods_for_advice_blocks_
-      self.class.send(:_advices_).each do |advice|
+    def aop_define_methods_for_advice_blocks
+      aop_advices.each do |advice|
         next unless advice.advice_block
-        @context.send :define_method, advice.with_method, advice.advice_block
-        @context.send :private, advice.with_method
+        @aop_context.send :define_method, advice.with_method, advice.advice_block
+        @aop_context.send :private, advice.with_method
       end
     end
 
-    def _add_to_instances_
-      aspect_instances = @context.instance_variable_get(:@aspector_instances)
+    def aop_add_to_instances
+      aspect_instances = @aop_context.instance_variable_get(:@aop_instances)
       unless aspect_instances
         aspect_instances = AspectInstances.new
-        @context.instance_variable_set(:@aspector_instances, aspect_instances)
+        @aop_context.instance_variable_set(:@aop_instances, aspect_instances)
       end
       aspect_instances << self
     end
 
-    def _add_method_hooks_
-      if @options[:eigen_class]
-        return unless @target.is_a?(Module)
+    def aop_add_method_hooks
+      if @aop_options[:eigen_class]
+        return unless @aop_target.is_a?(Module)
 
-        eigen_class = class << @target; self; end
-        orig_singleton_method_added = @target.method(:singleton_method_added)
+        eigen_class = class << @aop_target; self; end
+        orig_singleton_method_added = @aop_target.method(:singleton_method_added)
 
         eigen_class.send :define_method, :singleton_method_added do |method|
           singleton_method_added_aspector(method) do
@@ -125,10 +131,10 @@ module Aspector
           end
         end
       else
-        eigen_class = class << @target; self; end
+        eigen_class = class << @aop_target; self; end
 
-        if @target.is_a? Module
-          orig_method_added = @target.method(:method_added)
+        if @aop_target.is_a? Module
+          orig_method_added = @aop_target.method(:method_added)
         else
           orig_method_added = eigen_class.method(:method_added)
         end
@@ -141,14 +147,14 @@ module Aspector
       end
     end
 
-    def _advices_for_method_ method
-      self.class.send(:_advices_).select do |advice|
+    def aop_advices_for_method method
+      aop_advices.select do |advice|
         advice.match?(method, self)
       end
     end
 
-    def _recreate_method_ method, advices, scope
-      @context.instance_variable_set(:@aspector_creating_method, true)
+    def aop_recreate_method method, advices, scope
+      @aop_context.instance_variable_set(:@aop_creating_method, true)
 
       before_advices = advices.select {|advice| advice.before? }
       after_advices  = advices.select {|advice| advice.after?  }
@@ -157,21 +163,21 @@ module Aspector
       if around_advices.size > 1
         (around_advices.size - 1).downto(1) do |i|
           advice = around_advices[i]
-          _recreate_method_with_advices_ method, [], [], advice
+          aop_recreate_method_with_advices method, [], [], advice
         end
       end
 
-      _recreate_method_with_advices_ method, before_advices, after_advices, around_advices.first
+      aop_recreate_method_with_advices method, before_advices, after_advices, around_advices.first
 
-      @context.send scope, method if scope != :public
+      @aop_context.send scope, method if scope != :public
     ensure
-      @context.instance_variable_set(:@aspector_creating_method, nil)
+      @aop_context.instance_variable_set(:@aop_creating_method, nil)
     end
 
-    def _recreate_method_with_advices_ method, before_advices, after_advices, around_advice
+    def aop_recreate_method_with_advices method, before_advices, after_advices, around_advice
       code = METHOD_TEMPLATE.result(binding)
       #puts code
-      @context.class_eval code, __FILE__, __LINE__ + 4
+      @aop_context.class_eval code, __FILE__, __LINE__ + 4
     end
 
     METHOD_TEMPLATE = ERB.new <<-CODE

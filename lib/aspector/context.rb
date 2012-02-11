@@ -11,13 +11,13 @@ module Aspector
     end
 
     def aspect
-      @aspect ||= @target.instance_variable_get(:@aspector_instances).detect do |aspect|
+      @aspect ||= @target.instance_variable_get(:@aop_instances).detect do |aspect|
         aspect.hash == @aspect_hash
       end
     end
 
     def advice
-      @advice ||= aspect.class._advices_.detect { |advice| advice.hash == @advice_hash }
+      @advice ||= aspect.class.aop_advices.detect { |advice| advice.hash == @advice_hash }
     end
 
     def options

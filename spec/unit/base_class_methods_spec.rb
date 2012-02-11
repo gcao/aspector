@@ -6,8 +6,8 @@ describe "Aspector::Base class methods" do
       before :test, :do_before
     end
 
-    klass.send(:_advices_).size.should == 1
-    advice = klass.send(:_advices_).first
+    klass.send(:aop_advices).size.should == 1
+    advice = klass.send(:aop_advices).first
     advice.before?.should be_true
     advice.options[:skip_if_false].should_not be_true
     advice.with_method.should == 'do_before'
@@ -18,8 +18,8 @@ describe "Aspector::Base class methods" do
       before_filter :test, :do_before
     end
 
-    klass.send(:_advices_).size.should == 1
-    advice = klass.send(:_advices_).first
+    klass.send(:aop_advices).size.should == 1
+    advice = klass.send(:aop_advices).first
     advice.before?.should be_true
     advice.options[:skip_if_false].should be_true
     advice.with_method.should == 'do_before'

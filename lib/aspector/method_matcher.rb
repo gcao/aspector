@@ -15,7 +15,7 @@ module Aspector
         when Symbol
           item.to_s == method
         when DeferredLogic
-          value = aspect._deferred_logic_results_(item)
+          value = aspect.aop_deferred_logic_results(item)
           if value
             new_matcher = MethodMatcher.new(value)
             new_matcher.match?(method)

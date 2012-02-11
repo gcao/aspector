@@ -6,7 +6,7 @@ describe "Aspector::Base" do
       default :test => 'value'
     end
 
-    aspect.send(:_default_options_)[:test].should == 'value'
+    aspect.send(:aop_default_options)[:test].should == 'value'
   end
 
   it "#options is used to access options set when aspect is applied" do

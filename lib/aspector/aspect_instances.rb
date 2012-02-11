@@ -3,7 +3,7 @@ module Aspector
 
     def apply_to_method method
       each do |aspect_instance|
-        aspect_instance.apply_to_method(method)
+        aspect_instance.send :_apply_to_method_, method
       end
     end
 

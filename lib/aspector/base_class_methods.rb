@@ -3,21 +3,10 @@ module Aspector
     module ClassMethods
       ::Aspector::Base.extend(self)
 
-      def advices
-        @advices ||= []
-      end
-
-      def default_options
-        @default_options ||= {}
-      end
-
-      def deferred_logics
-        @deferred_logics ||= []
-      end
-
       def apply target, options = {}
         aspect_instance = new(target, options)
-        aspect_instance.apply
+        aspect_instance.send :_apply_
+        aspect_instance.send :_add_method_hooks_
         aspect_instance
       end
 
@@ -30,24 +19,24 @@ module Aspector
       end
 
       def before *methods, &block
-        advices << create_advice(Aspector::AdviceMetadata::BEFORE, self, methods, &block)
+        _advices_ << _create_advice_(Aspector::AdviceMetadata::BEFORE, self, methods, &block)
       end
 
       def before_filter *methods, &block
-        advices << create_advice(Aspector::AdviceMetadata::BEFORE_FILTER, self, methods, &block)
+        _advices_ << _create_advice_(Aspector::AdviceMetadata::BEFORE_FILTER, self, methods, &block)
       end
 
       def after *methods, &block
-        advices << create_advice(Aspector::AdviceMetadata::AFTER, self, methods, &block)
+        _advices_ << _create_advice_(Aspector::AdviceMetadata::AFTER, self, methods, &block)
       end
 
       def around *methods, &block
-        advices << create_advice(Aspector::AdviceMetadata::AROUND, self, methods, &block)
+        _advices_ << _create_advice_(Aspector::AdviceMetadata::AROUND, self, methods, &block)
       end
 
       def target code = nil, &block
         logic = DeferredLogic.new(code || block)
-        deferred_logics << logic
+        _deferred_logics_ << logic
         logic
       end
 
@@ -57,7 +46,19 @@ module Aspector
 
       private
 
-      def create_advice meta_data, klass_or_module, *methods, &block
+      def _advices_
+        @advices ||= []
+      end
+
+      def _default_options_
+        @default_options ||= {}
+      end
+
+      def _deferred_logics_
+        @deferred_logics ||= []
+      end
+
+      def _create_advice_ meta_data, klass_or_module, *methods, &block
         methods.flatten!
 
         options = meta_data.default_options.clone

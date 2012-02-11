@@ -17,7 +17,7 @@ module Aspector
     end
 
     def advice
-      @advice ||= aspect.class.advices.detect { |advice| advice.hash == @advice_hash }
+      @advice ||= aspect.class._advices_.detect { |advice| advice.hash == @advice_hash }
     end
 
     def options

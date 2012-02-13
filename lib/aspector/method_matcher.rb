@@ -21,7 +21,7 @@ module Aspector
             new_matcher.match?(method)
           end
         when DeferredOption
-          value = aspect.options[item.key]
+          value = aspect.send(:aop_options)[item.key]
           if value
             new_matcher = MethodMatcher.new(value)
             new_matcher.match?(method)

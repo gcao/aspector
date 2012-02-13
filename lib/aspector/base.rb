@@ -21,10 +21,6 @@ module Aspector
       after_initialize
     end
 
-    def options
-      @aop_options
-    end
-
     protected
 
     # Hook method that runs after an aspect is instantiated
@@ -42,6 +38,10 @@ module Aspector
       aop_add_to_instances
       aop_apply_to_methods
       after_apply
+    end
+
+    def aop_options
+      @aop_options
     end
 
     def aop_advices

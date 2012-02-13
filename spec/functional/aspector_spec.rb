@@ -22,6 +22,31 @@ describe "Aspector" do
     obj.value.should == %w"do_before do_around_before test do_around_after do_after"
   end
 
+  it "advices defined in after_initialization" do
+    klass = create_test_class
+
+    aspector(klass) do
+      def after_initialize
+        name = 'this'
+
+        before(:test) { value << "do_before(#{name})" }
+
+        after(:test)  { value << "do_after(#{name})"  }
+
+        around(:test) do |&block|
+          value   <<  "do_around_before(#{name})"
+          result  =   block.call
+          value   <<  "do_around_after(#{name})"
+          result
+        end
+      end
+    end
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"do_before(this) do_around_before(this) test do_around_after(this) do_after(this)"
+  end
+
   it "multiple aspects should work together" do
     klass = create_test_class
     aspector(klass) do

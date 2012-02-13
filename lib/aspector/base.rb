@@ -31,6 +31,26 @@ module Aspector
     def after_apply
     end
 
+    def before *methods, &block
+      @aop_advices ||= []
+      @aop_advices << self.class.send(:aop_create_advice, Aspector::AdviceMetadata::BEFORE, self, methods, &block)
+    end
+
+    def before_filter *methods, &block
+      @aop_advices ||= []
+      @aop_advices << self.class.send(:aop_create_advice, Aspector::AdviceMetadata::BEFORE_FILTER, self, methods, &block)
+    end
+
+    def after *methods, &block
+      @aop_advices ||= []
+      @aop_advices << self.class.send(:aop_create_advice, Aspector::AdviceMetadata::AFTER, self, methods, &block)
+    end
+
+    def around *methods, &block
+      @aop_advices ||= []
+      @aop_advices << self.class.send(:aop_create_advice, Aspector::AdviceMetadata::AROUND, self, methods, &block)
+    end
+
     private
 
     def aop_apply
@@ -45,7 +65,17 @@ module Aspector
     end
 
     def aop_advices
-      self.class.send(:aop_advices)
+      shared_advices = self.class.send(:aop_advices)
+
+      if shared_advices and shared_advices.size > 0
+        if @aop_advices
+          @aop_advices + shared_advices
+        else
+          shared_advices
+        end
+      else
+        @aop_advices or []
+      end
     end
 
     def aop_deferred_logic_results logic

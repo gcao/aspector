@@ -6,6 +6,22 @@ module Aspector
     attr :aop_options
     alias :options :aop_options
 
+    def initialize target, options = {}
+      @aop_target = target
+
+      default_options = self.class.aop_default_options
+      if default_options and not default_options.empty?
+        @aop_options = default_options.merge(options)
+      else
+        @aop_options = options
+      end
+
+      # @aop_context is where advices will be applied (i.e. where methods are modified), can be different from target
+      @aop_context = aop_get_context
+
+      after_initialize
+    end
+
     def aop_advices
       shared_advices = self.class.aop_advices
 
@@ -21,23 +37,15 @@ module Aspector
     end
     alias :advices :aop_advices
 
-    def initialize target, options = {}
-      @aop_target = target
-
-      default_options = self.class.aop_default_options
-      if default_options and not default_options.empty?
-        @aop_options = default_options.merge(options)
-      else
-        @aop_options = options
-      end
-
-      # @aop_context is where advices will be applied (i.e. where methods are modified), can be different from target
-      @aop_context = aop_get_context
-
+    def aop_apply
+      before_apply
       aop_invoke_deferred_logics
-
-      after_initialize
+      aop_define_methods_for_advice_blocks
+      aop_add_to_instances
+      aop_apply_to_methods
+      after_apply
     end
+    alias :apply :aop_apply
 
     protected
 
@@ -45,8 +53,18 @@ module Aspector
     def after_initialize
     end
 
+    # Hook method that runs before an aspect is applied
+    def before_apply
+    end
+
     # Hook method that runs after an aspect is applied
     def after_apply
+    end
+
+    def before_apply_to_method method, advices
+    end
+
+    def after_apply_to_method method, advices
     end
 
     def aop_before *methods, &block
@@ -75,13 +93,6 @@ module Aspector
 
     private
 
-    def aop_apply
-      aop_define_methods_for_advice_blocks
-      aop_add_to_instances
-      aop_apply_to_methods
-      after_apply
-    end
-
     def aop_deferred_logic_results logic
       @aop_deferred_logic_results[logic]
     end
@@ -106,6 +117,8 @@ module Aspector
       advices = aop_advices_for_method method
       return if advices.empty?
 
+      before_apply_to_method method, advices
+
       scope ||=
           if @aop_context.private_instance_methods.include?(method.to_s)
             :private
@@ -116,6 +129,8 @@ module Aspector
           end
 
       aop_recreate_method method, advices, scope
+
+      after_apply_to_method method, advices
     end
 
     def aop_get_context

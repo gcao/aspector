@@ -1,11 +1,8 @@
 source "http://rubygems.org"
 
 group :development do
-  gem "rspec", "~> 2.3.0"
+  gem "rspec"
   gem "jeweler", "~> 1.6.4"
-  gem "rcov", ">= 0"
-  gem "reek", "~> 1.2.8"
-  gem "roodi", "~> 2.1.0"
 
   gem 'ruby-prof'
 

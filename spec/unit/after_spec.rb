@@ -18,23 +18,6 @@ describe "After advices" do
     obj.value.should == %w"test do_this"
   end
 
-  it "context_arg" do
-    klass = create_test_class do
-      def do_this context, result
-        value << "do_this(#{context.method_name})"
-        result
-      end
-    end
-
-    aspector(klass) do
-      after :test, :do_this, :context_arg => true
-    end
-
-    obj = klass.new
-    obj.test
-    obj.value.should == %w"test do_this(test)"
-  end
-
   it "method_name_arg" do
     klass = create_test_class do
       def do_this method, result

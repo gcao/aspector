@@ -46,12 +46,15 @@ require 'aspector'
 class CacheAspect < Aspector::Base
   default :ttl => 60
 
-  around options[:method], :context_arg => true do |context, &block|
-    key = context.method_name
-    ttl = context.options[:ttl]
+  def after_initialize
+    aspect = self
+    around options[:method], :method_name_arg => true do |method, &block|
+      key = method
+      ttl = aspect.options[:ttl]
 
-    SimpleCache.cache key, ttl do
-      block.call
+      SimpleCache.cache key, ttl do
+        block.call
+      end
     end
   end
 

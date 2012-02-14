@@ -17,7 +17,7 @@ module Aspector
     end
 
     def with_method
-      @with_method ||= "aop_#{hash}"
+      @with_method ||= "aop_#{hash.abs}"
     end
 
     def match? method, context = nil

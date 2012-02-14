@@ -7,7 +7,10 @@ describe "Aspector" do
     aspector(klass) do
       before :test do value << "do_before" end
 
-      after  :test do value << "do_after"  end
+      after  :test do |result|
+        value << "do_after"
+        result
+      end
 
       around :test do |&block|
         value   <<  "do_around_before"
@@ -31,7 +34,10 @@ describe "Aspector" do
 
         before(:test) { value << "do_before(#{name})" }
 
-        after(:test)  { value << "do_after(#{name})"  }
+        after(:test)  do |result|
+          value << "do_after(#{name})"
+          result
+        end
 
         around(:test) do |&block|
           value   <<  "do_around_before(#{name})"

@@ -99,16 +99,16 @@ module Aspector
 
     def aop_apply_to_methods
       @aop_context.public_instance_methods.each do |method|
-        aop_apply_to_method(method, :public)
+        aop_apply_to_method(method.to_s, :public)
       end
 
       @aop_context.protected_instance_methods.each do |method|
-        aop_apply_to_method(method, :protected)
+        aop_apply_to_method(method.to_s, :protected)
       end
 
       if @aop_options[:private_methods]
         @aop_context.private_instance_methods.each do |method|
-          aop_apply_to_method(method, :private)
+          aop_apply_to_method(method.to_s, :private)
         end
       end
     end
@@ -120,9 +120,9 @@ module Aspector
       before_apply_to_method method, advices
 
       scope ||=
-          if @aop_context.private_instance_methods.include?(method.to_s)
+          if @aop_context.private_instance_methods.include?(RUBY_VERSION.index('1.9') ? method.to_sym : method.to_s)
             :private
-          elsif @aop_context.protected_instance_methods.include?(method.to_s)
+          elsif @aop_context.protected_instance_methods.include?(RUBY_VERSION.index('1.9') ? method.to_sym : method.to_s)
             :protected
           else
             :public
@@ -236,12 +236,7 @@ module Aspector
     define_method :<%= method %> do |*args, &block|
       # Before advices
 <% before_advices.each do |advice|
-    if advice.options[:context_arg]
-%>
-      context = Aspector::Context.new(target, <%= self.hash %>, <%= advice.hash %>)
-      context.method_name = '<%= method %>'
-      result = <%= advice.with_method %> context, *args
-<%  elsif advice.options[:method_name_arg] %>
+    if advice.options[:method_name_arg] %>
       result = <%= advice.with_method %> '<%= method %>', *args
 <%  else %>
       result = <%= advice.with_method %> *args
@@ -255,14 +250,7 @@ module Aspector
 %>
 
 <% if around_advice
-    if around_advice.options[:context_arg]
-%>
-      context = Aspector::Context.new(target, <%= self.hash %>, <%= around_advice.hash %>)
-      context.method_name = '<%= method %>'
-      result = <%= around_advice.with_method %> context, *args do |*args|
-        wrapped_method.bind(self).call *args, &block
-      end
-<%  elsif around_advice.options[:method_name_arg] %>
+    if around_advice.options[:method_name_arg] %>
       result = <%= around_advice.with_method %> '<%= method %>', *args do |*args|
         wrapped_method.bind(self).call *args, &block
       end
@@ -280,16 +268,7 @@ module Aspector
       # After advices
 <% unless after_advices.empty?
     after_advices.each do |advice|
-      if advice.options[:context_arg]
-        if advice.options[:result_arg]
-%>
-      context = Aspector::Context.new(target, <%= self.hash %>, <%= advice.hash %>)
-      context.method_name = '<%= method %>'
-      result = <%= advice.with_method %> context, result, *args
-<%      else %>
-      <%= advice.with_method %> context, *args
-<%      end
-      elsif advice.options[:method_name_arg]
+      if advice.options[:method_name_arg]
         if advice.options[:result_arg]
 %>
       result = <%= advice.with_method %> '<%= method %>', result, *args

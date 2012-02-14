@@ -7,7 +7,10 @@ describe "Aspect execution order" do
     aspector(klass) do
       before :test do value << "do_before" end
 
-      after  :test do value << "do_after"  end
+      after  :test do |result|
+        value << "do_after"
+        result
+      end
 
       around :test do |&block|
         value   <<  "do_around_before"
@@ -18,7 +21,10 @@ describe "Aspect execution order" do
 
       before :test do value << "do_before2" end
 
-      after  :test do value << "do_after2"  end
+      after  :test do |result|
+        value << "do_after2"
+        result
+      end
 
       around :test do |&block|
         value   <<  "do_around_before2"

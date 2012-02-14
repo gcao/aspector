@@ -17,7 +17,10 @@ describe "Aspector for eigen class" do
     aspector(klass, :eigen_class => true) do
       before :test do value << "do_before" end
 
-      after  :test do value << "do_after"  end
+      after  :test do |result|
+        value << "do_after"
+        result
+      end
 
       around :test do |&block|
         value   <<  "do_around_before"
@@ -43,7 +46,10 @@ describe "Aspector for eigen class" do
     aspector(klass, :eigen_class => true) do
       before :test do value << "do_before" end
 
-      after  :test do value << "do_after"  end
+      after  :test do |result|
+        value << "do_after"
+        result
+      end
 
       around :test do |&block|
         value   <<  "do_around_before"

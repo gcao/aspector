@@ -4,7 +4,7 @@ module Aspector
 
     private
 
-    def method_added_aspector method
+    def aop_method_added method
       return (block_given? and yield) if
         @aop_creating_method or
         @aop_instances.nil? or @aop_instances.empty?
@@ -23,7 +23,7 @@ module Aspector
       end
     end
 
-    def singleton_method_added_aspector method
+    def aop_singleton_method_added method
       # Note: methods involved are on eigen class
       eigen_class = class << self; self; end
 

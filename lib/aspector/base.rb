@@ -175,7 +175,7 @@ module Aspector
         orig_singleton_method_added = @aop_target.method(:singleton_method_added)
 
         eigen_class.send :define_method, :singleton_method_added do |method|
-          singleton_method_added_aspector(method) do
+          aop_singleton_method_added(method) do
             orig_singleton_method_added.call(method)
           end
         end
@@ -189,7 +189,7 @@ module Aspector
         end
 
         eigen_class.send :define_method, :method_added do |method|
-          method_added_aspector(method) do
+          aop_method_added(method) do
             orig_method_added.call(method)
           end
         end

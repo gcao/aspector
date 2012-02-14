@@ -31,25 +31,29 @@ module Aspector
     def after_apply
     end
 
-    def before *methods, &block
+    def aop_before *methods, &block
       @aop_advices ||= []
       @aop_advices << self.class.send(:aop_create_advice, Aspector::AdviceMetadata::BEFORE, self, methods, &block)
     end
+    alias :before :aop_before
 
-    def before_filter *methods, &block
+    def aop_before_filter *methods, &block
       @aop_advices ||= []
       @aop_advices << self.class.send(:aop_create_advice, Aspector::AdviceMetadata::BEFORE_FILTER, self, methods, &block)
     end
+    alias :before_filter :aop_before_filter
 
-    def after *methods, &block
+    def aop_after *methods, &block
       @aop_advices ||= []
       @aop_advices << self.class.send(:aop_create_advice, Aspector::AdviceMetadata::AFTER, self, methods, &block)
     end
+    alias :after :aop_after
 
-    def around *methods, &block
+    def aop_around *methods, &block
       @aop_advices ||= []
       @aop_advices << self.class.send(:aop_create_advice, Aspector::AdviceMetadata::AROUND, self, methods, &block)
     end
+    alias :around :aop_around
 
     private
 

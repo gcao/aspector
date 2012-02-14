@@ -3,46 +3,54 @@ module Aspector
     module ClassMethods
       ::Aspector::Base.extend(self)
 
-      def apply target, options = {}
+      def aop_apply target, options = {}
         aspect_instance = new(target, options)
         aspect_instance.send :aop_apply
         aspect_instance.send :aop_add_method_hooks
         aspect_instance
       end
+      alias :apply :aop_apply
 
-      def default options
+      def aop_default options
         if @aop_default_options
           @aop_default_options.merge! options
         else
           @aop_default_options = options
         end
       end
+      alias :default :aop_default
 
-      def before *methods, &block
+      def aop_before *methods, &block
         aop_advices << aop_create_advice(Aspector::AdviceMetadata::BEFORE, self, methods, &block)
       end
+      alias :before :aop_before
 
-      def before_filter *methods, &block
+      def aop_before_filter *methods, &block
         aop_advices << aop_create_advice(Aspector::AdviceMetadata::BEFORE_FILTER, self, methods, &block)
       end
+      alias :before_filter :aop_before_filter
 
-      def after *methods, &block
+      def aop_after *methods, &block
         aop_advices << aop_create_advice(Aspector::AdviceMetadata::AFTER, self, methods, &block)
       end
+      alias :after :aop_after
 
-      def around *methods, &block
+      def aop_around *methods, &block
         aop_advices << aop_create_advice(Aspector::AdviceMetadata::AROUND, self, methods, &block)
       end
+      alias :around :aop_around
 
-      def target code = nil, &block
+      def aop_target code = nil, &block
         logic = DeferredLogic.new(code || block)
         aop_deferred_logics << logic
         logic
       end
+      alias :target :aop_target
 
-      def options
+      def aop_options
         DeferredOption.new
       end
+      alias :options :aop_options
 
       private
 

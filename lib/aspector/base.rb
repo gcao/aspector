@@ -3,10 +3,28 @@ require 'erb'
 module Aspector
   class Base
 
+    attr :aop_options
+    alias :options :aop_options
+
+    def aop_advices
+      shared_advices = self.class.aop_advices
+
+      if shared_advices and shared_advices.size > 0
+        if @aop_advices
+          @aop_advices + shared_advices
+        else
+          shared_advices
+        end
+      else
+        @aop_advices or []
+      end
+    end
+    alias :advices :aop_advices
+
     def initialize target, options = {}
       @aop_target = target
 
-      default_options = self.class.send :aop_default_options
+      default_options = self.class.aop_default_options
       if default_options and not default_options.empty?
         @aop_options = default_options.merge(options)
       else
@@ -62,24 +80,6 @@ module Aspector
       aop_add_to_instances
       aop_apply_to_methods
       after_apply
-    end
-
-    def aop_options
-      @aop_options
-    end
-
-    def aop_advices
-      shared_advices = self.class.send(:aop_advices)
-
-      if shared_advices and shared_advices.size > 0
-        if @aop_advices
-          @aop_advices + shared_advices
-        else
-          shared_advices
-        end
-      else
-        @aop_advices or []
-      end
     end
 
     def aop_deferred_logic_results logic

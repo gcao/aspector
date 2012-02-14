@@ -3,6 +3,16 @@ module Aspector
     module ClassMethods
       ::Aspector::Base.extend(self)
 
+      def aop_advices
+        @aop_advices ||= []
+      end
+      alias :advices :aop_advices
+
+      def aop_default_options
+        @aop_default_options ||= {}
+      end
+      alias :default_options :aop_default_options
+
       def aop_apply target, options = {}
         aspect_instance = new(target, options)
         aspect_instance.send :aop_apply
@@ -53,14 +63,6 @@ module Aspector
       alias :options :aop_options
 
       private
-
-      def aop_advices
-        @aop_advices ||= []
-      end
-
-      def aop_default_options
-        @aop_default_options ||= {}
-      end
 
       def aop_deferred_logics
         @aop_deferred_logics ||= []

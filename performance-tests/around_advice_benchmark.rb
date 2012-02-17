@@ -17,17 +17,13 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'aspector'
 
 class AroundAspect < Aspector::Base
-  target do
-    def do_this *args, &block
+  around :test do |*args, &block|
+    begin
       block.call *args, &block
     rescue => e
     end
   end
-
-  around :test, :do_this
 end
-
-##############################
 
 class RawAspect < Aspector::Base
   target do
@@ -50,6 +46,7 @@ a = A.new
 b = B.new
 
 require 'benchmark'
+
 TIMES = 100000
 Benchmark.bmbm do |x|
   x.report "Around advice - good" do

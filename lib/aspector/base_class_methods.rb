@@ -3,9 +3,20 @@ module Aspector
     module ClassMethods
       ::Aspector::Base.extend(self)
 
-      def enable; @disabled = nil; end
-      def disable; @disabled = true; end
-      def disabled?; @disabled; end
+      def aop_enable
+        @aop_disabled = nil
+      end
+      alias :enable :aop_enable
+
+      def aop_disable
+        @aop_disabled = true
+      end
+      alias :disable :aop_disable
+
+      def aop_disabled?
+        @aop_disabled
+      end
+      alias :disabled? :aop_disabled?
 
       def aop_advices
         @aop_advices ||= []

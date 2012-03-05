@@ -247,7 +247,7 @@ module Aspector
     wrapped_method = instance_method(:<%= method %>)
 
     define_method :<%= method %> do |*args, &block|
-      return aspect.aop_wrapped_methods['<%= method %>'].bind(self).call(*args, &block) if aspect.class.disabled?
+      return aspect.aop_wrapped_methods['<%= method %>'].bind(self).call(*args, &block) if aspect.class.aop_disabled?
 
       # Before advices
 <% before_advices.each do |advice|

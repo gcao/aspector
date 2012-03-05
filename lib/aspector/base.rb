@@ -6,6 +6,10 @@ module Aspector
     attr :aop_options
     alias :options :aop_options
 
+    attr :aop_wrapped_methods
+
+    attr_accessor :aop_prev_aspect, :aop_next_aspect
+
     def initialize target, options = {}
       @aop_target = target
 
@@ -18,6 +22,8 @@ module Aspector
 
       # @aop_context is where advices will be applied (i.e. where methods are modified), can be different from target
       @aop_context = aop_get_context
+
+      @aop_wrapped_methods = {}
 
       after_initialize
     end
@@ -160,7 +166,12 @@ module Aspector
 
     def aop_add_to_instances
       aspect_instances = @aop_context.instance_variable_get(:@aop_instances)
-      unless aspect_instances
+      if aspect_instances
+        if (last = aspect_instances.last)
+          last.aop_next_aspect = self
+          self.aop_prev_aspect = last
+        end
+      else
         aspect_instances = AspectInstances.new
         @aop_context.instance_variable_set(:@aop_instances, aspect_instances)
       end
@@ -203,6 +214,7 @@ module Aspector
     end
 
     def aop_recreate_method method, advices, scope
+      @aop_wrapped_methods[method] = @aop_context.instance_method(method)
       @aop_context.instance_variable_set(:@aop_creating_method, true)
 
       before_advices = advices.select {|advice| advice.before? }
@@ -224,13 +236,14 @@ module Aspector
     end
 
     def aop_recreate_method_with_advices method, before_advices, after_advices, around_advice
+      aspect = self
+
       code = METHOD_TEMPLATE.result(binding)
       #puts code
       @aop_context.class_eval code, __FILE__, __LINE__ + 4
     end
 
     METHOD_TEMPLATE = ERB.new <<-CODE
-    target = self
     wrapped_method = instance_method(:<%= method %>)
 
     define_method :<%= method %> do |*args, &block|
@@ -262,7 +275,7 @@ module Aspector
   else
 %>
       # Invoke wrapped method
-      result = wrapped_method.bind(self).call *args, &block
+      result = aspect.aop_wrapped_methods['<%= method %>'].bind(self).call *args, &block
 <% end %>
 
       # After advices

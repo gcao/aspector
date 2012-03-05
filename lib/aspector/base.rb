@@ -8,8 +8,6 @@ module Aspector
 
     attr :aop_wrapped_methods
 
-    attr_accessor :aop_prev_aspect, :aop_next_aspect
-
     def initialize target, options = {}
       @aop_target = target
 
@@ -166,12 +164,7 @@ module Aspector
 
     def aop_add_to_instances
       aspect_instances = @aop_context.instance_variable_get(:@aop_instances)
-      if aspect_instances
-        if (last = aspect_instances.last)
-          last.aop_next_aspect = self
-          self.aop_prev_aspect = last
-        end
-      else
+      unless aspect_instances
         aspect_instances = AspectInstances.new
         @aop_context.instance_variable_set(:@aop_instances, aspect_instances)
       end

@@ -29,7 +29,16 @@ end
 ##############################
 
 LoggingAspect.apply(A)
+puts "LoggingAspect is applied"
 
 a = A.new
+a.test 'input'
+
+LoggingAspect.disable
+puts "LoggingAspect is disabled"
+a.test 'input'
+
+LoggingAspect.enable
+puts "LoggingAspect is enabled"
 a.test 'input'
 

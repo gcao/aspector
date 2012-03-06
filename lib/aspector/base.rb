@@ -238,10 +238,14 @@ module Aspector
     end
 
     METHOD_TEMPLATE = ERB.new <<-CODE
+    orig_method = aspect.aop_wrapped_methods['<%= method %>']
+
+<% if around_advice %>
     wrapped_method = instance_method(:<%= method %>)
+<% end %>
 
     define_method :<%= method %> do |*args, &block|
-      return aspect.aop_wrapped_methods['<%= method %>'].bind(self).call(*args, &block) if aspect.class.aop_disabled?
+      return orig_method.bind(self).call(*args, &block) if aspect.class.aop_disabled?
 
       # Before advices
 <% before_advices.each do |advice|
@@ -270,8 +274,8 @@ module Aspector
 <%  end
   else
 %>
-      # Invoke wrapped method
-      result = aspect.aop_wrapped_methods['<%= method %>'].bind(self).call *args, &block
+      # Invoke original method
+      result = orig_method.bind(self).call *args, &block
 <% end %>
 
       # After advices

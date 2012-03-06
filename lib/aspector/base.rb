@@ -51,6 +51,43 @@ module Aspector
     end
     alias :apply :aop_apply
 
+    def aop_apply_to_methods
+      advices = aop_advices
+      @aop_context.public_instance_methods.each do |method|
+        aop_apply_to_method(method.to_s, advices, :public)
+      end
+
+      @aop_context.protected_instance_methods.each do |method|
+        aop_apply_to_method(method.to_s, advices, :protected)
+      end
+
+      if @aop_options[:private_methods]
+        @aop_context.private_instance_methods.each do |method|
+          aop_apply_to_method(method.to_s, advices, :private)
+        end
+      end
+    end
+
+    def aop_apply_to_method method, advices, scope = nil
+      advices = aop_filter_advices advices, method
+      return if advices.empty?
+
+      before_apply_to_method method, advices
+
+      scope ||=
+          if @aop_context.private_instance_methods.include?(RUBY_VERSION.index('1.9') ? method.to_sym : method.to_s)
+            :private
+          elsif @aop_context.protected_instance_methods.include?(RUBY_VERSION.index('1.9') ? method.to_sym : method.to_s)
+            :protected
+          else
+            :public
+          end
+
+      aop_recreate_method method, advices, scope
+
+      after_apply_to_method method, advices
+    end
+
     protected
 
     # Hook method that runs after an aspect is instantiated
@@ -99,42 +136,6 @@ module Aspector
 
     def aop_deferred_logic_results logic
       @aop_deferred_logic_results[logic]
-    end
-
-    def aop_apply_to_methods
-      @aop_context.public_instance_methods.each do |method|
-        aop_apply_to_method(method.to_s, :public)
-      end
-
-      @aop_context.protected_instance_methods.each do |method|
-        aop_apply_to_method(method.to_s, :protected)
-      end
-
-      if @aop_options[:private_methods]
-        @aop_context.private_instance_methods.each do |method|
-          aop_apply_to_method(method.to_s, :private)
-        end
-      end
-    end
-
-    def aop_apply_to_method method, scope = nil
-      advices = aop_advices_for_method method
-      return if advices.empty?
-
-      before_apply_to_method method, advices
-
-      scope ||=
-          if @aop_context.private_instance_methods.include?(RUBY_VERSION.index('1.9') ? method.to_sym : method.to_s)
-            :private
-          elsif @aop_context.protected_instance_methods.include?(RUBY_VERSION.index('1.9') ? method.to_sym : method.to_s)
-            :protected
-          else
-            :public
-          end
-
-      aop_recreate_method method, advices, scope
-
-      after_apply_to_method method, advices
     end
 
     def aop_get_context
@@ -200,8 +201,8 @@ module Aspector
       end
     end
 
-    def aop_advices_for_method method
-      aop_advices.select do |advice|
+    def aop_filter_advices advices, method
+      advices.select do |advice|
         advice.match?(method, self)
       end
     end

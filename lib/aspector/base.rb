@@ -215,11 +215,9 @@ module Aspector
       after_advices  = advices.select {|advice| advice.after?  }
       around_advices = advices.select {|advice| advice.around? }
 
-      if around_advices.size > 1
-        (around_advices.size - 1).downto(1) do |i|
-          advice = around_advices[i]
-          aop_recreate_method_with_advices method, [], [], advice
-        end
+      (around_advices.size - 1).downto(1) do |i|
+        advice = around_advices[i]
+        aop_recreate_method_with_advices method, [], [], advice
       end
 
       aop_recreate_method_with_advices method, before_advices, after_advices, around_advices.first

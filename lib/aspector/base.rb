@@ -262,13 +262,15 @@ module Aspector
 
 <% if around_advice
     if around_advice.options[:method_name_arg] %>
-      result = <%= around_advice.with_method %> '<%= method %>', *args do |*args|
-        wrapped_method.bind(self).call *args, &block
-      end
+      #result = <%= around_advice.with_method %> '<%= method %>', *args do |*args|
+      #  wrapped_method.bind(self).call *args, &block
+      #end
+      result = <%= around_advice.with_method %> '<%= method %>', wrapped_method.bind(self), *args, &block
 <%  else %>
-      result = <%= around_advice.with_method %> *args do |*args|
-        wrapped_method.bind(self).call *args, &block
-      end
+      #result = <%= around_advice.with_method %> *args do |*args|
+      #  wrapped_method.bind(self).call *args, &block
+      #end
+      result = <%= around_advice.with_method %> wrapped_method.bind(self), *args, &block
 <%  end
   else
 %>

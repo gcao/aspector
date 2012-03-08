@@ -220,14 +220,14 @@ module Aspector
         aop_recreate_method_with_advices method, [], [], advice
       end
 
-      aop_recreate_method_with_advices method, before_advices, after_advices, around_advices.first
+      aop_recreate_method_with_advices method, before_advices, after_advices, around_advices.first, true
 
       @aop_context.send scope, method if scope != :public
     ensure
       @aop_context.instance_variable_set(:@aop_creating_method, nil)
     end
 
-    def aop_recreate_method_with_advices method, before_advices, after_advices, around_advice
+    def aop_recreate_method_with_advices method, before_advices, after_advices, around_advice, is_outermost = false
       aspect = self
 
       code = METHOD_TEMPLATE.result(binding)
@@ -245,6 +245,9 @@ module Aspector
     define_method :<%= method %> do |*args, &block|
       return orig_method.bind(self).call(*args, &block) if aspect.class.aop_disabled?
 
+<% if is_outermost %>
+catch(:aop_return) do
+<% end %>
       # Before advices
 <% before_advices.each do |advice|
     if advice.options[:method_name_arg] %>
@@ -253,7 +256,7 @@ module Aspector
       result = <%= advice.with_method %> *args
 <%  end %>
 
-      return result.value if result.is_a? ::Aspector::ReturnThis
+      #return result.value if result.is_a? ::Aspector::ReturnThis
 <%  if advice.options[:skip_if_false] %>
       return unless result
 <%  end
@@ -297,6 +300,9 @@ module Aspector
     end
 %>
       result
+<% end %>
+<% if is_outermost %>
+end
 <% end %>
     end
     CODE

@@ -1,6 +1,8 @@
 module Aspector
   module ObjectExtension
 
+    private
+
     def aspector *args, &block
       options = args.last.is_a?(Hash) ? args.pop : {}
 
@@ -19,7 +21,13 @@ module Aspector
       klass
     end
 
+    def aop_return value = nil
+      throw :aop_return, value
+    end
+    alias :returns :aop_return
+
   end
 end
 
 Object.send(:include, Aspector::ObjectExtension)
+

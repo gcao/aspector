@@ -11,4 +11,3 @@ require 'aspector/deferred_option'
 
 require 'aspector/aspect_instances'
 
-require 'aspector/return_this'

@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "aspector"
-  s.version = "0.8.0"
+  s.version = "0.9.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Guoliang Cao"]
-  s.date = "2012-02-14"
+  s.date = "2012-03-08"
   s.description = ""
   s.email = "gcao99@gmail.com"
   s.extra_rdoc_files = [
@@ -48,8 +48,8 @@ Gem::Specification.new do |s|
     "lib/aspector/method_matcher.rb",
     "lib/aspector/module_extension.rb",
     "lib/aspector/object_extension.rb",
-    "lib/aspector/return_this.rb",
     "performance-tests/after_test.rb",
+    "performance-tests/around_advice_benchmark.rb",
     "performance-tests/around_test.rb",
     "performance-tests/before_test.rb",
     "performance-tests/combined_test.rb",

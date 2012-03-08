@@ -15,8 +15,8 @@ require 'aspector'
 class ExceptionHandler < Aspector::Base
 
   target do
-    def handle_exception *args, &block
-      block.call *args
+    def handle_exception proxy, *args, &block
+      proxy.call *args, &block
     rescue => e
       puts "Rescued: #{e}"
     end

@@ -16,10 +16,10 @@ class LoggingAspect < Aspector::Base
 
   ALL_METHODS = /.*/
 
-  around ALL_METHODS, :except => :class, :method_name_arg => true do |method, *args, &block|
+  around ALL_METHODS, :except => :class, :method_name_arg => true do |method, proxy, *args, &block|
     class_method = "#{self.class}.#{method}"
     puts "Entering #{class_method}: #{args.join(',')}"
-    result = block.call *args
+    result = proxy.call *args, &block
     puts "Exiting  #{class_method}: #{result}"
     result
   end

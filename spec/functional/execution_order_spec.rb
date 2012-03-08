@@ -12,9 +12,9 @@ describe "Aspect execution order" do
         result
       end
 
-      around :test do |&block|
+      around :test do |proxy, &block|
         value   <<  "do_around_before"
-        result  =   block.call
+        result  =   proxy.call &block
         value   <<  "do_around_after"
         result
       end
@@ -26,9 +26,9 @@ describe "Aspect execution order" do
         result
       end
 
-      around :test do |&block|
+      around :test do |proxy, &block|
         value   <<  "do_around_before2"
-        result  =   block.call
+        result  =   proxy.call &block
         value   <<  "do_around_after2"
         result
       end

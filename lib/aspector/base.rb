@@ -246,8 +246,9 @@ module Aspector
       return orig_method.bind(self).call(*args, &block) if aspect.class.aop_disabled?
 
 <% if is_outermost %>
-catch(:aop_return) do
+      catch(:aop_return) do
 <% end %>
+
       # Before advices
 <% before_advices.each do |advice|
     if advice.options[:method_name_arg] %>
@@ -256,23 +257,17 @@ catch(:aop_return) do
       result = <%= advice.with_method %> *args
 <%  end %>
 
-      #return result.value if result.is_a? ::Aspector::ReturnThis
 <%  if advice.options[:skip_if_false] %>
       return unless result
 <%  end
   end
 %>
 
-<% if around_advice
-    if around_advice.options[:method_name_arg] %>
-      #result = <%= around_advice.with_method %> '<%= method %>', *args do |*args|
-      #  wrapped_method.bind(self).call *args, &block
-      #end
+<% if around_advice %>
+      # Around advice
+<%  if around_advice.options[:method_name_arg] %>
       result = <%= around_advice.with_method %> '<%= method %>', wrapped_method.bind(self), *args, &block
 <%  else %>
-      #result = <%= around_advice.with_method %> *args do |*args|
-      #  wrapped_method.bind(self).call *args, &block
-      #end
       result = <%= around_advice.with_method %> wrapped_method.bind(self), *args, &block
 <%  end
   else
@@ -301,8 +296,9 @@ catch(:aop_return) do
 %>
       result
 <% end %>
+
 <% if is_outermost %>
-end
+      end
 <% end %>
     end
     CODE

@@ -16,8 +16,8 @@ require 'aspector'
 class RetryAspect < Aspector::Base
 
   target do
-    def retry_this &block
-      block.call
+    def retry_this proxy, &block
+      proxy.call &block
     rescue => e
       @retry_count ||= 3
       @retry_count -= 1

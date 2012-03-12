@@ -4,19 +4,17 @@ module Aspector
       ::Aspector::Base.extend(self)
 
       def aop_enable
-        @aop_disabled = nil
+        def aop_disabled?
+        end
       end
       alias :enable :aop_enable
 
       def aop_disable
-        @aop_disabled = true
+        def aop_disabled?
+          true
+        end
       end
       alias :disable :aop_disable
-
-      def aop_disabled?
-        @aop_disabled
-      end
-      alias :disabled? :aop_disabled?
 
       def aop_advices
         @aop_advices ||= []

@@ -26,6 +26,9 @@ module Aspector
       after_initialize
     end
 
+    def aop_disabled?
+    end
+
     def aop_advices
       shared_advices = self.class.aop_advices
 
@@ -243,7 +246,7 @@ module Aspector
 <% end %>
 
     define_method :<%= method %> do |*args, &block|
-      return orig_method.bind(self).call(*args, &block) if aspect.class.aop_disabled?
+      return orig_method.bind(self).call(*args, &block) if aspect.aop_disabled?
 
 <% if is_outermost %>
       catch(:aop_return) do

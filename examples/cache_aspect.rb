@@ -48,12 +48,12 @@ class CacheAspect < Aspector::Base
 
   def after_initialize
     aspect = self
-    around options[:method], :method_name_arg => true do |method, proxy, &block|
+    around options[:method], :method_name_arg => true do |method, &proxy|
       key = method
       ttl = aspect.options[:ttl]
 
       SimpleCache.cache key, ttl do
-        proxy.call &block
+        proxy.call
       end
     end
   end

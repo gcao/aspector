@@ -3,9 +3,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe "Around advices" do
   it "should work" do
     klass = create_test_class do
-      def do_this proxy, &block
+      def do_this &proxy
         value << "before"
-        result = proxy.call &block
+        result = proxy.call
         value << "after"
         result
       end
@@ -24,9 +24,9 @@ describe "Around advices" do
     klass = create_test_class
 
     aspector(klass) do
-      around :test do |proxy, &block|
+      around :test do |&proxy|
         value << "before"
-        result = proxy.call &block
+        result = proxy.call
         value << "after"
         result
       end
@@ -39,9 +39,9 @@ describe "Around advices" do
 
   it "method_name_arg" do
     klass = create_test_class do
-      def do_this method, proxy, &block
+      def do_this method, &proxy
         value << "before(#{method})"
-        result = proxy.call &block
+        result = proxy.call
         value << "after(#{method})"
         result
       end

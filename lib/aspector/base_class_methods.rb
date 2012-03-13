@@ -4,13 +4,13 @@ module Aspector
       ::Aspector::Base.extend(self)
 
       def aop_enable
-        def aop_disabled?
+        send :define_method, :aop_disabled? do
         end
       end
       alias :enable :aop_enable
 
       def aop_disable
-        def aop_disabled?
+        send :define_method, :aop_disabled? do
           true
         end
       end

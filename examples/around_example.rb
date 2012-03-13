@@ -14,18 +14,18 @@ require 'aspector'
 
 aspector(A) do
   target do
-    def do_this proxy, &block
+    def do_this &proxy
       puts 'before'
-      proxy.call &block
+      proxy.call
       puts 'after'
     end
   end
 
   around :test, :do_this
 
-  around :test do |proxy, &block|
+  around :test do |&proxy|
     puts 'before(block)'
-    proxy.call &block
+    proxy.call
     puts 'after(block)'
   end
 end

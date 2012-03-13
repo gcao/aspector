@@ -26,32 +26,11 @@ module Aspector
       after_initialize
     end
 
-    def aop_enable
-      class << self
-        def aop_disabled?; end
-      end
-    end
-    alias enable aop_enable
-
-    def aop_disable
-      class << self
-        def aop_disabled?; true; end
-      end
-    end
-    alias disable aop_disable
-
-    def aop_reset_disabled
-      class << self
-        remove_method :aop_disabled?
-      end
-    end
-    alias reset_disabled :aop_reset_disabled
-
     def aop_disabled?
     end
 
     def disabled?
-      aop_disabled
+      aop_disabled?
     end
 
     def aop_advices
@@ -310,9 +289,13 @@ module Aspector
 <% if around_advice %>
       # Around advice
 <%  if around_advice.options[:method_name_arg] %>
-      result = <%= around_advice.with_method %> '<%= method %>', wrapped_method.bind(self), *args, &block
+      result = <%= around_advice.with_method %> '<%= method %>', *args do
+        wrapped_method.bind(self).call *args, &block
+      end
 <%  else %>
-      result = <%= around_advice.with_method %> wrapped_method.bind(self), *args, &block
+      result = <%= around_advice.with_method %> *args do
+        wrapped_method.bind(self).call *args, &block
+      end
 <%  end
   else
 %>

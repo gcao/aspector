@@ -17,9 +17,9 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'aspector'
 
 class AroundAspect < Aspector::Base
-  around :test do |proxy, *args, &block|
+  around :test do |*args, &proxy|
     begin
-      proxy.call *args, &block
+      proxy.call
     rescue => e
     end
   end

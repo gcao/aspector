@@ -12,9 +12,9 @@ describe "Aspects combined" do
         result
       end
 
-      around :test do |proxy, &block|
+      around :test do |&proxy|
         value   <<  "do_around_before"
-        result  =   proxy.call &block
+        result  =   proxy.call
         value   <<  "do_around_after"
         result
       end
@@ -28,9 +28,9 @@ describe "Aspects combined" do
         result
       end
 
-      around :test do |proxy, &block|
+      around :test do |&proxy|
         value   <<  "do_around_before2"
-        result  =   proxy.call &block
+        result  =   proxy.call
         value   <<  "do_around_after2"
         result
       end

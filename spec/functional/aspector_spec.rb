@@ -12,9 +12,9 @@ describe "Aspector" do
         result
       end
 
-      around :test do |proxy, &block|
+      around :test do |&proxy|
         value   <<  "do_around_before"
-        result  =   proxy.call &block
+        result  =   proxy.call
         value   <<  "do_around_after"
         result
       end
@@ -39,9 +39,9 @@ describe "Aspector" do
           result
         end
 
-        around(:test) do |proxy, &block|
+        around(:test) do |&proxy|
           value   <<  "do_around_before(#{name})"
-          result  =   proxy.call &block
+          result  =   proxy.call
           value   <<  "do_around_after(#{name})"
           result
         end

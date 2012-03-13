@@ -13,8 +13,8 @@ class AroundTest < Test::Unit::TestCase
 
     def test; end
 
-    def around_test proxy, &block
-      proxy.call &block
+    def around_test &proxy
+      proxy.call
     end
   end
 

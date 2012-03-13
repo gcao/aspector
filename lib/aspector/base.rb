@@ -26,11 +26,38 @@ module Aspector
       after_initialize
     end
 
+    def aop_enable
+      class << self
+        def aop_disabled?; end
+      end
+
+      aop_disabled?
+    end
+    alias enable aop_enable
+
+    def aop_disable
+      class << self
+        def aop_disabled?; true; end
+      end
+
+      aop_disabled?
+    end
+    alias disable aop_disable
+
+    def aop_reset_disabled
+      class << self
+        remove_method :aop_disabled?
+      end
+
+      aop_disabled?
+    end
+    alias reset_disabled :aop_reset_disabled
+
     def aop_disabled?
     end
 
     def disabled?
-      aop_disabled
+      aop_disabled?
     end
 
     def aop_advices

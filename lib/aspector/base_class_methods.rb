@@ -6,6 +6,8 @@ module Aspector
       def aop_enable
         send :define_method, :aop_disabled? do
         end
+
+        nil
       end
       alias :enable :aop_enable
 
@@ -13,6 +15,8 @@ module Aspector
         send :define_method, :aop_disabled? do
           true
         end
+
+        nil
       end
       alias :disable :aop_disable
 

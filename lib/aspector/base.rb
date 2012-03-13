@@ -82,6 +82,21 @@ module Aspector
 
     def aop_apply_to_methods
       advices = aop_advices
+
+      # If method/methods option is set and all are String or Symbol, apply to those only, instead of
+      # iterating through all methods
+      methods = [@aop_options[:method] || @aop_options[:methods]]
+      methods.compact!
+      methods.flatten!
+
+      if not methods.empty? and methods.all?{|method| method.is_a? String or method.is_a? Symbol }
+        methods.each do |method|
+          aop_apply_to_method(method.to_s, advices)
+        end
+
+        return
+      end
+
       @aop_context.public_instance_methods.each do |method|
         aop_apply_to_method(method.to_s, advices, :public)
       end

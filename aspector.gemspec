@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "aspector"
-  s.version = "0.9.0"
+  s.version = "0.9.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Guoliang Cao"]
-  s.date = "2012-03-08"
+  s.date = "2012-03-13"
   s.description = ""
   s.email = "gcao99@gmail.com"
   s.extra_rdoc_files = [
@@ -91,6 +91,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<rb-fsevent>, ["~> 0.4.3.1"])
       s.add_development_dependency(%q<growl>, ["~> 1.0.3"])
       s.add_development_dependency(%q<awesome_print>, [">= 0"])
+      s.add_development_dependency(%q<pry>, [">= 0"])
     else
       s.add_dependency(%q<rspec>, [">= 0"])
       s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
@@ -102,6 +103,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rb-fsevent>, ["~> 0.4.3.1"])
       s.add_dependency(%q<growl>, ["~> 1.0.3"])
       s.add_dependency(%q<awesome_print>, [">= 0"])
+      s.add_dependency(%q<pry>, [">= 0"])
     end
   else
     s.add_dependency(%q<rspec>, [">= 0"])
@@ -114,6 +116,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<rb-fsevent>, ["~> 0.4.3.1"])
     s.add_dependency(%q<growl>, ["~> 1.0.3"])
     s.add_dependency(%q<awesome_print>, [">= 0"])
+    s.add_dependency(%q<pry>, [">= 0"])
   end
 end
 

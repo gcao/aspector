@@ -29,7 +29,6 @@ module Aspector
       def aop_apply target, options = {}
         aspect_instance = new(target, options)
         aspect_instance.send :aop_apply
-        aspect_instance.send :aop_add_method_hooks
         aspect_instance
       end
       alias :apply :aop_apply
@@ -64,6 +63,8 @@ module Aspector
       alias :around :aop_around
 
       def aop_target code = nil, &block
+        return unless code or block_given?
+
         logic = DeferredLogic.new(code || block)
         aop_deferred_logics << logic
         logic

@@ -95,4 +95,74 @@ describe "Aspector" do
     obj.value.should == %w"before_test before_test test"
   end
 
+  it "if new_methods_only is true, do not apply to existing methods" do
+    aspect = Aspector do
+      before(:test) { value << 'before_test' }
+    end
+
+    klass = create_test_class
+    aspect.apply(klass, :new_methods_only => true)
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"test"
+  end
+
+  it "if new_methods_only is true, do apply to new methods" do
+    aspect = Aspector do
+      before(:test) { value << 'before_test' }
+    end
+
+    klass = Class.new do
+      def value
+        @value ||= []
+      end
+    end
+
+    aspect.apply(klass, :new_methods_only => true)
+
+    klass.send :define_method, :test do
+      value << "test"
+    end
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"before_test test"
+  end
+
+  it "if old_methods_only is true, do apply to methods already defined" do
+    aspect = Aspector do
+      before(:test) { value << 'before_test' }
+    end
+
+    klass = create_test_class
+    aspect.apply(klass, :old_methods_only => true)
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"before_test test"
+  end
+
+  it "if old_methods_only is true, do not apply to new methods" do
+    aspect = Aspector do
+      before(:test) { value << 'before_test' }
+    end
+
+    klass = Class.new do
+      def value
+        @value ||= []
+      end
+    end
+
+    aspect.apply(klass, :old_methods_only => true)
+
+    klass.send :define_method, :test do
+      value << "test"
+    end
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"test"
+  end
+
 end

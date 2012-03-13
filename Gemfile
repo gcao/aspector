@@ -14,4 +14,5 @@ group :development do
   gem 'growl', "~> 1.0.3"
 
   gem 'awesome_print'
+  gem 'pry'
 end

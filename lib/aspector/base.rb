@@ -26,7 +26,32 @@ module Aspector
       after_initialize
     end
 
+    def aop_enable
+      class << self
+        def aop_disabled?; end
+      end
+    end
+    alias enable aop_enable
+
+    def aop_disable
+      class << self
+        def aop_disabled?; true; end
+      end
+    end
+    alias disable aop_disable
+
+    def aop_reset_disabled
+      class << self
+        remove_method :aop_disabled?
+      end
+    end
+    alias reset_disabled :aop_reset_disabled
+
     def aop_disabled?
+    end
+
+    def disabled?
+      aop_disabled
     end
 
     def aop_advices
@@ -48,8 +73,9 @@ module Aspector
       before_apply
       aop_invoke_deferred_logics
       aop_define_methods_for_advice_blocks
-      aop_add_to_instances
-      aop_apply_to_methods
+      aop_add_to_instances unless @aop_options[:old_methods_only]
+      aop_apply_to_methods unless @aop_options[:new_methods_only]
+      aop_add_method_hooks unless @aop_options[:old_methods_only]
       after_apply
     end
     alias :apply :aop_apply
@@ -249,7 +275,7 @@ module Aspector
       return orig_method.bind(self).call(*args, &block) if aspect.aop_disabled?
 
 <% if is_outermost %>
-      catch(:aop_return) do
+      catch(:aop_returns) do
 <% end %>
 
       # Before advices

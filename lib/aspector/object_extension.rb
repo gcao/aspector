@@ -21,10 +21,10 @@ module Aspector
       klass
     end
 
-    def aop_return value = nil
-      throw :aop_return, value
+    def aop_returns value = nil
+      throw :aop_returns, value
     end
-    alias :returns :aop_return
+    alias :returns :aop_returns
 
   end
 end

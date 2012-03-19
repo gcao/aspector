@@ -53,10 +53,10 @@ describe "Before advices" do
     obj.value.should == %w"do_this test"
   end
 
-  it "method_name_arg" do
+  it "method_arg" do
     klass = Class.new do
       aspector do
-        before :test, :do_this, :method_name_arg => true
+        before :test, :do_this, :method_arg => true
       end
 
       def value

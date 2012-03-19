@@ -18,7 +18,7 @@ describe "After advices" do
     obj.value.should == %w"test do_this"
   end
 
-  it "method_name_arg" do
+  it "method_arg" do
     klass = create_test_class do
       def do_this method, result
         value << "do_this(#{method})"
@@ -27,7 +27,7 @@ describe "After advices" do
     end
 
     aspector(klass) do
-      after :test, :do_this, :method_name_arg => true
+      after :test, :do_this, :method_arg => true
     end
 
     obj = klass.new

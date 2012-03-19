@@ -37,7 +37,7 @@ describe "Around advices" do
     obj.value.should == %w"before test after"
   end
 
-  it "method_name_arg" do
+  it "method_arg" do
     klass = create_test_class do
       def do_this method, proxy, &block
         value << "before(#{method})"
@@ -48,7 +48,7 @@ describe "Around advices" do
     end
 
     aspector(klass) do
-      around :test, :do_this, :method_name_arg => true
+      around :test, :do_this, :method_arg => true
     end
 
     obj = klass.new

@@ -269,7 +269,7 @@ module Aspector
 <% before_advices.each do |advice| %>
       result = <%= advice.with_method %> <%
         if advice.options[:aspect_arg] %>aspect, <% end %><%
-        if advice.options[:method_name_arg] %>'<%= method %>', <% end
+        if advice.options[:method_arg] %>'<%= method %>', <% end
         %>*args
 
 <%  if advice.options[:skip_if_false] %>
@@ -282,7 +282,7 @@ module Aspector
       # Around advice
       result = <%= around_advice.with_method %> <%
         if around_advice.options[:aspect_arg] %>aspect, <% end %><%
-        if around_advice.options[:method_name_arg] %>'<%= method %>', <% end
+        if around_advice.options[:method_arg] %>'<%= method %>', <% end
         %>wrapped_method.bind(self), *args, &block
 <% else %>
       # Invoke original method
@@ -296,13 +296,13 @@ module Aspector
 %>
       result = <%= advice.with_method %> <%
         if advice.options[:aspect_arg] %>aspect, <% end %><%
-        if advice.options[:method_name_arg] %>'<%= method %>', <% end %><%
+        if advice.options[:method_arg] %>'<%= method %>', <% end %><%
         if advice.options[:result_arg] %>result, <% end
         %>*args
 <%    else %>
       <%= advice.with_method %> <%
         if advice.options[:aspect_arg] %>aspect, <% end %><%
-        if advice.options[:method_name_arg] %>'<%= method %>', <% end
+        if advice.options[:method_arg] %>'<%= method %>', <% end
         %>*args
 <%    end
     end

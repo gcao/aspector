@@ -61,17 +61,7 @@ module Aspector
     end
 
     def aop_advices
-      shared_advices = self.class.aop_advices
-
-      if shared_advices and shared_advices.size > 0
-        if @aop_advices
-          @aop_advices + shared_advices
-        else
-          shared_advices
-        end
-      else
-        @aop_advices or []
-      end
+      self.class.aop_advices
     end
     alias :advices :aop_advices
 
@@ -157,30 +147,6 @@ module Aspector
 
     def after_apply_to_method method, advices
     end
-
-    def aop_before *methods, &block
-      @aop_advices ||= []
-      @aop_advices << self.class.send(:aop_create_advice, Aspector::AdviceMetadata::BEFORE, self, methods, &block)
-    end
-    alias :before :aop_before
-
-    def aop_before_filter *methods, &block
-      @aop_advices ||= []
-      @aop_advices << self.class.send(:aop_create_advice, Aspector::AdviceMetadata::BEFORE_FILTER, self, methods, &block)
-    end
-    alias :before_filter :aop_before_filter
-
-    def aop_after *methods, &block
-      @aop_advices ||= []
-      @aop_advices << self.class.send(:aop_create_advice, Aspector::AdviceMetadata::AFTER, self, methods, &block)
-    end
-    alias :after :aop_after
-
-    def aop_around *methods, &block
-      @aop_advices ||= []
-      @aop_advices << self.class.send(:aop_create_advice, Aspector::AdviceMetadata::AROUND, self, methods, &block)
-    end
-    alias :around :aop_around
 
     private
 

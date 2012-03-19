@@ -300,12 +300,11 @@ module Aspector
 <% end %>
 
       # Before advices
-<% before_advices.each do |advice|
-    if advice.options[:method_name_arg] %>
-      result = <%= advice.with_method %> '<%= method %>', *args
-<%  else %>
-      result = <%= advice.with_method %> *args
-<%  end %>
+<% before_advices.each do |advice| %>
+      result = <%= advice.with_method %> <%
+        if advice.options[:aspect_arg] %>aspect, <% end %><%
+        if advice.options[:method_name_arg] %>'<%= method %>', <% end
+        %>*args
 
 <%  if advice.options[:skip_if_false] %>
       return unless result
@@ -315,13 +314,11 @@ module Aspector
 
 <% if around_advice %>
       # Around advice
-<%  if around_advice.options[:method_name_arg] %>
-      result = <%= around_advice.with_method %> '<%= method %>', wrapped_method.bind(self), *args, &block
-<%  else %>
-      result = <%= around_advice.with_method %> wrapped_method.bind(self), *args, &block
-<%  end
-  else
-%>
+      result = <%= around_advice.with_method %> <%
+        if around_advice.options[:aspect_arg] %>aspect, <% end %><%
+        if around_advice.options[:method_name_arg] %>'<%= method %>', <% end
+        %>wrapped_method.bind(self), *args, &block
+<% else %>
       # Invoke original method
       result = orig_method.bind(self).call *args, &block
 <% end %>
@@ -329,18 +326,18 @@ module Aspector
       # After advices
 <% unless after_advices.empty?
     after_advices.each do |advice|
-      if advice.options[:method_name_arg]
-        if advice.options[:result_arg]
+      if advice.options[:result_arg]
 %>
-      result = <%= advice.with_method %> '<%= method %>', result, *args
-<%      else %>
-      <%= advice.with_method %> '<%= method %>', *args
-<%      end
-      elsif advice.options[:result_arg]
-%>
-      result = <%= advice.with_method %> result, *args
+      result = <%= advice.with_method %> <%
+        if advice.options[:aspect_arg] %>aspect, <% end %><%
+        if advice.options[:method_name_arg] %>'<%= method %>', <% end %><%
+        if advice.options[:result_arg] %>result, <% end
+        %>*args
 <%    else %>
-      <%= advice.with_method %> *args
+      <%= advice.with_method %> <%
+        if advice.options[:aspect_arg] %>aspect, <% end %><%
+        if advice.options[:method_name_arg] %>'<%= method %>', <% end
+        %>*args
 <%    end
     end
 %>

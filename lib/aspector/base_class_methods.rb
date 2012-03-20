@@ -31,6 +31,13 @@ module Aspector
       alias :default_options :aop_default_options
 
       def aop_apply target, options = {}
+        # Handle 'Klass#method' shortcut
+        if target.is_a? String
+          target, method = target.split('#')
+          target = Object.const_get target
+          options.merge! :method => method
+        end
+
         aspect_instance = new(target, options)
         aspect_instance.send :aop_apply
         aspect_instance
@@ -99,6 +106,8 @@ module Aspector
         end
 
         with_method = methods.pop unless block_given?
+
+        methods << aop_options[:method] << aop_options[:methods] if methods.empty?
 
         Aspector::Advice.new(self,
                              meta_data.advice_type,

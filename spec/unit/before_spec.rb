@@ -77,5 +77,37 @@ describe "Before advices" do
     obj.value.should == %w"do_this(test) test"
   end
 
+  it "implicit method option" do
+    ImplicitMethodOptionTest = create_test_class do
+      def do_this
+        value << "do_this"
+      end
+    end
+
+    aspector "ImplicitMethodOptionTest#test" do
+      before :do_this
+    end
+
+    o = ImplicitMethodOptionTest.new
+    o.test
+    o.value.should == %w"do_this test"
+  end
+
+  it "implicit methods option" do
+    klass = create_test_class do
+      def do_this
+        value << "do_this"
+      end
+    end
+
+    aspector klass, :methods => [:test] do
+      before :do_this
+    end
+
+    o = ImplicitMethodOptionTest.new
+    o.test
+    o.value.should == %w"do_this test"
+  end
+
 end
 

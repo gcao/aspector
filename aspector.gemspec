@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "aspector"
-  s.version = "0.10.0"
+  s.version = "0.10.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Guoliang Cao"]
-  s.date = "2012-03-19"
+  s.date = "2012-03-20"
   s.description = ""
   s.email = "gcao99@gmail.com"
   s.extra_rdoc_files = [
@@ -35,6 +35,7 @@ Gem::Specification.new do |s|
     "examples/aspector_example.rb",
     "examples/cache_aspect.rb",
     "examples/exception_handler.rb",
+    "examples/implicit_method_option_test.rb",
     "examples/logging_aspect.rb",
     "examples/retry_aspect.rb",
     "lib/aspector.rb",

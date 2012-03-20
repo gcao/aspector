@@ -155,7 +155,7 @@ module Aspector
     end
 
     def aop_get_context
-      return @aop_target if @aop_target.is_a?(Module) and not @aop_options[:eigen_class]
+      return @aop_target if @aop_target.is_a?(Module) and not @aop_options[:class_methods]
 
       class << @aop_target
         self
@@ -189,7 +189,7 @@ module Aspector
     end
 
     def aop_add_method_hooks
-      if @aop_options[:eigen_class]
+      if @aop_options[:class_methods]
         return unless @aop_target.is_a?(Module)
 
         eigen_class = class << @aop_target; self; end

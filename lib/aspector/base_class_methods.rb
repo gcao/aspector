@@ -36,7 +36,7 @@ module Aspector
           if target.index('.')
             target, method = target.split('.')
             target = Object.const_get target
-            options.merge! :method => method, :eigen_class => true
+            options.merge! :method => method, :class_methods => true
           else
             target, method = target.split('#')
             target = Object.const_get target

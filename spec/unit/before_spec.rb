@@ -109,5 +109,25 @@ describe "Before advices" do
     o.value.should == %w"do_this test"
   end
 
+  it "klass.method shortcut" do
+    module KlassMethodTest
+      def self.value
+        @value ||= []
+      end
+
+      def self.test
+        value << "test"
+      end
+    end
+
+    aspector "KlassMethodTest.test" do
+      before do
+        value << "before"
+      end
+    end
+
+    KlassMethodTest.test.should == %w"before test"
+  end
+
 end
 

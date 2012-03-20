@@ -31,11 +31,17 @@ module Aspector
       alias :default_options :aop_default_options
 
       def aop_apply target, options = {}
-        # Handle 'Klass#method' shortcut
+        # Handle 'Klass#method' and 'Klass.method' shortcut
         if target.is_a? String
-          target, method = target.split('#')
-          target = Object.const_get target
-          options.merge! :method => method
+          if target.index('.')
+            target, method = target.split('.')
+            target = Object.const_get target
+            options.merge! :method => method, :eigen_class => true
+          else
+            target, method = target.split('#')
+            target = Object.const_get target
+            options.merge! :method => method
+          end
         end
 
         aspect_instance = new(target, options)

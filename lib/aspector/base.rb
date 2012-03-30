@@ -240,7 +240,7 @@ module Aspector
 
       @aop_context.send scope, method if scope != :public
     ensure
-      @aop_context.instance_variable_set(:@aop_creating_method, nil)
+      @aop_context.send :remove_instance_variable, :@aop_creating_method
     end
 
     def aop_recreate_method_with_advices method, before_advices, after_advices, around_advice, is_outermost = false

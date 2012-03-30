@@ -19,7 +19,7 @@ module Aspector
 
         yield if block_given?
       ensure
-        instance_variable_set(aop_applied_flag, nil)
+        remove_instance_variable aop_applied_flag
       end
     end
 
@@ -42,7 +42,7 @@ module Aspector
 
         yield if block_given?
       ensure
-        eigen_class.instance_variable_set(aop_applied_flag, nil)
+        eigen_class.send :remove_instance_variable, aop_applied_flag
       end
     end
 

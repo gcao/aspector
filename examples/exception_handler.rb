@@ -22,13 +22,13 @@ class ExceptionHandler < Aspector::Base
     end
   end
 
-  around options[:method], :handle_exception
+  around :handle_exception
 
 end
 
 ##############################
 
-ExceptionHandler.apply(A, :method => :test)
+ExceptionHandler.apply "A#test"
 
 a = A.new
 a.test 'good'

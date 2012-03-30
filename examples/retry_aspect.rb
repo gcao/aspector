@@ -28,13 +28,13 @@ class RetryAspect < Aspector::Base
     end
   end
 
-  around options[:method], :retry_this
+  around :retry_this
 
 end
 
 ##############################
 
-RetryAspect.apply(A, :method => :test)
+RetryAspect.apply "A#test"
 
 a = A.new
 a.test

@@ -46,7 +46,7 @@ require 'aspector'
 class CacheAspect < Aspector::Base
   default :ttl => 60
 
-  around options[:method], :aspect_arg => true, :method_arg => true do |aspect, method, proxy, &block|
+  around :aspect_arg => true, :method_arg => true do |aspect, method, proxy, &block|
     key = method
     ttl = aspect.options[:ttl]
 
@@ -59,8 +59,8 @@ end
 
 ##############################
 
-CacheAspect.apply A, :method => :test, :ttl => 2  # 2 seconds
-CacheAspect.apply A, :method => :test2
+CacheAspect.apply "A#test", :ttl => 2  # 2 seconds
+CacheAspect.apply "A#test2"
 
 a = A.new
 

@@ -79,6 +79,11 @@ module Aspector
       end
       alias :around :aop_around
 
+      def aop_raw *methods, &block
+        aop_advices << aop_create_advice(Aspector::AdviceMetadata::RAW, self, methods, &block)
+      end
+      alias :raw :aop_raw
+
       def aop_target code = nil, &block
         return unless code or block_given?
 
@@ -111,7 +116,12 @@ module Aspector
           methods[i] = methods[i].to_s if methods[i].is_a? Symbol
         end
 
-        with_method = methods.pop unless block_given?
+        if meta_data.advice_type == Aspector::Advice::RAW
+          raise "Bad raw advice - code block is required" unless block_given?
+          with_method = nil
+        else
+          with_method = methods.pop unless block_given?
+        end
 
         methods << aop_options[:method] << aop_options[:methods] if methods.empty?
 

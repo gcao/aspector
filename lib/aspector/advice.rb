@@ -4,6 +4,7 @@ module Aspector
     BEFORE = 1
     AFTER  = 2
     AROUND = 3
+    RAW    = 4
 
     attr_reader :type, :method_matcher, :options, :advice_block
 
@@ -31,6 +32,10 @@ module Aspector
       not @except.match?(method)
     end
 
+    def raw?
+      type == RAW
+    end
+
     def before?
       type == BEFORE
     end
@@ -52,6 +57,7 @@ module Aspector
       when BEFORE then @options[:skip_if_false] ? "BEFORE_FILTER" : "BEFORE"
       when AFTER  then "AFTER"
       when AROUND then "AROUND"
+      when RAW    then "RAW"
       else "UNKNOWN?!"
       end
     end

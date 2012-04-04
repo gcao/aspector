@@ -173,6 +173,7 @@ module Aspector
 
     def aop_define_methods_for_advice_blocks
       aop_advices.each do |advice|
+        next if advice.raw?
         next unless advice.advice_block
         @aop_context.send :define_method, advice.with_method, advice.advice_block
         @aop_context.send :private, advice.with_method
@@ -224,8 +225,23 @@ module Aspector
     end
 
     def aop_recreate_method method, advices, scope
-      @aop_wrapped_methods[method] = @aop_context.instance_method(method)
       @aop_context.instance_variable_set(:@aop_creating_method, true)
+
+      raw_advices = advices.select {|advice| advice.raw? }
+
+      if raw_advices.size > 0
+        raw_advices.each do |advice|
+          if @aop_target.is_a? Module and not @aop_options[:class_methods]
+            @aop_target.class_exec method, self, &advice.advice_block
+          else
+            @aop_target.instance_exec method, self, &advice.advice_block
+          end
+        end
+
+        return if raw_advices.size == advices.size
+      end
+
+      @aop_wrapped_methods[method] = @aop_context.instance_method(method)
 
       before_advices = advices.select {|advice| advice.before? }
       after_advices  = advices.select {|advice| advice.after?  }

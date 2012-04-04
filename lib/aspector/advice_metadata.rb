@@ -12,6 +12,7 @@ module Aspector
     BEFORE_FILTER = new Aspector::Advice::BEFORE, nil, :skip_if_false => true
     AFTER         = new Aspector::Advice::AFTER,  { :result_arg => true }, nil
     AROUND        = new Aspector::Advice::AROUND, nil, nil
+    RAW           = new Aspector::Advice::RAW, nil, nil
   end
 end
 

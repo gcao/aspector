@@ -6,13 +6,19 @@ class RawTest < Test::Unit::TestCase
   class Klass
 
     aspector do
+
       raw :test do |method, aspect|
-        alias_method :"#{method}_without_aspect", method
-        define_method method do
-          before_test
-          test_without_aspect
+        eval <<-CODE
+        alias #{method}_without_aspect #{method}
+
+        define_method :#{method} do
+          return #{method}_without_aspect if aspect.disabled?
+          before_#{method}
+          #{method}_without_aspect
         end
+        CODE
       end
+
     end
 
     def test_no_aspect; end

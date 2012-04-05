@@ -26,14 +26,15 @@ class AroundAspect < Aspector::Base
 end
 
 class RawAspect < Aspector::Base
-  target do
-    wrapped_method = instance_method(:test)
-    define_method :test do |*args, &block|
-      begin
-        wrapped_method.bind(self).call *args, &block
-      rescue => e
-      end
+  raw :test do |method,|
+    eval <<-CODE
+    alias #{method}_without_aspect #{method}
+
+    def #{method} *args, &block
+      #{method}_without_aspect *args, &block
+    rescue => e
     end
+    CODE
   end
 end
 

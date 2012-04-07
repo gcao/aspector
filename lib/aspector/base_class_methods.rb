@@ -76,6 +76,7 @@ module Aspector
       def aop_before_filter *methods, &block
         aop_advices << advice = aop_create_advice(Aspector::AdviceMetadata::BEFORE_FILTER, self, methods, &block)
         advice.index = aop_advices.size
+        aop_logger.log Logger::DEFINE_ADVICE, advice
         advice
       end
       alias before_filter aop_before_filter
@@ -83,6 +84,7 @@ module Aspector
       def aop_after *methods, &block
         aop_advices << advice = aop_create_advice(Aspector::AdviceMetadata::AFTER, self, methods, &block)
         advice.index = aop_advices.size
+        aop_logger.log Logger::DEFINE_ADVICE, advice
         advice
       end
       alias after aop_after
@@ -90,6 +92,7 @@ module Aspector
       def aop_around *methods, &block
         aop_advices << advice = aop_create_advice(Aspector::AdviceMetadata::AROUND, self, methods, &block)
         advice.index = aop_advices.size
+        aop_logger.log Logger::DEFINE_ADVICE, advice
         advice
       end
       alias around aop_around
@@ -97,6 +100,7 @@ module Aspector
       def aop_raw *methods, &block
         aop_advices << advice = aop_create_advice(Aspector::AdviceMetadata::RAW, self, methods, &block)
         advice.index = aop_advices.size
+        aop_logger.log Logger::DEFINE_ADVICE, advice
         advice
       end
       alias raw aop_raw

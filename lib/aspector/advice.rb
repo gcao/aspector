@@ -64,7 +64,7 @@ module Aspector
     end
 
     def to_s
-      s = "<advice " << index << "> "
+      s = "<advice " << index.to_s << "> "
       s << type_name
       s << " [" << @method_matcher.to_s << "] DO "
       s << @with_method.to_s

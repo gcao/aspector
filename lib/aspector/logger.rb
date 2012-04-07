@@ -10,8 +10,8 @@ module Aspector
     DEFAULT_LEVEL = TRACE
 
     # Actions
-    DEFINE_ADVICE = %W"define-advice"
-    APPLY = %W"apply"
+    DEFINE_ADVICE   = %W"define-advice"
+    APPLY           = %W"apply"
     APPLY_TO_METHOD = %W"apply-to-method #{DEBUG}"
 
     attr_reader :target

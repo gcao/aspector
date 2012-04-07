@@ -7,6 +7,7 @@ module Aspector
     RAW    = 4
 
     attr_reader :type, :method_matcher, :options, :advice_block
+    attr_accessor :index
 
     def initialize parent, type, method_matcher, with_method, options = {}, &block
       @parent         = parent
@@ -63,7 +64,8 @@ module Aspector
     end
 
     def to_s
-      s = type_name
+      s = "<advice " << index << "> "
+      s << type_name
       s << " [" << @method_matcher.to_s << "] DO "
       s << @with_method.to_s
       s << " WITH OPTIONS "

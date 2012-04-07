@@ -9,7 +9,7 @@ module Aspector
 
         nil
       end
-      alias :enable :aop_enable
+      alias enable aop_enable
 
       def aop_disable
         send :define_method, :aop_disabled? do
@@ -18,19 +18,25 @@ module Aspector
 
         nil
       end
-      alias :disable :aop_disable
+      alias disable aop_disable
+
+      def aop_logger
+        @aop_logger ||= Logger.new(self)
+      end
+      alias logger aop_logger
 
       def aop_advices
         @aop_advices ||= []
       end
-      alias :advices :aop_advices
+      alias advices aop_advices
 
       def aop_default_options
         @aop_default_options ||= {}
       end
-      alias :default_options :aop_default_options
+      alias default_options aop_default_options
 
       def aop_apply target, options = {}
+        aop_logger.log Logger::APPLY, target, options
         # Handle 'Klass#method' and 'Klass.method' shortcut
         if target.is_a? String
           if target.index('.')
@@ -48,7 +54,7 @@ module Aspector
         aspect_instance.send :aop_apply
         aspect_instance
       end
-      alias :apply :aop_apply
+      alias apply aop_apply
 
       def aop_default options
         if @aop_default_options
@@ -57,32 +63,43 @@ module Aspector
           @aop_default_options = options
         end
       end
-      alias :default :aop_default
+      alias default aop_default
 
       def aop_before *methods, &block
-        aop_advices << aop_create_advice(Aspector::AdviceMetadata::BEFORE, self, methods, &block)
+        aop_advices << advice = aop_create_advice(Aspector::AdviceMetadata::BEFORE, self, methods, &block)
+        advice.index = aop_advices.size
+        aop_logger.log Logger::DEFINE_ADVICE, advice
+        advice
       end
-      alias :before :aop_before
+      alias before aop_before
 
       def aop_before_filter *methods, &block
-        aop_advices << aop_create_advice(Aspector::AdviceMetadata::BEFORE_FILTER, self, methods, &block)
+        aop_advices << advice = aop_create_advice(Aspector::AdviceMetadata::BEFORE_FILTER, self, methods, &block)
+        advice.index = aop_advices.size
+        advice
       end
-      alias :before_filter :aop_before_filter
+      alias before_filter aop_before_filter
 
       def aop_after *methods, &block
-        aop_advices << aop_create_advice(Aspector::AdviceMetadata::AFTER, self, methods, &block)
+        aop_advices << advice = aop_create_advice(Aspector::AdviceMetadata::AFTER, self, methods, &block)
+        advice.index = aop_advices.size
+        advice
       end
-      alias :after :aop_after
+      alias after aop_after
 
       def aop_around *methods, &block
-        aop_advices << aop_create_advice(Aspector::AdviceMetadata::AROUND, self, methods, &block)
+        aop_advices << advice = aop_create_advice(Aspector::AdviceMetadata::AROUND, self, methods, &block)
+        advice.index = aop_advices.size
+        advice
       end
-      alias :around :aop_around
+      alias around aop_around
 
       def aop_raw *methods, &block
-        aop_advices << aop_create_advice(Aspector::AdviceMetadata::RAW, self, methods, &block)
+        aop_advices << advice = aop_create_advice(Aspector::AdviceMetadata::RAW, self, methods, &block)
+        advice.index = aop_advices.size
+        advice
       end
-      alias :raw :aop_raw
+      alias raw aop_raw
 
       def aop_target code = nil, &block
         return unless code or block_given?
@@ -91,12 +108,12 @@ module Aspector
         aop_deferred_logics << logic
         logic
       end
-      alias :target :aop_target
+      alias target aop_target
 
       def aop_options
         DeferredOption.new
       end
-      alias :options :aop_options
+      alias options aop_options
 
       private
 

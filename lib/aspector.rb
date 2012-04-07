@@ -1,3 +1,5 @@
+require 'aspector/logger'
+
 require 'aspector/object_extension'
 require 'aspector/module_extension'
 

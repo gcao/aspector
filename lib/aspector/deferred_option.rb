@@ -8,5 +8,9 @@ module Aspector
       self
     end
 
+    def inspect
+      "options[:#{key}]"
+    end
   end
 end
+

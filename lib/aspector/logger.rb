@@ -10,15 +10,25 @@ module Aspector
     DEFAULT_LEVEL = TRACE
 
     # Actions
-    DEFINE_ADVICE   = %W"define-advice"
-    APPLY           = %W"apply"
-    APPLY_TO_METHOD = %W"apply-to-method #{DEBUG}"
+    DEFINE_ADVICE          = %W"define-advice"
+    APPLY                  = %W"apply"
+    APPLY_TO_METHOD        = %W"apply-to-method #{DEBUG}"
+    ENABLE_ASPECT          = %W"enable-aspect"
+    DISABLE_ASPECT         = %W"disable-aspect"
 
-    attr_reader :target
+    ENTER_GENERATED_METHOD = %W"enter-generated-method #{TRACE}"
+    EXIT_GENERATED_METHOD  = %W"exit-generated-method #{TRACE}"
+    EXIT_BECAUSE_DISABLED  = %W"exit-because-disabled #{TRACE}"
+    BEFORE_INVOKE_ADVICE   = %W"before-invoke-advice #{TRACE}"
+    AFTER_INVOKE_ADVICE    = %W"after-invoke-advice #{TRACE}"
+    BEFORE_WRAPPED_METHOD  = %W"before-wrapped-method #{TRACE}"
+    AFTER_WRAPPED_METHOD   = %W"after-wrapped-method #{TRACE}"
+
+    attr_reader :aspect
     attr_writer :level
 
-    def initialize target
-      @target = target
+    def initialize aspect
+      @aspect = aspect
     end
 
     def level
@@ -35,7 +45,11 @@ module Aspector
       action = action_level[0]
       level = (action_level[1] || '30').to_i
       return if self.level > level
-      puts "Aspector | #{level_to_string(level)} | #{target} | #{action} | #{args.join(' | ')}"
+      puts "Aspector | #{level_to_string(level)} | #{aspect} | #{action} | #{args.join(' | ')}"
+    end
+
+    def visible? level
+      self.level <= level
     end
 
     private

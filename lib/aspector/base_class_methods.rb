@@ -4,6 +4,7 @@ module Aspector
       ::Aspector::Base.extend(self)
 
       def aop_enable
+        aop_logger.log Logger::ENABLE_ASPECT
         send :define_method, :aop_disabled? do
         end
 
@@ -12,6 +13,7 @@ module Aspector
       alias enable aop_enable
 
       def aop_disable
+        aop_logger.log Logger::DISABLE_ASPECT
         send :define_method, :aop_disabled? do
           true
         end

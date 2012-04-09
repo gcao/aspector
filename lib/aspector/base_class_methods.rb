@@ -38,7 +38,7 @@ module Aspector
       alias default_options aop_default_options
 
       def aop_apply target, options = {}
-        aop_logger.log Logger::APPLY, target, options
+        aop_logger.log Logger::APPLY, target, options.inspect
         # Handle 'Klass#method' and 'Klass.method' shortcut
         if target.is_a? String
           if target.index('.')

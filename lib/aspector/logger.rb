@@ -24,11 +24,11 @@ module Aspector
     BEFORE_WRAPPED_METHOD  = %W"before-wrapped-method #{TRACE}"
     AFTER_WRAPPED_METHOD   = %W"after-wrapped-method #{TRACE}"
 
-    attr_reader :aspect
+    attr_reader :context
     attr_writer :level
 
-    def initialize aspect
-      @aspect = aspect
+    def initialize context
+      @context = context
     end
 
     def level
@@ -42,10 +42,19 @@ module Aspector
     end
 
     def log action_level, *args
-      action = action_level[0]
-      level = (action_level[1] || '30').to_i
+      action, level = parse_action_level(action_level)
+
       return if self.level > level
-      puts "Aspector | #{level_to_string(level)} | #{aspect} | #{action} | #{args.join(' | ')}"
+
+      puts log_prefix(level) << action << " | " << args.join(" | ")
+    end
+
+    def log_method_call method, action_level, *args
+      action, level = parse_action_level(action_level)
+
+      return if self.level > level
+
+      puts log_prefix(level) << method << " | " << action << " | " << args.join(" | ")
     end
 
     def visible? level
@@ -53,6 +62,21 @@ module Aspector
     end
 
     private
+
+    def parse_action_level action_level
+      action = action_level[0]
+      level = (action_level[1] || '30').to_i
+      return action, level
+    end
+
+    def log_prefix level
+      s = "Aspector | " << level_to_string(level) << " | "
+      if context.is_a? Aspector::Base
+        s << context.class.to_s << " | " << context.aop_target.to_s << " | "
+      else
+        s << context.to_s << " | "
+      end
+    end
 
     def level_to_string level
       case level

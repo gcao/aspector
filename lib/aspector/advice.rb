@@ -64,15 +64,15 @@ module Aspector
     end
 
     def to_s
-      s = "<advice " << index.to_s << "> "
+      s = "<advice " << index.to_s << ">: "
       s << type_name
       s << " [" << @method_matcher.to_s << "] DO "
-      s << @with_method.to_s
-      s << " WITH OPTIONS "
-      @options.each do |key, value|
-        next if key == :skip_if_false
-        s << key.to_s << ":" << value.to_s << " "
+      if @with_method
+        s << @with_method.to_s
+      else
+        s << "stuff in block"
       end
+      s << " WITH OPTIONS " << @options.inspect
       s
     end
 

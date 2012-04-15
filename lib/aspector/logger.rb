@@ -7,7 +7,7 @@ module Aspector
     DEBUG = 20
     TRACE = 10
 
-    DEFAULT_VISIBLE_LEVEL = TRACE
+    DEFAULT_VISIBLE_LEVEL = INFO
 
     # Actions
     DEFINE_ADVICE          = %W"define-advice"

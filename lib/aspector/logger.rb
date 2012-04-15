@@ -7,7 +7,7 @@ module Aspector
     DEBUG = 20
     TRACE = 10
 
-    DEFAULT_LEVEL = TRACE
+    DEFAULT_VISIBLE_LEVEL = TRACE
 
     # Actions
     DEFINE_ADVICE          = %W"define-advice"
@@ -16,19 +16,24 @@ module Aspector
     ENABLE_ASPECT          = %W"enable-aspect"
     DISABLE_ASPECT         = %W"disable-aspect"
 
+    GENERATE_CODE          = %W"generate-code #{DEBUG}"
+
     ENTER_GENERATED_METHOD = %W"enter-generated-method #{TRACE}"
-    EXIT_GENERATED_METHOD  = %W"exit-generated-method #{TRACE}"
-    EXIT_BECAUSE_DISABLED  = %W"exit-because-disabled #{TRACE}"
+    EXIT_GENERATED_METHOD  = %W"exit--generated-method #{TRACE}"
+    EXIT_BECAUSE_DISABLED  = %W"exit--because-disabled #{TRACE}"
     BEFORE_INVOKE_ADVICE   = %W"before-invoke-advice #{TRACE}"
-    AFTER_INVOKE_ADVICE    = %W"after-invoke-advice #{TRACE}"
+    AFTER_INVOKE_ADVICE    = %W"after--invoke-advice #{TRACE}"
     BEFORE_WRAPPED_METHOD  = %W"before-wrapped-method #{TRACE}"
-    AFTER_WRAPPED_METHOD   = %W"after-wrapped-method #{TRACE}"
+    AFTER_WRAPPED_METHOD   = %W"after--wrapped-method #{TRACE}"
+    BEFORE_INVOKE_PROXY    = %W"before-invoke-proxy #{TRACE}"
+    AFTER_INVOKE_PROXY     = %W"after--invoke-proxy #{TRACE}"
 
     attr_reader :context
     attr_writer :level
 
-    def initialize context
+    def initialize context, level = nil
       @context = context
+      @level = level
     end
 
     def level
@@ -37,7 +42,7 @@ module Aspector
       if (level_string = ENV['ASPECTOR_LOG_LEVEL'])
         @level = string_to_level(level_string)
       else
-        @level = DEFAULT_LEVEL
+        @level = DEFAULT_VISIBLE_LEVEL
       end
     end
 
@@ -65,7 +70,7 @@ module Aspector
 
     def parse_action_level action_level
       action = action_level[0]
-      level = (action_level[1] || '30').to_i
+      level = (action_level[1] || INFO).to_i
       return action, level
     end
 

@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = "aspector"
-  s.version = "0.10.1"
+  s.name = %q{aspector}
+  s.version = "0.11.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Guoliang Cao"]
-  s.date = "2012-03-20"
-  s.description = ""
-  s.email = "gcao99@gmail.com"
+  s.date = %q{2012-04-15}
+  s.description = %q{}
+  s.email = %q{gcao99@gmail.com}
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
@@ -46,6 +46,7 @@ Gem::Specification.new do |s|
     "lib/aspector/base_class_methods.rb",
     "lib/aspector/deferred_logic.rb",
     "lib/aspector/deferred_option.rb",
+    "lib/aspector/logger.rb",
     "lib/aspector/method_matcher.rb",
     "lib/aspector/module_extension.rb",
     "lib/aspector/object_extension.rb",
@@ -55,6 +56,7 @@ Gem::Specification.new do |s|
     "performance-tests/before_test.rb",
     "performance-tests/combined_test.rb",
     "performance-tests/method_invocation_test.rb",
+    "performance-tests/raw_test.rb",
     "performance-tests/test_helper.rb",
     "spec/functional/advices_on_private_methods_spec.rb",
     "spec/functional/aspect_on_eigen_class_spec.rb",
@@ -70,13 +72,14 @@ Gem::Specification.new do |s|
     "spec/unit/base_spec.rb",
     "spec/unit/before_spec.rb",
     "spec/unit/deferred_logic_spec.rb",
-    "spec/unit/method_matcher_spec.rb"
+    "spec/unit/method_matcher_spec.rb",
+    "spec/unit/raw_spec.rb"
   ]
-  s.homepage = "http://github.com/gcao/aspector"
+  s.homepage = %q{http://github.com/gcao/aspector}
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.18"
-  s.summary = "Aspect Oriented Ruby Programming"
+  s.rubygems_version = %q{1.6.2}
+  s.summary = %q{Aspect Oriented Ruby Programming}
 
   if s.respond_to? :specification_version then
     s.specification_version = 3

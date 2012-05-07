@@ -10,23 +10,22 @@ module Aspector
     DEFAULT_VISIBLE_LEVEL = INFO
 
     # Actions
-    DEFINE_ADVICE          = %W"define-advice"
-    APPLY                  = %W"apply"
-    APPLY_TO_METHOD        = %W"apply-to-method #{DEBUG}"
-    ENABLE_ASPECT          = %W"enable-aspect"
-    DISABLE_ASPECT         = %W"disable-aspect"
+    DEFINE_ADVICE          = ["define-advice"  , INFO]
+    APPLY                  = ["apply"          , INFO]
+    APPLY_TO_METHOD        = ["apply-to-method", DEBUG]
+    ENABLE_ASPECT          = ["enable-aspect"  , INFO]
+    DISABLE_ASPECT         = ["disable-aspect" , INFO]
+    GENERATE_CODE          = ["generate-code"  , DEBUG]
 
-    GENERATE_CODE          = %W"generate-code #{DEBUG}"
-
-    ENTER_GENERATED_METHOD = %W"enter-generated-method #{TRACE}"
-    EXIT_GENERATED_METHOD  = %W"exit--generated-method #{TRACE}"
-    EXIT_BECAUSE_DISABLED  = %W"exit--because-disabled #{TRACE}"
-    BEFORE_INVOKE_ADVICE   = %W"before-invoke-advice #{TRACE}"
-    AFTER_INVOKE_ADVICE    = %W"after--invoke-advice #{TRACE}"
-    BEFORE_WRAPPED_METHOD  = %W"before-wrapped-method #{TRACE}"
-    AFTER_WRAPPED_METHOD   = %W"after--wrapped-method #{TRACE}"
-    BEFORE_INVOKE_PROXY    = %W"before-invoke-proxy #{TRACE}"
-    AFTER_INVOKE_PROXY     = %W"after--invoke-proxy #{TRACE}"
+    ENTER_GENERATED_METHOD = ["enter-generated-method", TRACE]
+    EXIT_GENERATED_METHOD  = ["exit--generated-method", TRACE]
+    EXIT_BECAUSE_DISABLED  = ["exit--because-disabled", TRACE]
+    BEFORE_INVOKE_ADVICE   = ["before-invoke-advice"  , TRACE]
+    AFTER_INVOKE_ADVICE    = ["after--invoke-advice"  , TRACE]
+    BEFORE_WRAPPED_METHOD  = ["before-wrapped-method" , TRACE]
+    AFTER_WRAPPED_METHOD   = ["after--wrapped-method" , TRACE]
+    BEFORE_INVOKE_PROXY    = ["before-invoke-proxy"   , TRACE]
+    AFTER_INVOKE_PROXY     = ["after--invoke-proxy"   , TRACE]
 
     attr_reader :context
     attr_writer :level
@@ -47,7 +46,7 @@ module Aspector
     end
 
     def log action_level, *args
-      action, level = parse_action_level(action_level)
+      action, level = *action_level
 
       return if self.level > level
 
@@ -55,7 +54,7 @@ module Aspector
     end
 
     def log_method_call method, action_level, *args
-      action, level = parse_action_level(action_level)
+      action, level = *action_level
 
       return if self.level > level
 
@@ -67,12 +66,6 @@ module Aspector
     end
 
     private
-
-    def parse_action_level action_level
-      action = action_level[0]
-      level = (action_level[1] || INFO).to_i
-      return action, level
-    end
 
     def log_prefix level
       s = "Aspector | " << level_to_string(level) << " | "

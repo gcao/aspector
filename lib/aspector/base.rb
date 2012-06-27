@@ -250,7 +250,12 @@ module Aspector
         return if raw_advices.size == advices.size
       end
 
-      @aop_wrapped_methods[method] = @aop_context.instance_method(method)
+      begin
+        @aop_wrapped_methods[method] = @aop_context.instance_method(method)
+      rescue
+        # ignore undefined method error
+        return
+      end
 
       before_advices = advices.select {|advice| advice.before? }
       after_advices  = advices.select {|advice| advice.after?  }

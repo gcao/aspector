@@ -88,7 +88,7 @@ module Aspector
     end
 
     def string_to_level level_string
-      return if level_string.nil? or level_string.strip == ''
+      return DEFAULT_VISIBLE_LEVEL if level_string.nil? or level_string.strip == ''
 
       case level_string.downcase
       when 'error' then ERROR

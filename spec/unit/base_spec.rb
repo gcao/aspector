@@ -77,5 +77,17 @@ describe "Aspector::Base" do
     obj.value.should == %w"do_this(TargetArgumentTestAspect) test"
   end
 
+  it "should not fail if method does not exist" do
+    klass = Class.new
+
+    aspect = Aspector do
+      before options[:methods] do
+        # dummy advice
+      end
+    end
+
+    aspect.apply(klass, :methods => 'not_exist')
+  end
+
 end
 

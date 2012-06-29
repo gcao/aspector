@@ -28,7 +28,7 @@ end
 
 ##############################
 
-ExceptionHandler.apply "A#test"
+ExceptionHandler.apply A, :method => "test"
 
 a = A.new
 a.test 'good'

@@ -78,17 +78,17 @@ describe "Before advices" do
   end
 
   it "implicit method option" do
-    ImplicitMethodOptionTest = create_test_class do
+    klass = create_test_class do
       def do_this
         value << "do_this"
       end
     end
 
-    aspector "ImplicitMethodOptionTest#test" do
+    aspector klass, :method => [:test] do
       before :do_this
     end
 
-    o = ImplicitMethodOptionTest.new
+    o = klass.new
     o.test
     o.value.should == %w"do_this test"
   end
@@ -104,29 +104,9 @@ describe "Before advices" do
       before :do_this
     end
 
-    o = ImplicitMethodOptionTest.new
+    o = klass.new
     o.test
     o.value.should == %w"do_this test"
-  end
-
-  it "klass.method shortcut" do
-    module KlassMethodTest
-      def self.value
-        @value ||= []
-      end
-
-      def self.test
-        value << "test"
-      end
-    end
-
-    aspector "KlassMethodTest.test" do
-      before do
-        value << "before"
-      end
-    end
-
-    KlassMethodTest.test.should == %w"before test"
   end
 
 end

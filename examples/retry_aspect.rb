@@ -34,7 +34,7 @@ end
 
 ##############################
 
-RetryAspect.apply "A#test"
+RetryAspect.apply A, :method => "test"
 
 a = A.new
 a.test

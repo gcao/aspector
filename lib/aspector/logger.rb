@@ -27,6 +27,9 @@ module Aspector
     BEFORE_INVOKE_PROXY    = ["before-invoke-proxy"   , TRACE]
     AFTER_INVOKE_PROXY     = ["after--invoke-proxy"   , TRACE]
 
+    # Unexpected behaviors
+    METHOD_NOT_FOUND       = ["method-not-found"      , WARN]
+
     attr_reader :context
     attr_writer :level
 

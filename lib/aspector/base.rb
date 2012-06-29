@@ -254,6 +254,10 @@ module Aspector
         @aop_wrapped_methods[method] = @aop_context.instance_method(method)
       rescue
         # ignore undefined method error
+        if @aop_options[:old_methods_only]
+          aop_logger.log Logger::METHOD_NOT_FOUND, method
+        end
+
         return
       end
 

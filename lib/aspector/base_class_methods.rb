@@ -39,18 +39,6 @@ module Aspector
 
       def aop_apply target, options = {}
         aop_logger.log Logger::APPLY, target, options.inspect
-        # Handle 'Klass#method' and 'Klass.method' shortcut
-        if target.is_a? String
-          if target.index('.')
-            target, method = target.split('.')
-            target = Object.const_get target
-            options.merge! :method => method, :class_methods => true
-          else
-            target, method = target.split('#')
-            target = Object.const_get target
-            options.merge! :method => method
-          end
-        end
 
         aspect_instance = new(target, options)
         aspect_instance.send :aop_apply

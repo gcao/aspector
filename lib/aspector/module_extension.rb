@@ -9,7 +9,8 @@ module Aspector
         @aop_creating_method or
         @aop_instances.nil? or @aop_instances.empty?
 
-      aop_applied_flag = :"@aop_applied_#{method}"
+      aop_applied_flag = "@aop_applied_#{method}"
+      aop_applied_flag.gsub! %r([?!=+\-\*/\^\|&\[\]<>%~]), "_"
       return (block_given? and yield) if instance_variable_get(aop_applied_flag)
 
       begin
@@ -32,7 +33,8 @@ module Aspector
       aop_instances = eigen_class.instance_variable_get(:@aop_instances)
       return (block_given? and yield) if aop_instances.nil? or aop_instances.empty?
 
-      aop_applied_flag = :"@aop_applied_#{method}"
+      aop_applied_flag = "@aop_applied_#{method}"
+      aop_applied_flag.gsub! %r([?!=+\-\*/\^\|&\[\]<>%~]), "_"
       return (block_given? and yield) if eigen_class.instance_variable_get(aop_applied_flag)
 
       begin

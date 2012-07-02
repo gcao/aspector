@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "aspector"
-  s.version = "0.11.1"
+  s.version = "0.12.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Guoliang Cao"]
-  s.date = "2012-06-27"
+  s.date = "2012-07-02"
   s.description = ""
   s.email = "gcao99@gmail.com"
   s.extra_rdoc_files = [

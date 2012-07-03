@@ -37,12 +37,18 @@ module Aspector
       end
       alias default_options aop_default_options
 
-      def aop_apply target, options = {}
-        aop_logger.log Logger::APPLY, target, options.inspect
+      def aop_apply target, *rest
+        options = rest.last.is_a?(Hash) ? rest.pop : {}
 
-        aspect_instance = new(target, options)
-        aspect_instance.send :aop_apply
-        aspect_instance
+        targets = rest.unshift target
+        result = targets.map do |target|
+          aop_logger.log Logger::APPLY, target, options.inspect
+          aspect_instance = new(target, options)
+          aspect_instance.send :aop_apply
+          aspect_instance
+        end
+
+        result.size == 1 ? result.first : result
       end
       alias apply aop_apply
 

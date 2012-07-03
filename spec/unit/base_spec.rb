@@ -39,6 +39,25 @@ describe "Aspector::Base" do
     obj.value.should == %w"do_before test"
   end
 
+  it "#apply to multiple targets at once" do
+    klass = create_test_class
+    klass2 = create_test_class
+
+    aspect = Aspector do
+      before :test do value << "do_before" end
+    end
+
+    aspect.apply(klass, klass2)
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"do_before test"
+
+    obj2 = klass2.new
+    obj2.test
+    obj2.value.should == %w"do_before test"
+  end
+
   it "use #target to add method to target class/module" do
     klass = create_test_class
 

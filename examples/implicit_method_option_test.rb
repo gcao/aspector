@@ -18,7 +18,6 @@ class ImplicitMethodOptionTest < Aspector::Base
   end
 end
 
-# ImplicitMethodOptionTest.apply A, :method => 'test'
 ImplicitMethodOptionTest.apply A, :method => "test"
 
 ##############################

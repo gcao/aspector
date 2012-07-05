@@ -9,3 +9,5 @@ rvm:
   - rbx-19mode
 # uncomment this line if your project needs to run something other than `rake`:
 script: bundle exec rspec spec
+gemfile: Gemfile.travis
+

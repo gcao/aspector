@@ -2,6 +2,8 @@
 
 aspector = ASPECT Oriented Ruby programming
 
+[![Build status](https://secure.travis-ci.org/gcao/aspector.png)](http://travis-ci.org/gcao/aspector)
+
 == Highlights
 
 * Encapsulate logic as aspects and apply to multiple targets easily
@@ -64,5 +66,4 @@ gem install aspector
 
 Copyright (c) 2011 Guoliang Cao. See LICENSE.txt for
 further details.
-
 

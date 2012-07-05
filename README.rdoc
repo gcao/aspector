@@ -1,8 +1,7 @@
 = aspector
+{<img src="https://secure.travis-ci.org/gcao/aspector.png" />}[http://travis-ci.org/gcao/aspector]
 
 aspector = ASPECT Oriented Ruby programming
-
-[![Build status](https://secure.travis-ci.org/gcao/aspector.png)](http://travis-ci.org/gcao/aspector)
 
 == Highlights
 

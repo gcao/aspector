@@ -24,6 +24,11 @@ GEM
       coderay (~> 1.0.5)
       method_source (~> 0.7.1)
       slop (>= 2.4.4, < 3)
+    pry (0.9.9.6-java)
+      coderay (~> 1.0.5)
+      method_source (~> 0.7.1)
+      slop (>= 2.4.4, < 3)
+      spoon (~> 0.0)
     rake (0.9.2.2)
     rb-fsevent (0.4.3.1)
     rspec (2.10.0)
@@ -36,9 +41,11 @@ GEM
     rspec-mocks (2.10.1)
     ruby-prof (0.11.2)
     slop (2.4.4)
+    spoon (0.0.1)
     thor (0.14.6)
 
 PLATFORMS
+  java
   ruby
 
 DEPENDENCIES

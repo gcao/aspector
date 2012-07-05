@@ -10,7 +10,7 @@ group :development do
   gem "guard-bundler", "~> 0.1.3"
   gem "guard-rspec", "~> 0.5.2"
   gem "guard-shell", "~> 0.1.1"
-  gem 'rb-fsevent', "~> 0.4.3.1"
+  gem 'rb-fsevent', "~> 0.4.3.1", :platforms => [:mri]
   gem 'growl', "~> 1.0.3"
 
   gem 'awesome_print'

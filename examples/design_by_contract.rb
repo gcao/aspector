@@ -1,6 +1,7 @@
 # Design by contract example
 
 class A
+
   def initialize
     @transactions = []
     @total = 0
@@ -26,7 +27,10 @@ require 'aspector'
 
 class Object
   def assert bool, message = 'Assertion failure'
-    $stderr.puts message unless bool
+    unless bool
+      $stderr.puts message
+      $stderr.puts caller
+    end
   end
 end
 
@@ -36,7 +40,7 @@ class ContractExample < Aspector::Base
     assert price > 0, "Price is #{price}, should be greater than 0"
   end
 
-  after do |*args, &block|
+  after :result_arg => false do |*_, &block|
     sum = @transactions.reduce(&:+)
     assert @total == sum, "Total(#{@total}) and sum of transactions(#{sum}) do not match"
   end
@@ -49,6 +53,6 @@ ContractExample.apply A, :methods => %w[buy sell]
 
 a = A.new
 a.buy 10
-a.buy -10
 a.sell 10
+a.sell -10
 

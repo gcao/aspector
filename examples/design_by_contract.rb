@@ -59,7 +59,7 @@ a.sell -10
 ##############################
 
 class A
-  include DesignByContract
+  include Aspector::DesignByContract
 
   precond   { |price| assert price < 0, "Price is less than 0" }
   postcond  { }

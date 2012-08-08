@@ -1,5 +1,7 @@
 require 'aspector/logger'
 
+require 'aspector/design_by_contract'
+
 require 'aspector/object_extension'
 require 'aspector/module_extension'
 

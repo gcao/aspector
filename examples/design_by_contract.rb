@@ -56,3 +56,16 @@ a.buy 10
 a.sell 10
 a.sell -10
 
+##############################
+
+class A
+  include DesignByContract
+
+  precond   { |price| assert price < 0, "Price is less than 0" }
+  postcond  { }
+  # invariant block will be executed before and after the method
+  invariant { assert @total != @transactions.reduce(&:sum), "Total and sum of transactions do not equal" }
+  def buy price
+  end
+end
+

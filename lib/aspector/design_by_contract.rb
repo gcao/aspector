@@ -5,9 +5,10 @@ module Aspector
     end
 
     module ClassMethods
-      def precond &block
+      def precond *methods, &block
         @preconditions ||= []
-        @preconditions << block
+        @preconditions << methods if methods.length > 0
+        @preconditions << block if block_given?
       end
 
       def postcond
@@ -27,8 +28,12 @@ module Aspector
         preconditions = @preconditions
         define_method method do |*args, &block|
           if preconditions
-            preconditions.each do |block|
-              instance_exec *args, &block
+            preconditions.flatten.each do |logic|
+              if logic.is_a? Proc
+                instance_exec *args, &logic
+              else
+                send logic, *args, &block
+              end
             end
           end
           m.bind(self).call(*args, &block)
@@ -38,9 +43,20 @@ module Aspector
       end
     end
 
+    class AssertionFailure < Exception
+      attr :message, :stack_trace
+
+      def initialize message, stack_trace
+        @message     = message
+        @stack_trace = stack_trace
+      end
+    end
+
     module Assert
       def assert bool, message = 'Assertion failure'
         unless bool
+          raise AssertionFailure.new(message, caller) if ENV["DBC_RAISE_ON_FAILURE"] == "true"
+
           $stderr.puts message
           $stderr.puts caller
         end

@@ -59,12 +59,48 @@ a.sell -10
 ##############################
 
 class A
-  include Aspector::DesignByContract
+  #include Aspector::DesignByContract
+  include Contractor # include Hooks and Types
+  include Contractor::Hooks
+  include Contractor::Assert
+  include Contractor::HooksAndAssert # This is same as above 2 lines
+  include Contractor::Types # Contains Any, Null, More, ArrayOf etc
+
+  # Type statements are mutually exclusive. Once arguments match one statement, 
+  # the rest are ignored, and result are checked against the result type of
+  # that statement.
+
+  # On failed type check, raise Contractor::TypesDoNotMatch
+
+  check_type Float => AnyType # Do not care return type
+  check_type Float # Do not care return type
+  check_type Float, Fixnum # Do not care return type
+  
+  must_return Float # Do not care arguments' type
+
+  # Below two are the same
+  check_type Float, Fixnum => Float # Most typical method signature
+  check_type [Float, Null], Fixnum => Float # Allows NULL in first argument which is the default behavior
+
+  check_type [Float], Fixnum => Float # Does not allow NULL in first argument
+
+  check_type Float, More # meth(first, *rest)
+  check_type Float, More(Float) # meth(first, *rest) first and rest are all floats
+
+  check_type Array # meth(first) first is an array
+  check_type ArrayOf(Float) # meth(first) first is an array whose elements are all float numbers
+
+  check_type WithBlock # must be called with a block
+  check_type NoBlock # must not be called with a block
+
+  # Below two lines make sure either a symbol or a block is passed, but not both
+  check_type Symbol, NoBlock
+  check_type WithBlock
 
   precond   { |price| assert price < 0, "Price is less than 0" }
-  postcond  { }
+  postcond  { |result, price| assert @total >= price }
   # invariant block will be executed before and after the method
-  invariant { assert @total != @transactions.reduce(&:sum), "Total and sum of transactions do not equal" }
+  invariant { |price| assert @total != @transactions.reduce(&:sum), "Total and sum of transactions do not equal" }
   def buy price
   end
 end

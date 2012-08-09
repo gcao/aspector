@@ -58,25 +58,30 @@ a.sell -10
 
 ##############################
 
+# Use TYPE_CHECK_LEVEL/CONTRACT_CHECK_LEVEL=none/info/warn/fail
+# to enable/disable type check and pre/post conditions etc
+# Make it possible to enable/disable for specific class/module
 class A
-  #include Aspector::DesignByContract
   include Contractor # include Hooks and Types
   include Contractor::Hooks
   include Contractor::Assert
   include Contractor::HooksAndAssert # This is same as above 2 lines
-  include Contractor::Types # Contains Any, Null, More, ArrayOf etc
+  include Contractor::Types # Contains AnyType, Null, More, ArrayOf etc
 
   # Type statements are mutually exclusive. Once arguments match one statement, 
   # the rest are ignored, and result are checked against the result type of
   # that statement.
 
-  # On failed type check, raise Contractor::TypesDoNotMatch
+  # On failed type check, raise Contractor::TypesDoNotMatch, or ArgumentError?
 
   check_type Float => AnyType # Do not care return type
   check_type Float # Do not care return type
   check_type Float, Fixnum # Do not care return type
   
-  must_return Float # Do not care arguments' type
+  check_type Return(Float)
+
+  check_type DuckType(:do_something) => Float
+  check_type DuckType(Float){|arg| arg >= 0}
 
   # Below two are the same
   check_type Float, Fixnum => Float # Most typical method signature
@@ -92,6 +97,8 @@ class A
 
   check_type WithBlock # must be called with a block
   check_type NoBlock # must not be called with a block
+
+  check_type Float, NoBlock => Float
 
   # Below two lines make sure either a symbol or a block is passed, but not both
   check_type Symbol, NoBlock

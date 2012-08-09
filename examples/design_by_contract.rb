@@ -58,15 +58,19 @@ a.sell -10
 
 ##############################
 
-# Use TYPE_CHECK_LEVEL/CONTRACT_CHECK_LEVEL=none/info/warn/fail
+# Use TYPE_CHECK_LEVEL/ASSERT_LEVEL=none/info/warn/fail
 # to enable/disable type check and pre/post conditions etc
 # Make it possible to enable/disable for specific class/module
 class A
-  include Contractor # include Hooks and Types
-  include Contractor::Hooks
-  include Contractor::Assert
-  include Contractor::HooksAndAssert # This is same as above 2 lines
-  include Contractor::Types # Contains AnyType, Null, More, ArrayOf etc
+  include Kontract # include Hooks and Types
+  include Kontract::Hooks
+  include Kontract::Assert
+  include Kontract::HooksAndAssert # This is same as above 2 lines
+  include Kontract::Types # Contains AnyType, Null, More, ArrayOf etc
+
+  # define custom environment variable for enabling/disabling type checks
+  checktype_env "A_CHECKTYPE"
+  assertion_env "A_ASSERTION"
 
   # Type statements are mutually exclusive. Once arguments match one statement, 
   # the rest are ignored, and result are checked against the result type of
@@ -74,35 +78,35 @@ class A
 
   # On failed type check, raise Contractor::TypesDoNotMatch, or ArgumentError?
 
-  check_type Float => AnyType # Do not care return type
-  check_type Float # Do not care return type
-  check_type Float, Fixnum # Do not care return type
+  checktype Float => AnyType # Do not care return type
+  checktype Float # Do not care return type
+  checktype Float, Fixnum # Do not care return type
   
-  check_type Return(Float)
+  checktype Return(Float)
 
-  check_type DuckType(:do_something) => Float
-  check_type DuckType(Float){|arg| arg >= 0}
+  checktype DuckType(:do_something) => Float
+  checktype DuckType(Float){|arg| arg >= 0}
 
   # Below two are the same
-  check_type Float, Fixnum => Float # Most typical method signature
-  check_type [Float, Null], Fixnum => Float # Allows NULL in first argument which is the default behavior
+  checktype Float, Fixnum => Float # Most typical method signature
+  checktype [Float, Null], Fixnum => Float # Allows NULL in first argument which is the default behavior
 
-  check_type [Float], Fixnum => Float # Does not allow NULL in first argument
+  checktype [Float], Fixnum => Float # Does not allow NULL in first argument
 
-  check_type Float, More # meth(first, *rest)
-  check_type Float, More(Float) # meth(first, *rest) first and rest are all floats
+  checktype Float, More # meth(first, *rest)
+  checktype Float, More(Float) # meth(first, *rest) first and rest are all floats
 
-  check_type Array # meth(first) first is an array
-  check_type ArrayOf(Float) # meth(first) first is an array whose elements are all float numbers
+  checktype Array # meth(first) first is an array
+  checktype ArrayOf(Float) # meth(first) first is an array whose elements are all float numbers
 
-  check_type WithBlock # must be called with a block
-  check_type NoBlock # must not be called with a block
+  checktype WithBlock # must be called with a block
+  checktype NoBlock # must not be called with a block
 
-  check_type Float, NoBlock => Float
+  checktype Float, NoBlock => Float
 
   # Below two lines make sure either a symbol or a block is passed, but not both
-  check_type Symbol, NoBlock
-  check_type WithBlock
+  checktype Symbol, NoBlock
+  checktype WithBlock
 
   precond   { |price| assert price < 0, "Price is less than 0" }
   postcond  { |result, price| assert @total >= price }

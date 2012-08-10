@@ -58,7 +58,7 @@ a.sell -10
 
 ##############################
 
-# Use TYPE_CHECK_LEVEL/ASSERT_LEVEL=none/info/warn/fail
+# Use CHECKTYPE_LEVEL/ASSERTION_LEVEL=none/info/warn/fail
 # to enable/disable type check and pre/post conditions etc
 # Make it possible to enable/disable for specific class/module
 class A
@@ -69,8 +69,12 @@ class A
   include Kontract::Types # Contains AnyType, Null, More, ArrayOf etc
 
   # define custom environment variable for enabling/disabling type checks
+  # Those can be accessed or changed any time, except if it is set to disabled,
+  # then it can not enabled or changed to other values
   checktype_env "A_CHECKTYPE"
   assertion_env "A_ASSERTION"
+  self.checktype_env # will return above value or default if it is not set
+  # a whole library/framework could use same env to control how this will work
 
   # Type statements are mutually exclusive. Once arguments match one statement, 
   # the rest are ignored, and result are checked against the result type of

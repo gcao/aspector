@@ -58,7 +58,7 @@ a.sell -10
 
 ##############################
 
-# Use CHECKTYPE_LEVEL/ASSERTION_LEVEL=none/info/warn/fail
+# Use CHECKTYPE_LEVEL/ASSERTION_LEVEL=none/info/warn/fail default to none
 # to enable/disable type check and pre/post conditions etc
 # Make it possible to enable/disable for specific class/module
 class A
@@ -66,7 +66,7 @@ class A
   include Kontract::Hooks
   include Kontract::Assert
   include Kontract::HooksAndAssert # This is same as above 2 lines
-  include Kontract::Types # Contains AnyType, Null, More, ArrayOf etc
+  include Kontract::Types # Contains AnyType, Anything, DuckType, More, ArrayOf etc
 
   # define custom environment variable for enabling/disabling type checks
   # Those can be accessed or changed any time, except if it is set to disabled,
@@ -80,22 +80,27 @@ class A
   # the rest are ignored, and result are checked against the result type of
   # that statement.
 
+  # AnyType vs Anything
+  # AnyType matches one value of any type
+  # Anything matches any number of values of any type
+
   # On failed type check, raise Contractor::TypesDoNotMatch, or ArgumentError?
 
   checktype Float => AnyType # Do not care return type
   checktype Float # Do not care return type
   checktype Float, Fixnum # Do not care return type
   
-  checktype Return(Float)
+  checktype Anything => Float # Anything means that do not check type and number of values
 
   checktype DuckType(:do_something) => Float
   checktype DuckType(Float){|arg| arg >= 0}
 
   # Below two are the same
   checktype Float, Fixnum => Float # Most typical method signature
-  checktype [Float, Null], Fixnum => Float # Allows NULL in first argument which is the default behavior
+  checktype [Float, NIL], Fixnum => Float # Allows nil in first argument which is the default behavior
 
-  checktype [Float], Fixnum => Float # Does not allow NULL in first argument
+  checktype Float, Fixnum => Float {|f, i| puts "Matched and parsed into #{f}, #{i}" }
+  checktype [Float], Fixnum => Float # Does not allow nil in first argument
 
   checktype Float, More # meth(first, *rest)
   checktype Float, More(Float) # meth(first, *rest) first and rest are all floats
@@ -117,6 +122,33 @@ class A
   # invariant block will be executed before and after the method
   invariant { |price| assert @total != @transactions.reduce(&:sum), "Total and sum of transactions do not equal" }
   def buy price
+  end
+end
+
+# Central place for defining environment variable, special types etc
+# Special types could be tested
+module Project::TypeCheck
+  include Contor
+
+  def self.included target
+    target.include Contor
+    target.checktype_env 'PROJECT_CHECKTYPE_LEVEL'
+  end
+
+  SpecialType = DuckType(:do_something)
+  
+  CommonSignature = Contor.def_signature A => B
+end
+
+class Project::A
+  include Project::TypeCheck
+
+  checktype SpecialType
+  def meth input
+  end
+
+  checktype CommonSignature
+  def meth1 input
   end
 end
 

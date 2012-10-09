@@ -1,5 +1,5 @@
 module Aspector
-  class Logging
+  module Logging
     # Log levels
     ERROR = 50
     WARN  = 40
@@ -12,11 +12,7 @@ module Aspector
     def self.get_logger context
       if logger_class_name = ENV["ASPECTOR_LOGGER"]
         begin
-          unless /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)+)\z/ =~ logger_class_name
-            raise NameError, "#{logger_class_name} is not a valid constant name!"
-          end
-
-          logger_class = Object.module_eval("::#{$1}", __FILE__, __LINE__)
+          logger_class = constanize(logger_class_name)
           logger_class.new(context)
         rescue => e
           $stderr.puts e.message
@@ -26,6 +22,16 @@ module Aspector
       else
         Logger.new(context)
       end
+    end
+
+    private
+
+    def self.constanize class_name
+      unless /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)+)\z/ =~ class_name
+        raise NameError, "#{class_name} is not a valid constant name!"
+      end
+
+      Object.module_eval("::#{$1}", __FILE__, __LINE__)
     end
   end
 end

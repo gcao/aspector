@@ -51,6 +51,18 @@ gem install aspector
   # do_that
   # test
 
+== Notes
+  To use a different logger, e.g. Logem::Logger, run below command
+
+  ASPECTOR_LOGGER=Logem::Logger LOGEM_LOG_LEVEL=trace ruby -rlogem examples/cache_aspect.rb
+
+  Explanation:
+  ASPECTOR_LOGGER=Logem::Logger  => set logger to Logem::Logger class
+  LOGEM_LOG_LEVEL=trace          => set logem log level to trace
+  -rlogem                        => require logem otherwise it might not be available
+                                    when the logger is initialized. This could be handled by
+                                    bundler etc though.
+
 == Contributing to aspector
 
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet

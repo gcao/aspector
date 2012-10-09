@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "aspector"
-  s.version = "0.12.2"
+  s.version = "0.12.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Guoliang Cao"]
-  s.date = "2012-07-03"
+  s.date = "2012-10-09"
   s.description = ""
   s.email = "gcao99@gmail.com"
   s.extra_rdoc_files = [
@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
     ".irbrc",
     ".rspec",
     ".rvmrc",
+    ".travis.yml",
     "Gemfile",
     "Gemfile.lock",
     "Guardfile",
@@ -34,6 +35,7 @@ Gem::Specification.new do |s|
     "examples/aspector_apply_example.rb",
     "examples/aspector_example.rb",
     "examples/cache_aspect.rb",
+    "examples/design_by_contract.rb",
     "examples/exception_handler.rb",
     "examples/implicit_method_option_test.rb",
     "examples/logging_aspect.rb",
@@ -47,6 +49,7 @@ Gem::Specification.new do |s|
     "lib/aspector/deferred_logic.rb",
     "lib/aspector/deferred_option.rb",
     "lib/aspector/logger.rb",
+    "lib/aspector/logging.rb",
     "lib/aspector/method_matcher.rb",
     "lib/aspector/module_extension.rb",
     "lib/aspector/object_extension.rb",

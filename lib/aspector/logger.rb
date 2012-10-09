@@ -27,7 +27,7 @@ module Aspector
     private
 
     def log_prefix level
-      s = "Aspector | " << level_to_string(level) << " | "
+      s = "#{Time.now} | Aspector | " << level_to_string(level) << " | "
       if context.is_a? Aspector::Base
         s << context.class.to_s << " | " << context.aop_target.to_s << " | "
       else

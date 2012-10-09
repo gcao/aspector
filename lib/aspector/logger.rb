@@ -50,11 +50,12 @@ module Aspector
       return Logging::DEFAULT_VISIBLE_LEVEL if level_string.nil? or level_string.strip == ''
 
       case level_string.downcase
-      when 'error' then Logging::ERROR
-      when 'warn'  then Logging::WARN
-      when 'info'  then Logging::INFO
-      when 'debug' then Logging::DEBUG
-      when 'trace' then Logging::TRACE
+        when 'error' then Logging::ERROR
+        when 'warn'  then Logging::WARN
+        when 'info'  then Logging::INFO
+        when 'debug' then Logging::DEBUG
+        when 'trace' then Logging::TRACE
+        when 'none'  then Logging::NONE
       end
     end
   end

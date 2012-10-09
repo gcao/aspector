@@ -1,6 +1,7 @@
 module Aspector
   module Logging
     # Log levels
+    NONE  = 10000
     ERROR = 50
     WARN  = 40
     INFO  = 30

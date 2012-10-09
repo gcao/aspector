@@ -4,7 +4,7 @@ module Aspector
       ::Aspector::Base.extend(self)
 
       def aop_enable
-        aop_logger.log Logger::ENABLE_ASPECT
+        aop_logger.log Logging::INFO, 'enable-aspect'
         send :define_method, :aop_disabled? do
         end
 
@@ -13,7 +13,7 @@ module Aspector
       alias enable aop_enable
 
       def aop_disable
-        aop_logger.log Logger::DISABLE_ASPECT
+        aop_logger.log Logging::INFO, 'disable-aspect'
         send :define_method, :aop_disabled? do
           true
         end
@@ -22,10 +22,18 @@ module Aspector
       end
       alias disable aop_disable
 
+      # if ENV["ASPECTOR_LOGGER"] is set, use it
+      # else try to load logem and use Logem::Logger
+      # else use built in logger
       def aop_logger
-        @aop_logger ||= Logger.new(self)
+        @aop_logger ||= Logging.get_logger(self)
       end
       alias logger aop_logger
+
+      def aop_logger= logger
+        @aop_logger = logger
+      end
+      alias logger= aop_logger=
 
       def aop_advices
         @aop_advices ||= []
@@ -42,7 +50,7 @@ module Aspector
 
         targets = rest.unshift target
         result = targets.map do |target|
-          aop_logger.log Logger::APPLY, target, options.inspect
+          aop_logger.log Logging::INFO, 'apply', target, options.inspect
           aspect_instance = new(target, options)
           aspect_instance.send :aop_apply
           aspect_instance
@@ -64,7 +72,7 @@ module Aspector
       def aop_before *methods, &block
         aop_advices << advice = aop_create_advice(Aspector::AdviceMetadata::BEFORE, self, methods, &block)
         advice.index = aop_advices.size
-        aop_logger.log Logger::DEFINE_ADVICE, advice
+        aop_logger.log Logging::INFO, 'define-advice', advice
         advice
       end
       alias before aop_before
@@ -72,7 +80,7 @@ module Aspector
       def aop_before_filter *methods, &block
         aop_advices << advice = aop_create_advice(Aspector::AdviceMetadata::BEFORE_FILTER, self, methods, &block)
         advice.index = aop_advices.size
-        aop_logger.log Logger::DEFINE_ADVICE, advice
+        aop_logger.log Logging::INFO, 'define-advice', advice
         advice
       end
       alias before_filter aop_before_filter
@@ -80,7 +88,7 @@ module Aspector
       def aop_after *methods, &block
         aop_advices << advice = aop_create_advice(Aspector::AdviceMetadata::AFTER, self, methods, &block)
         advice.index = aop_advices.size
-        aop_logger.log Logger::DEFINE_ADVICE, advice
+        aop_logger.log Logging::INFO, 'define-advice', advice
         advice
       end
       alias after aop_after
@@ -88,7 +96,7 @@ module Aspector
       def aop_around *methods, &block
         aop_advices << advice = aop_create_advice(Aspector::AdviceMetadata::AROUND, self, methods, &block)
         advice.index = aop_advices.size
-        aop_logger.log Logger::DEFINE_ADVICE, advice
+        aop_logger.log Logging::INFO, 'define-advice', advice
         advice
       end
       alias around aop_around
@@ -96,7 +104,7 @@ module Aspector
       def aop_raw *methods, &block
         aop_advices << advice = aop_create_advice(Aspector::AdviceMetadata::RAW, self, methods, &block)
         advice.index = aop_advices.size
-        aop_logger.log Logger::DEFINE_ADVICE, advice
+        aop_logger.log Logging::INFO, 'define-advice', advice
         advice
       end
       alias raw aop_raw

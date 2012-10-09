@@ -1,3 +1,4 @@
+require 'aspector/logging'
 require 'aspector/logger'
 
 require 'aspector/object_extension'

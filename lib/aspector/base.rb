@@ -64,7 +64,11 @@ module Aspector
     end
 
     def aop_logger
-      @aop_logger ||= Logger.new(self, self.class.logger.level)
+      return @aop_logger if @aop_logger
+
+      @aop_logger = Logging.get_logger(self)
+      @aop_logger.level = self.class.logger.level
+      @aop_logger
     end
     alias logger aop_logger
 
@@ -120,7 +124,7 @@ module Aspector
       advices = aop_filter_advices advices, method
       return if advices.empty?
 
-      aop_logger.log Logger::APPLY_TO_METHOD, method
+      aop_logger.log Logging::DEBUG, 'apply-to-method', method
       before_apply_to_method method, advices
 
       scope ||=
@@ -255,7 +259,7 @@ module Aspector
       rescue
         # ignore undefined method error
         if @aop_options[:old_methods_only]
-          aop_logger.log Logger::METHOD_NOT_FOUND, method
+          aop_logger.log Logging::WARN, 'method-not-found', method
         end
 
         return
@@ -281,7 +285,7 @@ module Aspector
       aspect = self
 
       code = METHOD_TEMPLATE.result(binding)
-      aspect.aop_logger.log Logger::GENERATE_CODE, method, code
+      aspect.aop_logger.log Logging::DEBUG, 'generate-code', method, code
       @aop_context.class_eval code, __FILE__, __LINE__ + 4
     end
 
@@ -293,13 +297,13 @@ module Aspector
 % end
 
     define_method :<%= method %> do |*args, &block|
-% if aop_logger.visible?(Logger::TRACE)
-      aspect.aop_logger.log_method_call '<%= method %>', Aspector::Logger::ENTER_GENERATED_METHOD
+% if aop_logger.visible?(Logging::TRACE)
+      aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'enter-generated-method'
 % end
 
       if aspect.aop_disabled?
-% if aop_logger.visible?(Logger::TRACE)
-        aspect.aop_logger.log_method_call '<%= method %>', Aspector::Logger::EXIT_BECAUSE_DISABLED
+% if aop_logger.visible?(Logging::TRACE)
+        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'exit--generated-method'
 % end
         return orig_method.bind(self).call(*args, &block)
       end
@@ -312,20 +316,20 @@ module Aspector
         # Before advices
 % end
 % before_advices.each do |advice|
-%   if aop_logger.visible?(Logger::TRACE)
-        aspect.aop_logger.log_method_call '<%= method %>', Aspector::Logger::BEFORE_INVOKE_ADVICE, '<advice <%= advice.index %>>'
+%   if aop_logger.visible?(Logging::TRACE)
+        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<advice <%= advice.index %>>'
 % end
         result = <%= advice.with_method %> <%
           if advice.options[:aspect_arg] %>aspect, <% end %><%
           if advice.options[:method_arg] %>'<%= method %>', <% end
           %>*args
-% if aop_logger.visible?(Logger::TRACE)
-        aspect.aop_logger.log_method_call '<%= method %>', Aspector::Logger::AFTER_INVOKE_ADVICE, '<advice <%= advice.index %>>'
+% if aop_logger.visible?(Logging::TRACE)
+        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-advice', '<advice <%= advice.index %>>'
 % end
 %   if advice.options[:skip_if_false]
         unless result
-% if aop_logger.visible?(Logger::TRACE)
-          aspect.aop_logger.log_method_call '<%= method %>', Aspector::Logger::EXIT_FROM_BEFORE_FILTER, '<advice <%= advice.index %>>'
+% if aop_logger.visible?(Logging::TRACE)
+          aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'exit-method-due-to-before-filter', '<advice <%= advice.index %>>'
 % end
           return
       end
@@ -334,14 +338,14 @@ module Aspector
 
 % if around_advice
         # Around advice
-% if aop_logger.visible?(Logger::TRACE)
-        aspect.aop_logger.log_method_call '<%= method %>', Aspector::Logger::BEFORE_INVOKE_ADVICE, '<advice <%= around_advice.index %>>'
+% if aop_logger.visible?(Logging::TRACE)
+        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<advice <%= around_advice.index %>>'
 % end
-% if aop_logger.visible?(Logger::TRACE)
+% if aop_logger.visible?(Logging::TRACE)
         proxy = lambda do |*args, &block|
-          aspect.aop_logger.log_method_call '<%= method %>', Aspector::Logger::BEFORE_INVOKE_PROXY
+          aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-proxy'
           res = wrapped_method.bind(self).call *args, &block
-          aspect.aop_logger.log_method_call '<%= method %>', Aspector::Logger::AFTER_INVOKE_PROXY
+          aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-proxy'
           res
         end
         result = <%= around_advice.with_method %> <%
@@ -354,19 +358,19 @@ module Aspector
           if around_advice.options[:method_arg] %>'<%= method %>', <% end
           %>wrapped_method.bind(self), *args, &block
 % end
-% if aop_logger.visible?(Logger::TRACE)
-        aspect.aop_logger.log_method_call '<%= method %>', Aspector::Logger::AFTER_INVOKE_ADVICE, '<advice <%= around_advice.index %>>'
+% if aop_logger.visible?(Logging::TRACE)
+        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-advice', '<advice <%= around_advice.index %>>'
 % end
 
 % else
 
         # Invoke original method
-% if aop_logger.visible?(Logger::TRACE)
-        aspect.aop_logger.log_method_call '<%= method %>', Aspector::Logger::BEFORE_WRAPPED_METHOD
+% if aop_logger.visible?(Logging::TRACE)
+        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-wrapped-method'
 % end
         result = orig_method.bind(self).call *args, &block
-% if aop_logger.visible?(Logger::TRACE)
-        aspect.aop_logger.log_method_call '<%= method %>', Aspector::Logger::AFTER_WRAPPED_METHOD
+% if aop_logger.visible?(Logging::TRACE)
+        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--wrapped-method'
 % end
 
 % end
@@ -374,8 +378,8 @@ module Aspector
 % unless after_advices.empty?
         # After advices
 %   after_advices.each do |advice|
-% if aop_logger.visible?(Logger::TRACE)
-        aspect.aop_logger.log_method_call '<%= method %>', Aspector::Logger::BEFORE_INVOKE_ADVICE, '<advice <%= advice.index %>>'
+% if aop_logger.visible?(Logging::TRACE)
+        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<advice <%= advice.index %>>'
 % end
 %     if advice.options[:result_arg]
         result = <%= advice.with_method %> <%
@@ -389,8 +393,8 @@ module Aspector
           if advice.options[:method_arg] %>'<%= method %>', <% end
           %>*args
 %     end
-% if aop_logger.visible?(Logger::TRACE)
-        aspect.aop_logger.log_method_call '<%= method %>', Aspector::Logger::AFTER_INVOKE_ADVICE, '<advice <%= advice.index %>>'
+% if aop_logger.visible?(Logging::TRACE)
+        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-advice', '<advice <%= advice.index %>>'
 % end
 %   end
 % end
@@ -401,8 +405,8 @@ module Aspector
       end # end of catch
 % end
 
-% if aop_logger.visible?(Logger::TRACE)
-      aspect.aop_logger.log_method_call '<%= method %>', Aspector::Logger::EXIT_GENERATED_METHOD
+% if aop_logger.visible?(Logging::TRACE)
+      aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'exit--generated-method'
 % end
       result
     end

@@ -18,6 +18,10 @@ module Aspector
       @advice_block   = block
     end
 
+    def name
+      @options[:name] || "advice #{index}"
+    end
+
     def with_method
       @with_method ||= "aop_#{hash.abs}"
     end
@@ -64,7 +68,7 @@ module Aspector
     end
 
     def to_s
-      s = "<advice " << index.to_s << ">: "
+      s = "#{name}: "
       s << type_name
       s << " [" << @method_matcher.to_s << "] DO "
       if @with_method

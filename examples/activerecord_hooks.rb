@@ -13,7 +13,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'aspector'
 
 class ActiveRecordHooks < Aspector::Base
-  logger.level = Aspector::Logger::TRACE
+  logger.level = Aspector::Logging::TRACE
 
   default :private_methods => true
 

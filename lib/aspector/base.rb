@@ -84,11 +84,14 @@ module Aspector
       aop_add_to_instances unless @aop_options[:old_methods_only]
       aop_apply_to_methods unless @aop_options[:new_methods_only]
       aop_add_method_hooks unless @aop_options[:old_methods_only]
+      # TODO: clear deferred logic results if they are not used in any advice
       after_apply
     end
     alias apply aop_apply
 
     def aop_apply_to_methods
+      return if aop_advices.empty?
+
       advices = aop_advices
 
       # If method/methods option is set and all are String or Symbol, apply to those only, instead of
@@ -194,6 +197,8 @@ module Aspector
     end
 
     def aop_add_to_instances
+      return if aop_advices.empty?
+
       aspect_instances = @aop_context.instance_variable_get(:@aop_instances)
       unless aspect_instances
         aspect_instances = AspectInstances.new
@@ -203,6 +208,8 @@ module Aspector
     end
 
     def aop_add_method_hooks
+      return if aop_advices.empty?
+
       if @aop_options[:class_methods]
         return unless @aop_target.is_a?(Module)
 
@@ -312,10 +319,8 @@ module Aspector
       result = catch(:aop_returns) do
 % end
 
-% unless before_advices.empty?
-        # Before advices
-% end
 % before_advices.each do |advice|
+        # Before advice: <%= advice.name %>
 %   if aop_logger.visible?(Logging::TRACE)
         aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
 % end
@@ -337,7 +342,7 @@ module Aspector
 % end
 
 % if around_advice
-        # Around advice
+        # Around advice: <%= around_advice.name %>
 % if aop_logger.visible?(Logging::TRACE)
         aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= around_advice.name %>'
 % end
@@ -376,8 +381,8 @@ module Aspector
 % end
 
 % unless after_advices.empty?
-        # After advices
 %   after_advices.each do |advice|
+        # After advice: <%= advice.name %>
 % if aop_logger.visible?(Logging::TRACE)
         aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
 % end

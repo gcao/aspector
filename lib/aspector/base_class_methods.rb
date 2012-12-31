@@ -110,7 +110,7 @@ module Aspector
       alias raw aop_raw
 
       def aop_target code = nil, &block
-        return unless code or block_given?
+        raise ArgumentError.new('No code or block is passed.') unless code or block_given?
 
         logic = DeferredLogic.new(code || block)
         aop_deferred_logics << logic

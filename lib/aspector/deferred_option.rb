@@ -8,8 +8,12 @@ module Aspector
       self
     end
 
-    def inspect
-      "options[:#{key}]"
+    def to_s
+      if key
+        "options[#{key.inspect}]"
+      else
+        "options[?]"
+      end
     end
   end
 end

@@ -20,6 +20,23 @@ describe "Around advices" do
     obj.value.should == %w"before test after"
   end
 
+  it "logic in String" do
+    klass = create_test_class
+
+    aspector(klass) do
+      around :test, <<-CODE
+        value << "before"
+        result = INVOKE_PROXY
+        value << "after"
+        result
+      CODE
+    end
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"before test after"
+  end
+
   it "logic in block" do
     klass = create_test_class
 

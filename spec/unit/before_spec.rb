@@ -29,6 +29,18 @@ describe "Before advices" do
     obj.value.should == %w"do_block test"
   end
 
+  it "logic in String" do
+    klass = create_test_class
+
+    aspector(klass) do
+      before :test, "value << 'do_block'"
+    end
+
+    obj = klass.new
+    obj.test
+    obj.value.should == %w"do_block test"
+  end
+  
   it "new methods should work" do
     klass = Class.new do
       aspector do

@@ -6,14 +6,20 @@ module Aspector
     AROUND = 3
     RAW    = 4
 
-    attr_reader :type, :method_matcher, :options, :advice_block
+    attr_reader :type, :method_matcher, :options, :advice_code, :advice_block
     attr_accessor :index
 
     def initialize parent, type, method_matcher, with_method, options = {}, &block
       @parent         = parent
       @type           = type
       @method_matcher = method_matcher
-      @with_method    = with_method
+
+      if with_method.is_a? Symbol
+        @with_method  = with_method
+      else
+        @advice_code  = with_method
+      end
+
       @options        = options
       @advice_block   = block
     end
@@ -23,7 +29,9 @@ module Aspector
     end
 
     def with_method
-      @with_method ||= "aop_#{hash.abs}"
+      unless @advice_code
+        @with_method ||= "aop_#{hash.abs}"
+      end
     end
 
     def match? method, context = nil

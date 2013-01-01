@@ -324,10 +324,14 @@ module Aspector
 %   if aop_logger.visible?(Logging::TRACE)
         aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
 % end
+%   if advice.advice_code
+        result = (<%= advice.advice_code %>)
+%   else
         result = <%= advice.with_method %> <%
           if advice.options[:aspect_arg] %>aspect, <% end %><%
           if advice.options[:method_arg] %>'<%= method %>', <% end
           %>*args
+%   end
 % if aop_logger.visible?(Logging::TRACE)
         aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-advice', '<%= advice.name %>'
 % end
@@ -346,6 +350,14 @@ module Aspector
 % if aop_logger.visible?(Logging::TRACE)
         aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= around_advice.name %>'
 % end
+%   if around_advice.advice_code
+        result =
+(
+<%= around_advice.advice_code.gsub('INVOKE_PROXY',
+                                   'wrapped_method.bind(self).call(*args, &block)')
+%>)
+
+%   else
 % if aop_logger.visible?(Logging::TRACE)
         proxy = lambda do |*args, &block|
           aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-proxy'
@@ -363,6 +375,7 @@ module Aspector
           if around_advice.options[:method_arg] %>'<%= method %>', <% end
           %>wrapped_method.bind(self), *args, &block
 % end
+%   end
 % if aop_logger.visible?(Logging::TRACE)
         aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-advice', '<%= around_advice.name %>'
 % end
@@ -386,6 +399,9 @@ module Aspector
 % if aop_logger.visible?(Logging::TRACE)
         aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
 % end
+%  if advice.advice_code
+        result = (<%= advice.advice_code %>)
+%   else
 %     if advice.options[:result_arg]
         result = <%= advice.with_method %> <%
           if advice.options[:aspect_arg] %>aspect, <% end %><%
@@ -398,6 +414,7 @@ module Aspector
           if advice.options[:method_arg] %>'<%= method %>', <% end
           %>*args
 %     end
+%   end
 % if aop_logger.visible?(Logging::TRACE)
         aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-advice', '<%= advice.name %>'
 % end

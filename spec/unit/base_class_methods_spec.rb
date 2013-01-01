@@ -10,7 +10,7 @@ describe "Aspector::Base class methods" do
     advice = klass.send(:aop_advices).first
     advice.before?.should be_true
     advice.options[:skip_if_false].should_not be_true
-    advice.with_method.should == 'do_before'
+    advice.with_method.should == :do_before
   end
 
   it "before_filter" do
@@ -22,7 +22,7 @@ describe "Aspector::Base class methods" do
     advice = klass.send(:aop_advices).first
     advice.before?.should be_true
     advice.options[:skip_if_false].should be_true
-    advice.with_method.should == 'do_before'
+    advice.with_method.should == :do_before
   end
 
 end

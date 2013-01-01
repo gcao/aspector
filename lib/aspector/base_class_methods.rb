@@ -136,16 +136,16 @@ module Aspector
         options.merge!(methods.pop) if methods.last.is_a? Hash
         options.merge!(meta_data.mandatory_options)
 
-        # Convert symbols to strings to avoid inconsistencies
-        methods.size.times do |i|
-          methods[i] = methods[i].to_s if methods[i].is_a? Symbol
-        end
-
         if meta_data.advice_type == Aspector::Advice::RAW
           raise "Bad raw advice - code block is required" unless block_given?
           with_method = nil
         else
           with_method = methods.pop unless block_given?
+        end
+
+        # Convert symbols to strings to avoid inconsistencies
+        methods.size.times do |i|
+          methods[i] = methods[i].to_s if methods[i].is_a? Symbol
         end
 
         methods << aop_options[:method] << aop_options[:methods] if methods.empty?

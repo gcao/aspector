@@ -341,7 +341,7 @@ module Aspector
           aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'exit-method-due-to-before-filter', '<%= advice.name %>'
 % end
           return
-      end
+        end
 %   end
 % end
 
@@ -351,11 +351,7 @@ module Aspector
         aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= around_advice.name %>'
 % end
 %   if around_advice.advice_code
-        result =
-(
-<%= around_advice.advice_code.gsub('INVOKE_PROXY',
-                                   'wrapped_method.bind(self).call(*args, &block)')
-%>)
+        result = (<%= around_advice.advice_code.gsub('INVOKE_PROXY', 'wrapped_method.bind(self).call(*args, &block)') %>)
 
 %   else
 % if aop_logger.visible?(Logging::TRACE)

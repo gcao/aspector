@@ -15,18 +15,24 @@ module Aspector
         when Symbol
           item.to_s == method
         when DeferredLogic
-          value = aspect.aop_deferred_logic_results(item)
+          value = aspect.deferred_logic_results(item)
           if value
             new_matcher = MethodMatcher.new(value)
             new_matcher.match?(method)
           end
         when DeferredOption
-          value = aspect.send(:aop_options)[item.key]
+          value = aspect.options[item.key]
           if value
             new_matcher = MethodMatcher.new(value)
             new_matcher.match?(method)
           end
         end
+      end
+    end
+    
+    def use_deferred_logic? logic
+      @match_data.detect do |item|
+        logic == item
       end
     end
 

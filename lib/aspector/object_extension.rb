@@ -8,23 +8,23 @@ module Aspector
 
       aspect = Aspector(options, &block)
 
-      aspect.aop_apply(self) if self.is_a? Module
-      args.each {|target| aspect.aop_apply(target) }
+      aspect.apply(self) if self.is_a? Module
+      args.each {|target| aspect.apply(target) }
 
       aspect
     end
 
     def Aspector options = {}, &block
       klass = Class.new(Aspector::Base)
-      klass.aop_default options
+      klass.class_eval { default options }
       klass.class_eval &block if block_given?
       klass
     end
 
-    def aop_returns value = nil
-      throw :aop_returns, value
+    def returns value = nil
+      throw :returns, value
     end
-    alias :returns :aop_returns
+    alias :returns :returns
 
   end
 end

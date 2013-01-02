@@ -61,10 +61,6 @@ module Aspector
       type == AROUND
     end
 
-    def invoke obj, *args, &block
-      obj.send with_method, *args, &block
-    end
-
     def type_name
       case @type
       when BEFORE then @options[:skip_if_false] ? "BEFORE_FILTER" : "BEFORE"
@@ -73,6 +69,10 @@ module Aspector
       when RAW    then "RAW"
       else "UNKNOWN?!"
       end
+    end
+    
+    def use_deferred_logic? logic
+      method_matcher.use_deferred_logic? logic
     end
 
     def to_s

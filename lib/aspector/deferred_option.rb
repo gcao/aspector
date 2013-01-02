@@ -2,6 +2,10 @@ module Aspector
   class DeferredOption
 
     attr_reader :key
+    
+    def initialize key = nil
+      @key = key
+    end
 
     def [] key
       @key = key

@@ -3,218 +3,156 @@ require 'erb'
 module Aspector
   class Base
 
-    attr :aop_options
-    alias options aop_options
-
-    attr :aop_target
-    alias target aop_target
-
-    attr :aop_wrapped_methods
+    attr :target
+    attr :options
 
     def initialize target, options = {}
-      @aop_target = target
+      @target = target
 
-      default_options = self.class.aop_default_options
+      default_options = self.class.default_options
       if default_options and not default_options.empty?
-        @aop_options = default_options.merge(options)
+        @options = default_options.merge(options)
       else
-        @aop_options = options
+        @options = options
       end
 
-      # @aop_context is where advices will be applied (i.e. where methods are modified), can be different from target
-      @aop_context = aop_get_context
-
-      @aop_wrapped_methods = {}
-
-      after_initialize
-    end
-
-    def aop_enable
-      class << self
-        def aop_disabled?; end
-      end
-
-      aop_disabled?
-    end
-    alias enable aop_enable
-
-    def aop_disable
-      class << self
-        def aop_disabled?; true; end
-      end
-
-      aop_disabled?
-    end
-    alias disable aop_disable
-
-    def aop_reset_disabled
-      class << self
-        remove_method :aop_disabled?
-      end
-
-      aop_disabled?
-    end
-    alias reset_disabled aop_reset_disabled
-
-    def aop_disabled?
+      @wrapped_methods = {}
     end
 
     def disabled?
-      aop_disabled?
+      # Enabled by default
     end
 
-    def aop_logger
-      return @aop_logger if @aop_logger
+    def logger
+      return @logger if @logger
 
-      @aop_logger = Logging.get_logger(self)
-      @aop_logger.level = self.class.logger.level
-      @aop_logger
+      @logger = Logging.get_logger(self)
+      @logger.level = self.class.logger.level
+      @logger
     end
-    alias logger aop_logger
 
-    def aop_advices
-      self.class.aop_advices
+    def advices
+      self.class.advices
     end
-    alias advices aop_advices
 
-    def aop_apply
-      before_apply
-      aop_invoke_deferred_logics
-      aop_define_methods_for_advice_blocks
-      aop_add_to_instances unless @aop_options[:old_methods_only]
-      aop_apply_to_methods unless @aop_options[:new_methods_only]
-      aop_add_method_hooks unless @aop_options[:old_methods_only]
+    def apply
+      invoke_deferred_logics
+      define_methods_for_advice_blocks
+      add_to_instances unless @options[:old_methods_only]
+      apply_to_methods unless @options[:new_methods_only]
+      add_method_hooks unless @options[:old_methods_only]
       # TODO: clear deferred logic results if they are not used in any advice
-      after_apply
     end
-    alias apply aop_apply
 
-    def aop_apply_to_methods
-      return if aop_advices.empty?
-
-      advices = aop_advices
+    def apply_to_methods
+      return if advices.empty?
 
       # If method/methods option is set and all are String or Symbol, apply to those only, instead of
       # iterating through all methods
-      methods = [@aop_options[:method] || @aop_options[:methods]]
+      methods = [@options[:method] || @options[:methods]]
       methods.compact!
       methods.flatten!
 
       if not methods.empty? and methods.all?{|method| method.is_a? String or method.is_a? Symbol }
         methods.each do |method|
-          aop_apply_to_method(method.to_s, advices)
+          apply_to_method(method.to_s)
         end
 
         return
       end
 
-      @aop_context.public_instance_methods.each do |method|
-        aop_apply_to_method(method.to_s, advices, :public)
+      context.public_instance_methods.each do |method|
+        apply_to_method(method.to_s, :public)
       end
 
-      @aop_context.protected_instance_methods.each do |method|
-        aop_apply_to_method(method.to_s, advices, :protected)
+      context.protected_instance_methods.each do |method|
+        apply_to_method(method.to_s, :protected)
       end
 
-      if @aop_options[:private_methods]
-        @aop_context.private_instance_methods.each do |method|
-          aop_apply_to_method(method.to_s, advices, :private)
+      if @options[:private_methods]
+        context.private_instance_methods.each do |method|
+          apply_to_method(method.to_s, :private)
         end
       end
     end
 
-    def aop_apply_to_method method, advices, scope = nil
-      advices = aop_filter_advices advices, method
-      return if advices.empty?
+    def apply_to_method method, scope = nil
+      filtered_advices = filter_advices advices, method
+      return if filtered_advices.empty?
 
-      aop_logger.log Logging::DEBUG, 'apply-to-method', method
-      before_apply_to_method method, advices
+      logger.log Logging::DEBUG, 'apply-to-method', method
 
       scope ||=
-          if @aop_context.private_instance_methods.include?(RUBY_VERSION.index('1.9') ? method.to_sym : method.to_s)
+          if context.private_instance_methods.include?(RUBY_VERSION.index('1.9') ? method.to_sym : method.to_s)
             :private
-          elsif @aop_context.protected_instance_methods.include?(RUBY_VERSION.index('1.9') ? method.to_sym : method.to_s)
+          elsif context.protected_instance_methods.include?(RUBY_VERSION.index('1.9') ? method.to_sym : method.to_s)
             :protected
           else
             :public
           end
 
-      aop_recreate_method method, advices, scope
-
-      after_apply_to_method method, advices
-    end
-
-    protected
-
-    # Hook method that runs after an aspect is instantiated
-    def after_initialize
-    end
-
-    # Hook method that runs before an aspect is applied
-    def before_apply
-    end
-
-    # Hook method that runs after an aspect is applied
-    def after_apply
-    end
-
-    def before_apply_to_method method, advices
-    end
-
-    def after_apply_to_method method, advices
+      recreate_method method, filtered_advices, scope
     end
 
     private
 
-    def aop_deferred_logic_results logic
-      @aop_deferred_logic_results[logic]
+    def deferred_logic_results logic
+      @deferred_logic_results[logic]
     end
 
-    def aop_get_context
-      return @aop_target if @aop_target.is_a?(Module) and not @aop_options[:class_methods]
+    def get_wrapped_method_of method
+      @wrapped_methods[method]
+    end
 
-      class << @aop_target
+    # context is where advices will be applied (i.e. where methods are modified), can be different from target
+    def context
+      return @target if @target.is_a?(Module) and not @options[:class_methods]
+
+      class << @target
         self
       end
     end
 
-    def aop_invoke_deferred_logics
-      return unless (logics = self.class.send :aop_deferred_logics)
+    def invoke_deferred_logics
+      return unless (logics = self.class.send :_deferred_logics_)
 
-      @aop_deferred_logic_results ||= {}
       logics.each do |logic|
-        @aop_deferred_logic_results[logic] = logic.apply @aop_context, self
+        result = logic.apply context, self
+        if advices.detect {|advice| advice.use_deferred_logic? logic }
+          @deferred_logic_results ||= {}
+          @deferred_logic_results[logic] = result
+        end
       end
     end
 
-    def aop_define_methods_for_advice_blocks
-      aop_advices.each do |advice|
+    def define_methods_for_advice_blocks
+      advices.each do |advice|
         next if advice.raw?
         next unless advice.advice_block
-        @aop_context.send :define_method, advice.with_method, advice.advice_block
-        @aop_context.send :private, advice.with_method
+        context.send :define_method, advice.with_method, advice.advice_block
+        context.send :private, advice.with_method
       end
     end
 
-    def aop_add_to_instances
-      return if aop_advices.empty?
+    def add_to_instances
+      return if advices.empty?
 
-      aspect_instances = @aop_context.instance_variable_get(:@aop_instances)
+      aspect_instances = context.instance_variable_get(:@aop_instances)
       unless aspect_instances
         aspect_instances = AspectInstances.new
-        @aop_context.instance_variable_set(:@aop_instances, aspect_instances)
+        context.instance_variable_set(:@aop_instances, aspect_instances)
       end
       aspect_instances << self
     end
 
-    def aop_add_method_hooks
-      return if aop_advices.empty?
+    def add_method_hooks
+      return if advices.empty?
 
-      if @aop_options[:class_methods]
-        return unless @aop_target.is_a?(Module)
+      if @options[:class_methods]
+        return unless @target.is_a?(Module)
 
-        eigen_class = class << @aop_target; self; end
-        orig_singleton_method_added = @aop_target.method(:singleton_method_added)
+        eigen_class = class << @target; self; end
+        orig_singleton_method_added = @target.method(:singleton_method_added)
 
         eigen_class.send :define_method, :singleton_method_added do |method|
           aop_singleton_method_added(method) do
@@ -222,10 +160,10 @@ module Aspector
           end
         end
       else
-        eigen_class = class << @aop_target; self; end
+        eigen_class = class << @target; self; end
 
-        if @aop_target.is_a? Module
-          orig_method_added = @aop_target.method(:method_added)
+        if @target.is_a? Module
+          orig_method_added = @target.method(:method_added)
         else
           orig_method_added = eigen_class.method(:method_added)
         end
@@ -238,23 +176,23 @@ module Aspector
       end
     end
 
-    def aop_filter_advices advices, method
+    def filter_advices advices, method
       advices.select do |advice|
         advice.match?(method, self)
       end
     end
 
-    def aop_recreate_method method, advices, scope
-      @aop_context.instance_variable_set(:@aop_creating_method, true)
+    def recreate_method method, advices, scope
+      context.instance_variable_set(:@aop_creating_method, true)
 
       raw_advices = advices.select {|advice| advice.raw? }
 
       if raw_advices.size > 0
         raw_advices.each do |advice|
-          if @aop_target.is_a? Module and not @aop_options[:class_methods]
-            @aop_target.class_exec method, self, &advice.advice_block
+          if @target.is_a? Module and not @options[:class_methods]
+            @target.class_exec method, self, &advice.advice_block
           else
-            @aop_target.instance_exec method, self, &advice.advice_block
+            @target.instance_exec method, self, &advice.advice_block
           end
         end
 
@@ -262,11 +200,11 @@ module Aspector
       end
 
       begin
-        @aop_wrapped_methods[method] = @aop_context.instance_method(method)
+        @wrapped_methods[method] = context.instance_method(method)
       rescue
         # ignore undefined method error
-        if @aop_options[:old_methods_only]
-          aop_logger.log Logging::WARN, 'method-not-found', method
+        if @options[:old_methods_only]
+          logger.log Logging::WARN, 'method-not-found', method
         end
 
         return
@@ -278,51 +216,51 @@ module Aspector
 
       (around_advices.size - 1).downto(1) do |i|
         advice = around_advices[i]
-        aop_recreate_method_with_advices method, [], [], advice
+        recreate_method_with_advices method, [], [], advice
       end
 
-      aop_recreate_method_with_advices method, before_advices, after_advices, around_advices.first, true
+      recreate_method_with_advices method, before_advices, after_advices, around_advices.first, true
 
-      @aop_context.send scope, method if scope != :public
+      context.send scope, method if scope != :public
     ensure
-      @aop_context.send :remove_instance_variable, :@aop_creating_method
+      context.send :remove_instance_variable, :@aop_creating_method
     end
 
-    def aop_recreate_method_with_advices method, before_advices, after_advices, around_advice, is_outermost = false
+    def recreate_method_with_advices method, before_advices, after_advices, around_advice, is_outermost = false
       aspect = self
 
       code = METHOD_TEMPLATE.result(binding)
-      aspect.aop_logger.log Logging::DEBUG, 'generate-code', method, code
-      @aop_context.class_eval code, __FILE__, __LINE__ + 4
+      aspect.logger.log Logging::DEBUG, 'generate-code', method, code
+      context.class_eval code, __FILE__, __LINE__ + 4
     end
 
     METHOD_TEMPLATE = ERB.new <<-CODE, nil, "%<>"
 
-    orig_method = aspect.aop_wrapped_methods['<%= method %>']
+    orig_method = aspect.send :get_wrapped_method_of, '<%= method %>'
 % if around_advice
     wrapped_method = instance_method(:<%= method %>)
 % end
 
     define_method :<%= method %> do |*args, &block|
-% if aop_logger.visible?(Logging::TRACE)
-      aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'enter-generated-method'
+% if logger.visible?(Logging::TRACE)
+      aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'enter-generated-method'
 % end
 
-      if aspect.aop_disabled?
-% if aop_logger.visible?(Logging::TRACE)
-        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'exit--generated-method'
+      if aspect.disabled?
+% if logger.visible?(Logging::TRACE)
+        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'exit--generated-method'
 % end
         return orig_method.bind(self).call(*args, &block)
       end
 
 % if is_outermost
-      result = catch(:aop_returns) do
+      result = catch(:returns) do
 % end
 
 % before_advices.each do |advice|
         # Before advice: <%= advice.name %>
-%   if aop_logger.visible?(Logging::TRACE)
-        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
+%   if logger.visible?(Logging::TRACE)
+        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
 % end
 %   if advice.advice_code
         result = (<%= advice.advice_code %>)
@@ -332,13 +270,13 @@ module Aspector
           if advice.options[:method_arg] %>'<%= method %>', <% end
           %>*args
 %   end
-% if aop_logger.visible?(Logging::TRACE)
-        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-advice', '<%= advice.name %>'
+% if logger.visible?(Logging::TRACE)
+        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-advice', '<%= advice.name %>'
 % end
 %   if advice.options[:skip_if_false]
         unless result
-% if aop_logger.visible?(Logging::TRACE)
-          aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'exit-method-due-to-before-filter', '<%= advice.name %>'
+% if logger.visible?(Logging::TRACE)
+          aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'exit-method-due-to-before-filter', '<%= advice.name %>'
 % end
           return
         end
@@ -347,18 +285,18 @@ module Aspector
 
 % if around_advice
         # Around advice: <%= around_advice.name %>
-% if aop_logger.visible?(Logging::TRACE)
-        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= around_advice.name %>'
+% if logger.visible?(Logging::TRACE)
+        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= around_advice.name %>'
 % end
 %   if around_advice.advice_code
         result = (<%= around_advice.advice_code.gsub('INVOKE_PROXY', 'wrapped_method.bind(self).call(*args, &block)') %>)
 
 %   else
-% if aop_logger.visible?(Logging::TRACE)
+% if logger.visible?(Logging::TRACE)
         proxy = lambda do |*args, &block|
-          aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-proxy'
+          aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-proxy'
           res = wrapped_method.bind(self).call *args, &block
-          aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-proxy'
+          aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-proxy'
           res
         end
         result = <%= around_advice.with_method %> <%
@@ -372,19 +310,19 @@ module Aspector
           %>wrapped_method.bind(self), *args, &block
 % end
 %   end
-% if aop_logger.visible?(Logging::TRACE)
-        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-advice', '<%= around_advice.name %>'
+% if logger.visible?(Logging::TRACE)
+        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-advice', '<%= around_advice.name %>'
 % end
 
 % else
 
         # Invoke original method
-% if aop_logger.visible?(Logging::TRACE)
-        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-wrapped-method'
+% if logger.visible?(Logging::TRACE)
+        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-wrapped-method'
 % end
         result = orig_method.bind(self).call *args, &block
-% if aop_logger.visible?(Logging::TRACE)
-        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--wrapped-method'
+% if logger.visible?(Logging::TRACE)
+        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--wrapped-method'
 % end
 
 % end
@@ -392,8 +330,8 @@ module Aspector
 % unless after_advices.empty?
 %   after_advices.each do |advice|
         # After advice: <%= advice.name %>
-% if aop_logger.visible?(Logging::TRACE)
-        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
+% if logger.visible?(Logging::TRACE)
+        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
 % end
 %  if advice.advice_code
         result = (<%= advice.advice_code %>)
@@ -411,8 +349,8 @@ module Aspector
           %>*args
 %     end
 %   end
-% if aop_logger.visible?(Logging::TRACE)
-        aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-advice', '<%= advice.name %>'
+% if logger.visible?(Logging::TRACE)
+        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-advice', '<%= advice.name %>'
 % end
 %   end
 % end
@@ -423,8 +361,8 @@ module Aspector
       end # end of catch
 % end
 
-% if aop_logger.visible?(Logging::TRACE)
-      aspect.aop_logger.log <%= Logging::TRACE %>, '<%= method %>', 'exit--generated-method'
+% if logger.visible?(Logging::TRACE)
+      aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'exit--generated-method'
 % end
       result
     end

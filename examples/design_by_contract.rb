@@ -58,6 +58,7 @@ a.sell -10
 
 ##############################
 
+=begin
 class A
   include DesignByContract
 
@@ -68,4 +69,5 @@ class A
   def buy price
   end
 end
+=end
 

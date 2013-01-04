@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Guoliang Cao"]
-  s.date = "2012-10-09"
+  s.date = "2013-01-04"
   s.description = ""
   s.email = "gcao99@gmail.com"
   s.extra_rdoc_files = [
@@ -61,6 +61,7 @@ Gem::Specification.new do |s|
     "performance-tests/method_invocation_test.rb",
     "performance-tests/raw_test.rb",
     "performance-tests/test_helper.rb",
+    "run_all_examples.sh",
     "spec/functional/advices_on_private_methods_spec.rb",
     "spec/functional/aspect_on_eigen_class_spec.rb",
     "spec/functional/aspect_on_object_spec.rb",
@@ -82,7 +83,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/gcao/aspector"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.18"
+  s.rubygems_version = "1.8.24"
   s.summary = "Aspect Oriented Ruby Programming"
 
   if s.respond_to? :specification_version then
@@ -96,7 +97,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<guard-bundler>, ["~> 0.1.3"])
       s.add_development_dependency(%q<guard-rspec>, ["~> 0.5.2"])
       s.add_development_dependency(%q<guard-shell>, ["~> 0.1.1"])
-      s.add_development_dependency(%q<rb-fsevent>, ["~> 0.4.3.1"])
+      s.add_development_dependency(%q<rb-fsevent>, [">= 0"])
       s.add_development_dependency(%q<growl>, ["~> 1.0.3"])
       s.add_development_dependency(%q<awesome_print>, [">= 0"])
       s.add_development_dependency(%q<pry>, [">= 0"])
@@ -108,7 +109,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<guard-bundler>, ["~> 0.1.3"])
       s.add_dependency(%q<guard-rspec>, ["~> 0.5.2"])
       s.add_dependency(%q<guard-shell>, ["~> 0.1.1"])
-      s.add_dependency(%q<rb-fsevent>, ["~> 0.4.3.1"])
+      s.add_dependency(%q<rb-fsevent>, [">= 0"])
       s.add_dependency(%q<growl>, ["~> 1.0.3"])
       s.add_dependency(%q<awesome_print>, [">= 0"])
       s.add_dependency(%q<pry>, [">= 0"])
@@ -121,7 +122,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<guard-bundler>, ["~> 0.1.3"])
     s.add_dependency(%q<guard-rspec>, ["~> 0.5.2"])
     s.add_dependency(%q<guard-shell>, ["~> 0.1.1"])
-    s.add_dependency(%q<rb-fsevent>, ["~> 0.4.3.1"])
+    s.add_dependency(%q<rb-fsevent>, [">= 0"])
     s.add_dependency(%q<growl>, ["~> 1.0.3"])
     s.add_dependency(%q<awesome_print>, [">= 0"])
     s.add_dependency(%q<pry>, [">= 0"])

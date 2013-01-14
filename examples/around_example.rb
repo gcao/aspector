@@ -8,9 +8,7 @@ end
 
 ##############################
 
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-
-require 'aspector'
+require_relative '../lib/aspector'
 
 aspector(A) do
   target do

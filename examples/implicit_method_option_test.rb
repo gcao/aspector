@@ -6,9 +6,7 @@ end
 
 ##############################
 
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-
-require 'aspector'
+require_relative '../lib/aspector'
 
 class ImplicitMethodOptionTest < Aspector::Base
   # Apply advice to options[:method] and options[:methods] if no target method is given

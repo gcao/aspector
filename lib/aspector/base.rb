@@ -36,6 +36,7 @@ module Aspector
     end
 
     def apply
+      include_extension_module
       invoke_deferred_logics
       define_methods_for_advice_blocks
       add_to_instances unless @options[:old_methods_only]
@@ -95,6 +96,12 @@ module Aspector
     end
 
     private
+
+    def include_extension_module
+      if self.class.const_defined?(:ToBeIncluded)
+        context.send(:include, self.class.const_get(:ToBeIncluded))
+      end
+    end
 
     def deferred_logic_results logic
       @deferred_logic_results[logic]

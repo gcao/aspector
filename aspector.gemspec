@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = "aspector"
-  s.version = "0.13.0"
+  s.name = %q{aspector}
+  s.version = "0.13.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Guoliang Cao"]
-  s.date = "2013-01-04"
-  s.description = ""
-  s.email = "gcao99@gmail.com"
+  s.date = %q{2013-01-23}
+  s.description = %q{}
+  s.email = %q{gcao99@gmail.com}
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
@@ -37,6 +37,7 @@ Gem::Specification.new do |s|
     "examples/cache_aspect.rb",
     "examples/design_by_contract.rb",
     "examples/exception_handler.rb",
+    "examples/exception_handler2.rb",
     "examples/implicit_method_option_test.rb",
     "examples/logging_aspect.rb",
     "examples/retry_aspect.rb",
@@ -80,11 +81,11 @@ Gem::Specification.new do |s|
     "spec/unit/raw_spec.rb",
     "spec/unit/special_chars_spec.rb"
   ]
-  s.homepage = "http://github.com/gcao/aspector"
+  s.homepage = %q{http://github.com/gcao/aspector}
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.24"
-  s.summary = "Aspect Oriented Ruby Programming"
+  s.rubygems_version = %q{1.6.2}
+  s.summary = %q{Aspect Oriented Ruby Programming}
 
   if s.respond_to? :specification_version then
     s.specification_version = 3

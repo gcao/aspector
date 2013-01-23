@@ -12,11 +12,13 @@ end
 
 ##############################
 
-require_relative '../lib/aspector'
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+
+require 'aspector'
 
 class ExceptionHandler < Aspector::Base
 
-  module ToBeIncluded
+  target do
     def handle_exception proxy, *args, &block
       proxy.call *args, &block
     rescue => e

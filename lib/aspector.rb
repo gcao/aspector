@@ -1,16 +1,16 @@
-require_relative 'aspector/logging'
-require_relative 'aspector/logger'
+require 'aspector/logging'
+require 'aspector/logger'
 
-require_relative 'aspector/object_extension'
-require_relative 'aspector/module_extension'
+require 'aspector/object_extension'
+require 'aspector/module_extension'
 
-require_relative 'aspector/base'
-require_relative 'aspector/base_class_methods'
-require_relative 'aspector/advice'
-require_relative 'aspector/advice_metadata'
-require_relative 'aspector/method_matcher'
-require_relative 'aspector/deferred_logic'
-require_relative 'aspector/deferred_option'
+require 'aspector/base'
+require 'aspector/base_class_methods'
+require 'aspector/advice'
+require 'aspector/advice_metadata'
+require 'aspector/method_matcher'
+require 'aspector/deferred_logic'
+require 'aspector/deferred_option'
 
-require_relative 'aspector/aspect_instances'
+require 'aspector/aspect_instances'
 

@@ -21,7 +21,9 @@ end
 
 ##############################
 
-require_relative '../lib/aspector'
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+
+require 'aspector'
 
 class Object
   def assert bool, message = 'Assertion failure'

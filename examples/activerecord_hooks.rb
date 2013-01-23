@@ -8,7 +8,9 @@ end
 
 ##############################
 
-require_relative '../lib/aspector'
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+
+require 'aspector'
 
 class ActiveRecordHooks < Aspector::Base
   logger.level = Aspector::Logging::TRACE

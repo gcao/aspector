@@ -9,11 +9,13 @@ end
 
 ##############################
 
-require_relative '../lib/aspector'
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+
+require 'aspector'
 
 class RetryAspect < Aspector::Base
 
-  module ToBeIncluded
+  target do
     def retry_this proxy, &block
       proxy.call &block
     rescue => e

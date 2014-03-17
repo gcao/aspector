@@ -46,7 +46,7 @@ require 'aspector'
 class CacheAspect < Aspector::Base
   default :ttl => 60
 
-  around :name => 'cache', :aspect_arg => true, :method_arg => true do |aspect, method, proxy, &block|
+  around :aspect_arg => true, :method_arg => true do |aspect, method, proxy, &block|
     key = method
     ttl = aspect.options[:ttl]
 

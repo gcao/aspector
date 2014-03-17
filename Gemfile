@@ -4,7 +4,7 @@ group :development do
   gem "rspec"
   gem "jeweler", "~> 1.6.4"
 
-  gem 'ruby-prof', :platforms => [:mri]
+  #gem 'ruby-prof', :platforms => [:mri]
 
   gem "guard", "~> 0.8.4"
   gem "guard-bundler", "~> 0.1.3"

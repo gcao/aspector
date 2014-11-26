@@ -18,11 +18,14 @@ class RetryAspect < Aspector::Base
   target do
     def retry_this proxy, &block
       proxy.call &block
-    rescue => e
+    rescue
       @retry_count ||= 3
       @retry_count -= 1
 
-      @retry_count = nil or raise if @retry_count == 0
+      if @retry_count == 0
+        @retry_count = nil
+        raise
+      end
 
       retry
     end

@@ -1,31 +1,30 @@
-ENV["ASPECTOR_LOG_LEVEL"] ||= "warn"
+require 'rubygems'
+require 'rspec'
+require 'simplecov'
+require 'pry'
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
-require 'rubygems'
-require 'rspec'
-require 'rspec/autorun'
-require 'aspector'
 
-# Requires supporting files with custom matchers and macros, etc,
-# in ./support/ and its subdirectories.
-Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
+# Don't include unnecessary stuff into rcov
+SimpleCov.start do
+  add_filter '/vendor/'
+  add_filter '/gems/'
+  add_filter '/.bundle/'
+  add_filter '/spec/'
+  merge_timeout 600
+end
+
+Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 RSpec.configure do |config|
-end
+  config.disable_monkey_patching!
 
-def create_test_class &block
-  klass = Class.new do
-    def value
-      @value ||= []
-    end
-
-    def test
-      value << "test"
-    end
+  config.expect_with :rspec do |expectations|
+    expectations.include_chain_clauses_in_custom_matcher_descriptions = true
   end
-
-  klass.class_eval &block if block_given?
-  klass
 end
 
+require 'aspector'
+
+ENV['ASPECTOR_LOG_LEVEL'] ||= ::Logger::WARN.to_s

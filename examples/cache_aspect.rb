@@ -1,5 +1,8 @@
-class A
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+require 'aspector'
 
+# Example class to which we will apply our aspects
+class ExampleClass
   def test
     puts 'test'
     1
@@ -9,16 +12,13 @@ class A
     puts 'test2'
     2
   end
-
 end
 
-##############################
-
+# A simple cache engine
 class SimpleCache
-
   @data = {}
 
-  def self.cache key, ttl
+  def self.cache(key, ttl)
     found = @data[key]  # found is like [time, value]
 
     if found
@@ -34,46 +34,36 @@ class SimpleCache
     @data[key] = [Time.now, value]
     value
   end
-
 end
 
-##############################
-
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-
-require 'aspector'
-
+# Aspect used to wrap methods with caching logic
 class CacheAspect < Aspector::Base
-  default :ttl => 60
+  default ttl: 60
 
-  around :aspect_arg => true, :method_arg => true do |aspect, method, proxy, &block|
+  around aspect_arg: true, method_arg: true do |aspect, method, proxy, &block|
     key = method
     ttl = aspect.options[:ttl]
 
     SimpleCache.cache key, ttl do
-      proxy.call &block
+      proxy.call(&block)
     end
   end
-
 end
 
-##############################
+CacheAspect.apply ExampleClass, method: :test, ttl: 2
+CacheAspect.apply ExampleClass, method: :test2
 
-CacheAspect.apply A, :method => "test", :ttl => 2  # 2 seconds
-CacheAspect.apply A, :method => "test2"
-
-a = A.new
+instance = ExampleClass.new
 
 # Will store value in cache
-a.test
-a.test2
+instance.test
+instance.test2
 
 # Will get value from cache
-a.test
-a.test2
+instance.test
+instance.test2
 
 sleep 3
 
-a.test  # Cache expired
-a.test2 # Cache is still valid
-
+instance.test  # Cache expired
+instance.test2 # Cache is still valid

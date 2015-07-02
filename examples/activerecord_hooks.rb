@@ -1,4 +1,8 @@
-class A
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+require 'aspector'
+
+# Class that fakes the ActiveRecord class
+class ARClass
   def initialize
   end
 
@@ -6,16 +10,9 @@ class A
   end
 end
 
-##############################
-
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-
-require 'aspector'
-
+# Our ActiveRecord hooks aspect
 class ActiveRecordHooks < Aspector::Base
-  logger.level = Aspector::Logging::TRACE
-
-  default :private_methods => true
+  default private_methods: true
 
   before :initialize do
     puts "Before creating #{self.class.name} instance"
@@ -26,9 +23,7 @@ class ActiveRecordHooks < Aspector::Base
   end
 end
 
-##############################
+ActiveRecordHooks.apply(ARClass)
 
-ActiveRecordHooks.apply(A)
-
-a = A.new
-a.save
+ar = ARClass.new
+ar.save

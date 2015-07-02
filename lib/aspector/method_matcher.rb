@@ -1,11 +1,11 @@
 module Aspector
   class MethodMatcher
-    def initialize *match_data
+    def initialize(*match_data)
       @match_data = match_data
       @match_data.flatten!
     end
 
-    def match? method, aspect = nil
+    def match?(method, aspect = nil)
       @match_data.detect do |item|
         case item
         when String
@@ -29,16 +29,15 @@ module Aspector
         end
       end
     end
-    
-    def use_deferred_logic? logic
+
+    def use_deferred_logic?(logic)
       @match_data.detect do |item|
         logic == item
       end
     end
 
     def to_s
-      @match_data.map {|item| item.inspect }.join ", "
+      @match_data.map(&:inspect).join(', ')
     end
   end
 end
-

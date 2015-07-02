@@ -1,16 +1,14 @@
-class A
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+require 'aspector'
+
+# Example class to which we will apply our aspects
+class ExampleClass
   def test
     puts 'test'
   end
 end
 
-##############################
-
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-
-require 'aspector'
-
-aspector(A) do
+aspector(ExampleClass) do
   target do
     def do_this
       puts 'do_this'
@@ -24,11 +22,4 @@ aspector(A) do
   end
 end
 
-##############################
-
-A.new.test
-
-# Expected output:
-# do_this
-# do_that
-# test
+ExampleClass.new.test

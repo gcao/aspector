@@ -1,16 +1,17 @@
-require 'aspector/logging'
-require 'aspector/logger'
+require 'logger'
 
-require 'aspector/object_extension'
-require 'aspector/module_extension'
-
-require 'aspector/base'
-require 'aspector/base_class_methods'
-require 'aspector/advice'
-require 'aspector/advice_metadata'
-require 'aspector/method_matcher'
-require 'aspector/deferred_logic'
-require 'aspector/deferred_option'
-
-require 'aspector/aspect_instances'
-
+%w(
+  version
+  logging
+  logger
+  object_extension
+  module_extension
+  advice
+  advice_metadata
+  base
+  base_class_methods
+  method_matcher
+  deferred_logic
+  deferred_option
+  aspect_instances
+).each { |scope| require "aspector/#{scope}" }

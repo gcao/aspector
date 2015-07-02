@@ -1,92 +1,79 @@
 module Aspector
+  # A single aspect advice representation
   class Advice
+    # All available advices types that we support
+    TYPES = %i(
+      before
+      before_filter
+      after
+      around
+      raw
+    )
 
-    BEFORE = 1
-    AFTER  = 2
-    AROUND = 3
-    RAW    = 4
+    # Defines methods that allow us to check if an advice is of a given type
+    TYPES.each do |type_name|
+      # Defines constants like BEFORE, AFTER,etc
+      const_set(type_name.to_s.upcase, type_name)
 
-    attr_reader :type, :method_matcher, :options, :advice_code, :advice_block
-    attr_accessor :index
-
-    def initialize parent, type, method_matcher, with_method, options = {}, &block
-      @parent         = parent
-      @type           = type
-      @method_matcher = method_matcher
-
-      if with_method.is_a? Symbol
-        @with_method  = with_method
-      else
-        @advice_code  = with_method
+      # @return [Boolean] is advice of a given type?
+      # @example Check if advice is an after
+      #   advice.after? #=> true
+      define_method :"#{type_name}?" do
+        type == type_name
       end
-
-      @options        = options
-      @advice_block   = block
     end
 
-    def name
-      @options[:name] || "advice #{index}"
+    attr_reader :type, :method_matcher, :options, :advice_code, :advice_block, :name
+    attr_accessor :index
+
+    def initialize(parent, type, method_matcher, with_method, options = {}, &block)
+      @type = type
+      @parent = parent
+      @options = options
+      @advice_block = block
+      @method_matcher = method_matcher
+      @name = @options[:name] || "advice_#{index}"
+
+      if with_method.is_a? Symbol
+        @with_method = with_method
+      else
+        @advice_code = with_method
+      end
     end
 
     def with_method
-      unless @advice_code
-        @with_method ||= "aop_#{hash.abs}"
-      end
+      return nil if @advice_code
+
+      @with_method ||= "aop_#{hash.abs}"
     end
 
-    def match? method, context = nil
-      return if method == with_method
-      return unless @method_matcher.match?(method, context)
+    def match?(method, context = nil)
+      return false if method == with_method
+      return false unless @method_matcher.match?(method, context)
 
       return true unless @options[:except]
 
       @except ||= MethodMatcher.new(@options[:except])
 
-      not @except.match?(method)
+      !@except.match?(method)
     end
 
-    def raw?
-      type == RAW
-    end
-
-    def before?
-      type == BEFORE
-    end
-
-    def after?
-      type == AFTER
-    end
-
-    def around?
-      type == AROUND
-    end
-
-    def type_name
-      case @type
-      when BEFORE then @options[:skip_if_false] ? "BEFORE_FILTER" : "BEFORE"
-      when AFTER  then "AFTER"
-      when AROUND then "AROUND"
-      when RAW    then "RAW"
-      else "UNKNOWN?!"
-      end
-    end
-    
-    def use_deferred_logic? logic
+    def use_deferred_logic?(logic)
       method_matcher.use_deferred_logic? logic
     end
 
     def to_s
       s = "#{name}: "
-      s << type_name
-      s << " [" << @method_matcher.to_s << "] DO "
+      s << type.to_s.upcase
+      s << ' [' << @method_matcher.to_s << '] DO '
+
       if @with_method
         s << @with_method.to_s
       else
-        s << "stuff in block"
+        s << 'stuff in block'
       end
-      s << " WITH OPTIONS " << @options.inspect
+      s << ' WITH OPTIONS ' << @options.inspect
       s
     end
-
   end
 end

@@ -1,23 +1,19 @@
-class A
-
-  def test
-    puts 'test'
-    raise
-  end
-
-end
-
-##############################
-
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-
 require 'aspector'
 
-class RetryAspect < Aspector::Base
+# Example class to which we will apply our aspects
+class ExampleClass
+  def test
+    puts 'test'
+    fail
+  end
+end
 
+# Aspect that will be used as a retry with counting
+class RetryAspect < Aspector::Base
   target do
-    def retry_this proxy, &block
-      proxy.call &block
+    def retry_this(proxy, &block)
+      proxy.call(&block)
     rescue
       @retry_count ||= 3
       @retry_count -= 1
@@ -32,13 +28,14 @@ class RetryAspect < Aspector::Base
   end
 
   around :retry_this
-
 end
 
-##############################
+RetryAspect.apply(ExampleClass, method: :test)
 
-RetryAspect.apply A, :method => "test"
+instance = ExampleClass.new
 
-a = A.new
-a.test
-
+begin
+  instance.test
+rescue
+  puts 'Fails after 3 retries'
+end

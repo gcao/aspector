@@ -1,18 +1,13 @@
-source "http://rubygems.org"
+source 'http://rubygems.org'
 
 group :development do
-  gem "rspec"
-  gem "jeweler", "~> 1.6.4"
-
-  #gem 'ruby-prof', :platforms => [:mri]
-
-  gem "guard", "~> 0.8.4"
-  gem "guard-bundler", "~> 0.1.3"
-  gem "guard-rspec", "~> 0.5.2"
-  gem "guard-shell", "~> 0.1.1"
-  gem 'rb-fsevent'
-  gem 'growl', "~> 1.0.3"
-
-  gem 'awesome_print'
+  gem 'rspec'
+  gem 'guard'
+  gem 'guard-bundler'
+  gem 'guard-rspec'
+  gem 'guard-shell'
+  gem 'rubocop'
   gem 'pry'
+  gem 'simplecov'
+  gem 'ruby-prof'
 end

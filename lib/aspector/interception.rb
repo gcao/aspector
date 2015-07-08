@@ -216,8 +216,9 @@ module Aspector
     end
 
     def recreate_method_with_advices method, before_advices, after_advices, around_advice, is_outermost = false
-      aspect = self
+      aspect = @aspect
       logger = @logger
+      interception = self
       orig_method = get_wrapped_method_of method
 
       code = METHOD_TEMPLATE.result(binding)
@@ -226,20 +227,18 @@ module Aspector
     end
 
     METHOD_TEMPLATE = ERB.new <<-CODE, nil, "%<>"
-      orig_method = aspect.send(:get_wrapped_method_of, '<%= method %>')
-
 %     if around_advice
         wrapped_method = instance_method(:<%= method %>)
 %     end
 
       define_method :<%= method %> do |*args, &block|
 %       if logger.debug?
-          aspect.logger.debug '<%= method %>', 'enter-generated-method'
+          logger.debug '<%= method %>', 'enter-generated-method'
 %       end
 
         if aspect.disabled?
 %         if logger.debug?
-            aspect.logger.debug '<%= method %>', 'exit--generated-method'
+            logger.debug '<%= method %>', 'exit--generated-method'
 %         end
 
           return orig_method.bind(self).call(*args, &block)
@@ -247,26 +246,26 @@ module Aspector
 
 %       before_advices.each do |advice|
 %         if logger.debug?
-            aspect.logger.debug '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
+            logger.debug '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
 %         end
 
 %         if advice.advice_code
             result = (<%= advice.advice_code %>)
 %         else
             result = <%= advice.with_method %> <%
-              if advice.options[:aspect_arg] %>aspect, <% end %><%
+              if advice.options[:interception_arg] %>interception, <% end %><%
               if advice.options[:method_arg] %>'<%= method %>', <% end
               %>*args
 %         end
 
 %         if logger.debug?
-            aspect.logger.debug '<%= method %>', 'after--invoke-advice', '<%= advice.name %>'
+            logger.debug '<%= method %>', 'after--invoke-advice', '<%= advice.name %>'
 %         end
 
 %         if advice.before_filter?
             unless result
 %             if logger.debug?
-                aspect.logger.debug '<%= method %>', 'exit-method-due-to-before-filter', '<%= advice.name %>'
+                logger.debug '<%= method %>', 'exit-method-due-to-before-filter', '<%= advice.name %>'
 %             end
 
               return
@@ -276,51 +275,50 @@ module Aspector
 
 %       if around_advice
 %         if logger.debug?
-            aspect.logger.debug '<%= method %>', 'before-invoke-advice', '<%= around_advice.name %>'
+            logger.debug '<%= method %>', 'before-invoke-advice', '<%= around_advice.name %>'
 %         end
 
 %         if around_advice.advice_code
             result = (<%= around_advice.advice_code.gsub('INVOKE_PROXY', 'wrapped_method.bind(self).call(*args, &block)') %>)
 %         else
-            proxy = lambda do |*args, &block|
-%             if logger.debug?
-                aspect.logger.debug '<%= method %>', 'before-invoke-proxy'
-%             end
-
-              res = wrapped_method.bind(self).call *args, &block
-
-%             if logger.debug?
-                aspect.logger.debug '<%= method %>', 'after--invoke-proxy'
-%             end
-
-              res
-            end
-
-            result = <%= around_advice.with_method %> <%
-              if around_advice.options[:aspect_arg] %>aspect, <% end %><%
-              if around_advice.options[:method_arg] %>'<%= method %>', <% end
-              %>proxy, *args, &block
-
 %           if logger.debug?
-              aspect.logger.debug '<%= method %>', 'after--invoke-advice', '<%= around_advice.name %>'
+              proxy = lambda do |*args, &block|
+                logger.debug '<%= method %>', 'before-invoke-proxy'
+                res = wrapped_method.bind(self).call *args, &block
+                logger.debug '<%= method %>', 'after--invoke-proxy'
+                res
+              end
+              result = <%= around_advice.with_method %> <%
+                if around_advice.options[:interception_arg] %>interception, <% end %><%
+                if around_advice.options[:method_arg] %>'<%= method %>', <% end
+                %>proxy, *args, &block
+%           else
+              result = <%= around_advice.with_method %> <%
+                if around_advice.options[:interception_arg] %>interception, <% end %><%
+                if around_advice.options[:method_arg] %>'<%= method %>', <% end
+                %>wrapped_method.bind(self), *args, &block
 %           end
+%         end
+
+%         if logger.debug?
+            logger.debug '<%= method %>', 'after--invoke-advice', '<%= around_advice.name %>'
 %         end
 %       else
           # Invoke original method
 %         if logger.debug?
-            aspect.logger.debug '<%= method %>', 'before-wrapped-method'
+            logger.debug '<%= method %>', 'before-wrapped-method'
 %         end
 
           result = orig_method.bind(self).call *args, &block
 %         if logger.debug?
-            aspect.logger.debug '<%= method %>', 'after--wrapped-method'
+            logger.debug '<%= method %>', 'after--wrapped-method'
 %         end
 %       end
 
 %       unless after_advices.empty?
 %         after_advices.each do |advice|
 %           if logger.debug?
-              aspect.logger.debug '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
+              logger.debug '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
 %           end
 
 %           if advice.advice_code
@@ -328,26 +326,26 @@ module Aspector
 %           else
 %             if advice.options[:result_arg]
                 result = <%= advice.with_method %> <%
-                  if advice.options[:aspect_arg] %>aspect, <% end %><%
+                  if advice.options[:interception_arg] %>interception, <% end %><%
                   if advice.options[:method_arg] %>'<%= method %>', <% end %><%
                   if advice.options[:result_arg] %>result, <% end
                   %>*args
 %             else
                 <%= advice.with_method %> <%
-                  if advice.options[:aspect_arg] %>aspect, <% end %><%
+                  if advice.options[:interception_arg] %>interception, <% end %><%
                   if advice.options[:method_arg] %>'<%= method %>', <% end
                   %>*args
 %             end
 %           end
 
 %           if logger.debug?
-              aspect.logger.debug '<%= method %>', 'after--invoke-advice', '<%= advice.name %>'
+              logger.debug '<%= method %>', 'after--invoke-advice', '<%= advice.name %>'
 %           end
 %         end
 %       end
 
 %       if logger.debug?
-          aspect.logger.debug '<%= method %>', 'exit--generated-method'
+          logger.debug '<%= method %>', 'exit--generated-method'
 %       end
 
         result

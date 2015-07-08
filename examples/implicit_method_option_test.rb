@@ -1,15 +1,14 @@
-class A
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+require 'aspector'
+
+# Example class to which we will apply our aspects
+class ExampleClass
   def test
     puts 'test'
   end
 end
 
-##############################
-
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-
-require 'aspector'
-
+# Aspect that we want to use
 class ImplicitMethodOptionTest < Aspector::Base
   # Apply advice to options[:method] and options[:methods] if no target method is given
   # before options[:method], options[:methods] do
@@ -18,13 +17,6 @@ class ImplicitMethodOptionTest < Aspector::Base
   end
 end
 
-ImplicitMethodOptionTest.apply A, :method => "test"
+ImplicitMethodOptionTest.apply(ExampleClass, method: :test)
 
-##############################
-
-A.new.test
-
-# Expected output:
-# before
-# test
-
+ExampleClass.new.test

@@ -1,14 +1,12 @@
-class A
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+require 'aspector'
+
+# Example class to which we will apply our aspects
+class ExampleClass
   def test
     puts 'test'
   end
 end
-
-##############################
-
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-
-require 'aspector'
 
 aspect = Aspector do
   target do
@@ -24,13 +22,8 @@ aspect = Aspector do
   end
 end
 
-##############################
-
-aspect.apply(A)
-
-A.new.test
-
-# Expected output:
-# do_this
-# do_that
-# test
+aspect.apply(ExampleClass)
+element = ExampleClass.new
+element.test
+aspect.disable
+element.test

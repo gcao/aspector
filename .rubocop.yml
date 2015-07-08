@@ -1,0 +1,22 @@
+AlignParameters:
+  Enabled: false
+ClassLength:
+  CountComments: false
+  Max: 200
+LineLength:
+  Max: 99
+MethodLength:
+  CountComments: false
+  Max: 15
+Metrics/AbcSize:
+  Max: 25
+AllCops:
+  Exclude:
+    - bin/**/*
+    - /.gemspec/
+    - !ruby/regexp /old_and_unused\.rb$/
+Style/MultilineOperationIndentation:
+  EnforcedStyle: indented
+  SupportedStyles:
+    - aligned
+    - indented

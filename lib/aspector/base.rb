@@ -8,27 +8,16 @@ module Aspector
 
     def initialize target, options = {}
       @target = target
-
-      default_options = self.class.default_options
-      if default_options and not default_options.empty?
-        @options = default_options.merge(options)
-      else
-        @options = options
-      end
-
+      @options = (self.class.default_options || {}).merge(options)
       @wrapped_methods = {}
     end
 
     def disabled?
-      # Enabled by default
+      false
     end
 
     def logger
-      return @logger if @logger
-
-      @logger = Logging.get_logger(self)
-      @logger.level = self.class.logger.level
-      @logger
+      @logger ||= Logging.get_logger(self)
     end
 
     def advices
@@ -39,9 +28,9 @@ module Aspector
       include_extension_module
       invoke_deferred_logics
       define_methods_for_advice_blocks
-      add_to_instances unless @options[:old_methods_only]
+      add_to_instances unless @options[:existing_methods_only]
       apply_to_methods unless @options[:new_methods_only]
-      add_method_hooks unless @options[:old_methods_only]
+      add_method_hooks unless @options[:existing_methods_only]
       # TODO: clear deferred logic results if they are not used in any advice
     end
 
@@ -81,12 +70,12 @@ module Aspector
       filtered_advices = filter_advices advices, method
       return if filtered_advices.empty?
 
-      logger.log Logging::DEBUG, 'apply-to-method', method
+      logger.debug 'apply-to-method', method
 
       scope ||=
-          if context.private_instance_methods.include?(RUBY_VERSION.index('1.9') ? method.to_sym : method.to_s)
+          if context.private_instance_methods.include?(method.to_sym)
             :private
-          elsif context.protected_instance_methods.include?(RUBY_VERSION.index('1.9') ? method.to_sym : method.to_s)
+          elsif context.protected_instance_methods.include?(method.to_sym)
             :protected
           else
             :public
@@ -98,9 +87,9 @@ module Aspector
     private
 
     def include_extension_module
-      if self.class.const_defined?(:ToBeIncluded)
-        context.send(:include, self.class.const_get(:ToBeIncluded))
-      end
+      return unless self.class.const_defined?(:ToBeIncluded)
+
+      context.send(:include, self.class.const_get(:ToBeIncluded))
     end
 
     def deferred_logic_results logic
@@ -210,14 +199,14 @@ module Aspector
         @wrapped_methods[method] = context.instance_method(method)
       rescue
         # ignore undefined method error
-        if @options[:old_methods_only]
-          logger.log Logging::WARN, 'method-not-found', method
+        if @options[:existing_methods_only]
+          logger.warn 'method-not-found', method
         end
 
         return
       end
 
-      before_advices = advices.select {|advice| advice.before? }
+      before_advices = advices.select {|advice| advice.before? || advice.before_filter? }
       after_advices  = advices.select {|advice| advice.after?  }
       around_advices = advices.select {|advice| advice.around? }
 
@@ -226,155 +215,148 @@ module Aspector
         recreate_method_with_advices method, [], [], advice
       end
 
-      recreate_method_with_advices method, before_advices, after_advices, around_advices.first, true
+      recreate_method_with_advices method, before_advices, after_advices, around_advices.first
 
       context.send scope, method if scope != :public
     ensure
       context.send :remove_instance_variable, :@aop_creating_method
     end
 
-    def recreate_method_with_advices method, before_advices, after_advices, around_advice, is_outermost = false
+    def recreate_method_with_advices method, before_advices, after_advices, around_advice
       aspect = self
 
       code = METHOD_TEMPLATE.result(binding)
-      aspect.logger.log Logging::DEBUG, 'generate-code', method, code
+      aspect.logger.debug 'generate-code', method, code
       context.class_eval code, __FILE__, __LINE__ + 4
     end
 
     METHOD_TEMPLATE = ERB.new <<-CODE, nil, "%<>"
+      orig_method = aspect.send(:get_wrapped_method_of, '<%= method %>')
 
-    orig_method = aspect.send :get_wrapped_method_of, '<%= method %>'
-% if around_advice
-    wrapped_method = instance_method(:<%= method %>)
-% end
-
-    define_method :<%= method %> do |*args, &block|
-% if logger.visible?(Logging::TRACE)
-      aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'enter-generated-method'
-% end
-
-      if aspect.disabled?
-% if logger.visible?(Logging::TRACE)
-        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'exit--generated-method'
-% end
-        return orig_method.bind(self).call(*args, &block)
-      end
-
-% if is_outermost
-      result = catch(:returns) do
-% end
-
-% before_advices.each do |advice|
-        # Before advice: <%= advice.name %>
-%   if logger.visible?(Logging::TRACE)
-        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
-% end
-%   if advice.advice_code
-        result = (<%= advice.advice_code %>)
-%   else
-        result = <%= advice.with_method %> <%
-          if advice.options[:aspect_arg] %>aspect, <% end %><%
-          if advice.options[:method_arg] %>'<%= method %>', <% end
-          %>*args
-%   end
-% if logger.visible?(Logging::TRACE)
-        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-advice', '<%= advice.name %>'
-% end
-%   if advice.options[:skip_if_false]
-        unless result
-% if logger.visible?(Logging::TRACE)
-          aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'exit-method-due-to-before-filter', '<%= advice.name %>'
-% end
-          return
-        end
-%   end
-% end
-
-% if around_advice
-        # Around advice: <%= around_advice.name %>
-% if logger.visible?(Logging::TRACE)
-        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= around_advice.name %>'
-% end
-%   if around_advice.advice_code
-        result = (<%= around_advice.advice_code.gsub('INVOKE_PROXY', 'wrapped_method.bind(self).call(*args, &block)') %>)
-
-%   else
-% if logger.visible?(Logging::TRACE)
-        proxy = lambda do |*args, &block|
-          aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-proxy'
-          res = wrapped_method.bind(self).call *args, &block
-          aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-proxy'
-          res
-        end
-        result = <%= around_advice.with_method %> <%
-          if around_advice.options[:aspect_arg] %>aspect, <% end %><%
-          if around_advice.options[:method_arg] %>'<%= method %>', <% end
-          %>proxy, *args, &block
-% else
-        result = <%= around_advice.with_method %> <%
-          if around_advice.options[:aspect_arg] %>aspect, <% end %><%
-          if around_advice.options[:method_arg] %>'<%= method %>', <% end
-          %>wrapped_method.bind(self), *args, &block
-% end
-%   end
-% if logger.visible?(Logging::TRACE)
-        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-advice', '<%= around_advice.name %>'
-% end
-
-% else
-
-        # Invoke original method
-% if logger.visible?(Logging::TRACE)
-        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-wrapped-method'
-% end
-        result = orig_method.bind(self).call *args, &block
-% if logger.visible?(Logging::TRACE)
-        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--wrapped-method'
-% end
-
-% end
-
-% unless after_advices.empty?
-%   after_advices.each do |advice|
-        # After advice: <%= advice.name %>
-% if logger.visible?(Logging::TRACE)
-        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
-% end
-%  if advice.advice_code
-        result = (<%= advice.advice_code %>)
-%   else
-%     if advice.options[:result_arg]
-        result = <%= advice.with_method %> <%
-          if advice.options[:aspect_arg] %>aspect, <% end %><%
-          if advice.options[:method_arg] %>'<%= method %>', <% end %><%
-          if advice.options[:result_arg] %>result, <% end
-          %>*args
-%     else
-        <%= advice.with_method %> <%
-          if advice.options[:aspect_arg] %>aspect, <% end %><%
-          if advice.options[:method_arg] %>'<%= method %>', <% end
-          %>*args
+%     if around_advice
+        wrapped_method = instance_method(:<%= method %>)
 %     end
-%   end
-% if logger.visible?(Logging::TRACE)
-        aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'after--invoke-advice', '<%= advice.name %>'
-% end
-%   end
-% end
 
-% if is_outermost
+      define_method :<%= method %> do |*args, &block|
+%       if logger.debug?
+          aspect.logger.debug '<%= method %>', 'enter-generated-method'
+%       end
+
+        if aspect.disabled?
+%         if logger.debug?
+            aspect.logger.debug '<%= method %>', 'exit--generated-method'
+%         end
+
+          return orig_method.bind(self).call(*args, &block)
+        end
+
+%       before_advices.each do |advice|
+%         if logger.debug?
+            aspect.logger.debug '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
+%         end
+
+%         if advice.advice_code
+            result = (<%= advice.advice_code %>)
+%         else
+            result = <%= advice.with_method %> <%
+              if advice.options[:aspect_arg] %>aspect, <% end %><%
+              if advice.options[:method_arg] %>'<%= method %>', <% end
+              %>*args
+%         end
+
+%         if logger.debug?
+            aspect.logger.debug '<%= method %>', 'after--invoke-advice', '<%= advice.name %>'
+%         end
+
+%         if advice.before_filter?
+            unless result
+%             if logger.debug?
+                aspect.logger.debug '<%= method %>', 'exit-method-due-to-before-filter', '<%= advice.name %>'
+%             end
+
+              return
+            end
+%         end
+%       end
+
+%       if around_advice
+%         if logger.debug?
+            aspect.logger.debug '<%= method %>', 'before-invoke-advice', '<%= around_advice.name %>'
+%         end
+
+%         if around_advice.advice_code
+            result = (<%= around_advice.advice_code.gsub('INVOKE_PROXY', 'wrapped_method.bind(self).call(*args, &block)') %>)
+%         else
+            proxy = lambda do |*args, &block|
+%             if logger.debug?
+                aspect.logger.debug '<%= method %>', 'before-invoke-proxy'
+%             end
+
+              res = wrapped_method.bind(self).call *args, &block
+
+%             if logger.debug?
+                aspect.logger.debug '<%= method %>', 'after--invoke-proxy'
+%             end
+
+              res
+            end
+
+            result = <%= around_advice.with_method %> <%
+              if around_advice.options[:aspect_arg] %>aspect, <% end %><%
+              if around_advice.options[:method_arg] %>'<%= method %>', <% end
+              %>proxy, *args, &block
+
+%           if logger.debug?
+              aspect.logger.debug '<%= method %>', 'after--invoke-advice', '<%= around_advice.name %>'
+%           end
+%         end
+%       else
+          # Invoke original method
+%         if logger.debug?
+            aspect.logger.debug '<%= method %>', 'before-wrapped-method'
+%         end
+
+          result = orig_method.bind(self).call *args, &block
+%         if logger.debug?
+            aspect.logger.debug '<%= method %>', 'after--wrapped-method'
+%         end
+%       end
+
+%       unless after_advices.empty?
+%         after_advices.each do |advice|
+%           if logger.debug?
+              aspect.logger.debug '<%= method %>', 'before-invoke-advice', '<%= advice.name %>'
+%           end
+
+%           if advice.advice_code
+              result = (<%= advice.advice_code %>)
+%           else
+%             if advice.options[:result_arg]
+                result = <%= advice.with_method %> <%
+                  if advice.options[:aspect_arg] %>aspect, <% end %><%
+                  if advice.options[:method_arg] %>'<%= method %>', <% end %><%
+                  if advice.options[:result_arg] %>result, <% end
+                  %>*args
+%             else
+                <%= advice.with_method %> <%
+                  if advice.options[:aspect_arg] %>aspect, <% end %><%
+                  if advice.options[:method_arg] %>'<%= method %>', <% end
+                  %>*args
+%             end
+%           end
+
+%           if logger.debug?
+              aspect.logger.debug '<%= method %>', 'after--invoke-advice', '<%= advice.name %>'
+%           end
+%         end
+%       end
+
+%       if logger.debug?
+          aspect.logger.debug '<%= method %>', 'exit--generated-method'
+%       end
+
         result
-
-      end # end of catch
-% end
-
-% if logger.visible?(Logging::TRACE)
-      aspect.logger.log <%= Logging::TRACE %>, '<%= method %>', 'exit--generated-method'
-% end
-      result
-    end
+      end
     CODE
-
   end
 end
-

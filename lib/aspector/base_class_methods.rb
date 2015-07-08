@@ -3,21 +3,32 @@ module Aspector
     module ClassMethods
       ::Aspector::Base.extend(self)
 
-      def enable
-        logger.log Logging::INFO, 'enable-aspect'
-        send :define_method, :disabled? do
+      Aspector::Advice::TYPES.each do |type_name|
+        define_method type_name do |*methods, &block|
+          meta = Object.const_get("Aspector::AdviceMetadata::#{type_name.to_s.upcase}")
+          advices << advice = _create_advice_(meta, self, methods, &block)
+          advice.index = advices.size
+          logger.info 'define-advice', advice
+          advice
         end
 
-        nil
+        private type_name
+      end
+
+      def enable
+        logger.info 'enable-aspect'
+
+        send :define_method, :disabled? do
+          false
+        end
       end
 
       def disable
-        logger.log Logging::INFO, 'disable-aspect'
+        logger.info 'disable-aspect'
+
         send :define_method, :disabled? do
           true
         end
-
-        nil
       end
 
       # if ENV["ASPECTOR_LOGGER"] is set, use it
@@ -40,7 +51,7 @@ module Aspector
 
         targets = rest.unshift target
         result = targets.map do |target|
-          logger.log Logging::INFO, 'apply', target, options.inspect
+          logger.info 'apply', target, options.inspect
           aspect_instance = new(target, options)
           aspect_instance.send :apply
           aspect_instance
@@ -48,50 +59,12 @@ module Aspector
 
         result.size == 1 ? result.first : result
       end
-      
+
       private
 
       def default options
-        if @default_options
-          @default_options.merge! options
-        else
-          @default_options = options
-        end
-      end
-
-      def before *methods, &block
-        advices << advice = _create_advice_(Aspector::AdviceMetadata::BEFORE, self, methods, &block)
-        advice.index = advices.size
-        logger.log Logging::INFO, 'define-advice', advice
-        advice
-      end
-
-      def before_filter *methods, &block
-        advices << advice = _create_advice_(Aspector::AdviceMetadata::BEFORE_FILTER, self, methods, &block)
-        advice.index = advices.size
-        logger.log Logging::INFO, 'define-advice', advice
-        advice
-      end
-
-      def after *methods, &block
-        advices << advice = _create_advice_(Aspector::AdviceMetadata::AFTER, self, methods, &block)
-        advice.index = advices.size
-        logger.log Logging::INFO, 'define-advice', advice
-        advice
-      end
-
-      def around *methods, &block
-        advices << advice = _create_advice_(Aspector::AdviceMetadata::AROUND, self, methods, &block)
-        advice.index = advices.size
-        logger.log Logging::INFO, 'define-advice', advice
-        advice
-      end
-
-      def raw *methods, &block
-        advices << advice = _create_advice_(Aspector::AdviceMetadata::RAW, self, methods, &block)
-        advice.index = advices.size
-        logger.log Logging::INFO, 'define-advice', advice
-        advice
+        @default_options ||= {}
+        @default_options.merge!(options)
       end
 
       def target code = nil, &block
@@ -115,7 +88,6 @@ module Aspector
 
         options = meta_data.default_options.clone
         options.merge!(methods.pop) if methods.last.is_a? Hash
-        options.merge!(meta_data.mandatory_options)
 
         if meta_data.advice_type == Aspector::Advice::RAW
           raise "Bad raw advice - code block is required" unless block_given?

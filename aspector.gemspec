@@ -4,9 +4,9 @@ Gem::Specification.new do |s|
   s.name = %q( aspector )
   s.version = Aspector::VERSION
 
-  s.authors     = %q( Guoliang Cao )
+  s.authors     = ['Guoliang Cao', 'Maciej Mensfeld']
   s.date        = %q( 2015-07-07 )
-  s.email       = %q( gcao99@gmail.com )
+  s.email       = ['gcao99@gmail.com', 'maciej@mensfeld.pl']
   s.summary     = %q( Aspect Oriented Ruby Programming library )
   s.homepage    = %q( http://github.com/gcao/aspector )
   s.licenses    = %w( MIT )

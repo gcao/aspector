@@ -1,17 +1,17 @@
 require 'aspector/version'
 
 Gem::Specification.new do |s|
-  s.name = %q( aspector )
+  s.name = %w( aspector )
   s.version = Aspector::VERSION
 
   s.authors     = ['Guoliang Cao', 'Maciej Mensfeld']
-  s.date        = %q( 2015-07-07 )
+  s.date        = %w( 2015-07-07 )
   s.email       = ['gcao99@gmail.com', 'maciej@mensfeld.pl']
-  s.summary     = %q( Aspect Oriented Ruby Programming library )
-  s.homepage    = %q( http://github.com/gcao/aspector )
+  s.summary     = %w( Aspect Oriented Ruby Programming library )
+  s.homepage    = %w( http://github.com/gcao/aspector )
   s.licenses    = %w( MIT )
-  s.description = %q()
-  s.rubygems_version = %q( 1.6.2 )
+  s.description = %w()
+  s.rubygems_version = %w( 1.6.2 )
 
   s.files         = `git ls-files -z`.split("\x0")
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }

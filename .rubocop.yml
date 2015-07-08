@@ -15,6 +15,10 @@ AllCops:
     - bin/**/*
     - /.gemspec/
     - !ruby/regexp /old_and_unused\.rb$/
+    - lib/**/*
+  Include:
+    - Rakefile
+    - aspector.gemspec
 Style/MultilineOperationIndentation:
   EnforcedStyle: indented
   SupportedStyles:

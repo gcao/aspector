@@ -4,7 +4,5 @@ rvm:
   - 2.1.5
   - 2.2.2
 script:
-  - bundle exec rubocop spec
-  - bundle exec rubocop examples
-  - bundle exec rubocop benchmarks
+  - bundle exec rubocop
   - bundle exec rspec spec

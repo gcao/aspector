@@ -12,7 +12,7 @@ module Aspector
 
     %i( debug info warn error fatal ).each do |level|
       define_method level do |*args|
-        super -> { postfix(*args) }
+        super(nil) { postfix(*args) }
       end
     end
 

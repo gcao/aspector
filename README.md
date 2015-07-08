@@ -95,7 +95,7 @@ Aspector is really easy to use. After installation it doesn't require any additi
 | ASPECTOR_LOGGER    | Any logger class you want to use (if you don't want to use Aspector standard logger) |
 | ASPECTOR_LOG_LEVEL | DEBUG < INFO < WARN < ERROR < FATAL < UNKNOWN                                        |
 
-Aspector::Logger inherits from a [standard Ruby logger](ruby-doc.org/stdlib-2.2.0/libdoc/logger/rdoc/Logger.html). Log levels and the API are pretty standard. You can however use yor own:
+Aspector::Logger inherits from a [standard Ruby logger](http://ruby-doc.org/stdlib-2.2.0/libdoc/logger/rdoc/Logger.html). Log levels and the API are pretty standard. You can however use yor own:
 
 ```ruby
 ASPECTOR_LOGGER='MyApp::Logger' ASPECTOR_LOG_LEVEL='any log level' ruby aspected_stuff.rb

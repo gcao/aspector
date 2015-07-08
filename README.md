@@ -113,6 +113,6 @@ ASPECTOR_LOGGER='MyApp::Logger' ASPECTOR_LOG_LEVEL'any log level' ruby aspected_
 * Please benchmark any functionality that might have a performance impact
 * Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
 
-== Copyright
+## Copyright
 
 Copyright (c) 2015 Guoliang Cao, Maciej Mensfeld. See LICENSE.txt for further details.

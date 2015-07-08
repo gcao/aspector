@@ -8,6 +8,7 @@ require 'logger'
   module_extension
   advice
   advice_metadata
+  interception
   base
   base_class_methods
   method_matcher

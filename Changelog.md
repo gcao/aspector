@@ -2,7 +2,7 @@
 
 ## Changelog
 
-### 0.15.0
+### 0.14.0
 
 * Created instance of an aspect can be applied to multiple targets(classes/instances)
 * aspect_arg replaced with interception_arg because of multiple possible targets with different options
@@ -12,9 +12,6 @@
 * Specs for accessing interception options
 * Specs that validate if interception options inherit aspect default options
 * Logger proc printing instead of evaluating fix
-
-### 0.14.0
-
 * jruby support drop - there's no 2.0 syntax for jruby yet. Once it's out of beta - no further work needs to be done (works for me on beta)
 * drop 1.8 and 1.9 - even ruby guys recommend upgrading
 * added rubocop for spec/, examples/ and benchmarks/

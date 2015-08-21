@@ -18,7 +18,7 @@ RSpec.describe Aspector::MethodMatcher do
     end
 
     context 'Regular expression matching - when we want to match method by regexp' do
-      let(:method) {  rand.to_s + 'constant-part' }
+      let(:method) { rand.to_s + 'constant-part' }
       let(:match_data) { /constant/ }
 
       it 'should match it' do
@@ -44,7 +44,7 @@ RSpec.describe Aspector::MethodMatcher do
       end
 
       context 'and all of them match' do
-        let(:match_data) { [/test/, /te/]  }
+        let(:match_data) { [/test/, /te/] }
 
         it 'should not be nil' do
           expect(subject.match?('test2')).not_to be_nil

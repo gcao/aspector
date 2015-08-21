@@ -19,7 +19,7 @@ class SimpleCache
   @data = {}
 
   def self.cache(key, ttl)
-    found = @data[key]  # found is like [time, value]
+    found = @data[key] # found is like [time, value]
 
     if found
       puts "Found in cache: #{key}"

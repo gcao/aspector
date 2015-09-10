@@ -1,10 +1,9 @@
 module Aspector
+  # Module extensions that we need to make aspector work
   module ModuleExtension
-    Module.send :include, self
-
     private
 
-    def aop_method_added method
+    def aop_method_added(method)
       return (block_given? and yield) if
         @aop_creating_method or
         @aop_instances.nil? or @aop_instances.empty?
@@ -24,7 +23,7 @@ module Aspector
       end
     end
 
-    def aop_singleton_method_added method
+    def aop_singleton_method_added(method)
       # Note: methods involved are on eigen class
       eigen_class = class << self; self; end
 
@@ -53,3 +52,4 @@ module Aspector
   end
 end
 
+::Module.send(:include, Aspector::ModuleExtension)

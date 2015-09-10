@@ -49,17 +49,17 @@ module Aspector
 
     def match?(method, context = nil)
       return false if method == with_method
-      return false unless @method_matcher.match?(method, context)
+      return false unless @method_matcher.any?(method, context)
 
       return true unless @options[:except]
 
       @except ||= MethodMatcher.new(@options[:except])
 
-      !@except.match?(method)
+      !@except.any?(method)
     end
 
     def use_deferred_logic?(logic)
-      method_matcher.use_deferred_logic? logic
+      method_matcher.include?(logic)
     end
 
     def to_s

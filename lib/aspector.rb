@@ -1,5 +1,7 @@
 require 'logger'
 
+base_path = File.dirname(__FILE__) + '/aspector'
+
 %w(
   version
   logging
@@ -15,4 +17,4 @@ require 'logger'
   deferred_logic
   deferred_option
   aspect_instances
-).each { |scope| require "aspector/#{scope}" }
+).each { |scope| require "#{base_path}/#{scope}" }

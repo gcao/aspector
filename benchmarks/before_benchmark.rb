@@ -15,14 +15,10 @@ end
 
 instance = Klass.new
 
-RubyProf.start
-ITERATIONS.times { instance.test_no_aspect }
-result = RubyProf.stop
+benchmark 'instance.test_no_aspect' do
+  instance.test_no_aspect
+end
 
-print_result(result, 'instance.test_no_aspect')
-
-RubyProf.start
-ITERATIONS.times { instance.test }
-result = RubyProf.stop
-
-print_result(result, 'instance.test')
+benchmark 'instance.test' do
+  instance.test
+end

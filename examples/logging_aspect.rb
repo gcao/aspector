@@ -27,10 +27,10 @@ puts 'LoggingAspect is applied'
 instance = ExampleClass.new
 instance.test 'input'
 
-LoggingAspect.disable
+LoggingAspect.disable!
 puts 'LoggingAspect is disabled'
 instance.test 'input'
 
-LoggingAspect.enable
+LoggingAspect.enable!
 puts 'LoggingAspect is enabled'
 instance.test 'input'

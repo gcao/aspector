@@ -240,7 +240,7 @@ RSpec.describe 'Around advices' do
     end
 
     before do
-      aspect.disable
+      aspect.disable!
     end
 
     context 'when we define an aspect and we disable it' do
@@ -253,7 +253,7 @@ RSpec.describe 'Around advices' do
         it 'should work again' do
           subject.exec
           expect(subject.values).to eq %w( exec-result )
-          aspect.enable
+          aspect.enable!
           subject.exec
           expect(subject.values).to eq %w( exec-result before-exec exec-result after-exec )
         end
@@ -280,7 +280,7 @@ RSpec.describe 'Around advices' do
     end
 
     before do
-      aspect.disable
+      aspect.disable!
     end
 
     context 'when we define an aspect and we disable it' do
@@ -294,7 +294,7 @@ RSpec.describe 'Around advices' do
       it 'should not work' do
         subject.exec
         expect(subject.values).to eq %w( exec-result )
-        aspect.enable
+        aspect.enable!
         subject.exec
         expect(subject.values).to eq %w( exec-result before-exec exec-result after-exec )
       end

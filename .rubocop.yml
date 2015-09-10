@@ -15,7 +15,8 @@ AllCops:
     - bin/**/*
     - /.gemspec/
     - !ruby/regexp /old_and_unused\.rb$/
-    - lib/**/*
+    - lib/aspector/interception.rb
+    - lib/aspector/extensions/object.rb
   Include:
     - Rakefile
     - aspector.gemspec

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Aspector::MethodMatcher do
+RSpec.describe Aspector::Advice::MethodMatcher do
   describe '#initialize' do
     pending
   end
@@ -61,7 +61,7 @@ RSpec.describe Aspector::MethodMatcher do
     end
 
     context 'deferred logic matching' do
-      let(:match_item) { Aspector::DeferredLogic.new('') }
+      let(:match_item) { Aspector::Deferred::Logic.new(-> {}) }
       let(:method) { double }
 
       before do
@@ -77,7 +77,7 @@ RSpec.describe Aspector::MethodMatcher do
     end
 
     context 'deferred option matching' do
-      let(:match_item) { Aspector::DeferredOption.new[:methods] }
+      let(:match_item) { Aspector::Deferred::Option.new[:methods] }
       let(:method) { double }
 
       before do
@@ -96,9 +96,17 @@ RSpec.describe Aspector::MethodMatcher do
       let(:match_item) { [] }
 
       it 'should fail with a proper exception' do
-        error = described_class::UnsupportedItemClass
+        error = Aspector::Errors::UnsupportedItemClass
         expect { subject.send(:matches?, match_item, method) }.to raise_error error
       end
     end
+  end
+
+  describe '#matches_deferred_logic?' do
+    pending
+  end
+
+  describe '#matches_deferred_option?' do
+    pending
   end
 end

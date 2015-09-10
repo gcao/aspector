@@ -4,7 +4,7 @@ RSpec.describe Aspector::Logging do
   subject { described_class }
   let(:context) { double }
 
-  describe '.get_logger' do
+  describe '.build' do
     before do
       subject.instance_variable_set('@logger', logger)
     end
@@ -29,7 +29,7 @@ RSpec.describe Aspector::Logging do
       end
 
       it 'should use Aspector::Logger' do
-        expect(subject.get_logger(context)).to be_instance_of(Aspector::Logger)
+        expect(subject.build(context)).to be_instance_of(Aspector::Logger)
       end
     end
 
@@ -49,7 +49,7 @@ RSpec.describe Aspector::Logging do
       end
 
       it 'should use it' do
-        expect(subject.get_logger(context)).to be_instance_of(Aspector::Logger)
+        expect(subject.build(context)).to be_instance_of(Aspector::Logger)
       end
     end
   end

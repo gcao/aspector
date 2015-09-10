@@ -10,23 +10,17 @@ class Klass
 
   def test; end
 
-  def around_test(proxy, &block)
+  def around_test(proxy, *_args, &block)
     proxy.call(&block)
   end
 end
 
-AroundAspect.apply(Klass)
-
 instance = Klass.new
 
-RubyProf.start
-ITERATIONS.times { instance.test('good') }
-result = RubyProf.stop
+benchmark 'Around good' do
+  instance.test('good')
+end
 
-print_result(result, 'Around good')
-
-RubyProf.start
-ITERATIONS.times { instance.test(nil) }
-result = RubyProf.stop
-
-print_result(result, 'Around bad')
+benchmark 'Around bad' do
+  instance.test(nil)
+end

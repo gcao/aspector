@@ -21,29 +21,8 @@ RSpec.describe Aspector::Base do
       end
 
       it 'should store them' do
-        expect(subject.send(:default_options)[:exec]).to eq 'value'
+        expect(subject.send(:storage).default_options[:exec]).to eq 'value'
       end
-    end
-  end
-
-  describe '#options' do
-    # They are used to access options set when aspect is applied
-    let(:method) { rand }
-    let(:aspect) do
-      Aspector do
-        before options[:methods] do
-          values << 'do_this'
-        end
-      end
-    end
-
-    before do
-      aspect.apply(klass, methods: :exec)
-    end
-
-    it 'should use methods block' do
-      subject.exec
-      expect(subject.values).to eq %w( do_this exec-result )
     end
   end
 
@@ -77,7 +56,7 @@ RSpec.describe Aspector::Base do
     context 'when we try to apply to nonexisting method' do
       let(:aspect) do
         Aspector do
-          before options[:methods] do
+          before do
             # dummy advice
           end
         end

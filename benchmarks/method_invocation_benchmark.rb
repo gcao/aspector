@@ -17,14 +17,10 @@ end
 
 instance = Klass.new
 
-RubyProf.start
-ITERATIONS.times { instance.test }
-result = RubyProf.stop
+benchmark 'instance.test' do
+  instance.test
+end
 
-print_result(result, 'instance.test')
-
-RubyProf.start
-ITERATIONS.times { instance.test_with_method_object }
-result = RubyProf.stop
-
-print_result(result, 'instance.test_with_method_object')
+benchmark 'instance.test_with_method_object' do
+  instance.test_with_method_object
+end

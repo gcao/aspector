@@ -101,6 +101,23 @@ Aspector::Logger inherits from a [standard Ruby logger](http://ruby-doc.org/stdl
 ASPECTOR_LOGGER='MyApp::Logger' ASPECTOR_LOG_LEVEL='any log level' ruby aspected_stuff.rb
 ```
 
+## Default and apply options
+
+Here are options that you can use when creating or applying a single aspect:
+
+| Option name           | Type                                     | Description                                                                       |
+|-----------------------|------------------------------------------------------------------------------------------------------------------------------|
+| except                | Symbol, String, Regexp or Array of those | Will apply aspect to all the methods except those listed                          |
+| name                  | String                                   | Advice name (really useful only for debugging)                                    |
+| methods               | Array of Symbol, String, Regexp          | Method names (or regexp for matching) to which we should apply given aspect       |
+| method                | Symbol, String, Regexp or Array of those | Acts as **methods** but accepts a single name of method (or a single regexp)      |
+| existing_methods_only | Boolean (true/false) - default: false    | Will apply aspect only to already defined methods                                 |
+| new_methods_only      | Boolean (true/false) - default: false    | Will apply aspect only to methods that were defined **after* aspect was applied   |
+| private_methods       | Boolean (true/false) - default: false    | Should the aspect be applied to private methods as well (public only by default)  |
+| class_methods         | Boolean (true/false) - default: false    | Should the aspect for instance methods of class methods of a given element        |
+| method_arg            | Boolean (true/false) - default: false    | Do we want to have access to base method arguments in the aspect method/block     |
+| interception_arg      | Boolean (true/false) - default: false    | Do we want to have access to the interception instance in the aspect method/block |
+
 ## Contributing to aspector
 
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet

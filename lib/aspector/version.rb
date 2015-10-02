@@ -1,3 +1,5 @@
+# Aspector namespace module
 module Aspector
-  VERSION = '0.14.0'
+  # Current Aspector gem version
+  VERSION = '0.15.0'
 end

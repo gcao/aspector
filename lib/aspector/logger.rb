@@ -29,7 +29,7 @@ module Aspector
     private
 
     # Creates a full messages that we want to log
-    # @param any arguments that we want to log based on
+    # @param args any arguments that we want to log based on
     # @return [String] message string for logging - provides additional context information
     # @example Create a message based on a single argument
     #   message('action taken') #=> 'Aspector::Base | ExampleClass | action taken'

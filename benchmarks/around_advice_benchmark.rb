@@ -22,14 +22,10 @@ AroundAspect.apply(Klass)
 
 instance = Klass.new
 
-RubyProf.start
-ITERATIONS.times { instance.test('good') }
-result = RubyProf.stop
+benchmark 'Around advice good' do
+  instance.test('good')
+end
 
-print_result(result, 'Around advice good')
-
-RubyProf.start
-ITERATIONS.times { instance.test(nil) }
-result = RubyProf.stop
-
-print_result(result, 'Around advice bad')
+benchmark 'Around advice bad' do
+  instance.test(nil)
+end

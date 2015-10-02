@@ -1,11 +1,11 @@
 language: ruby
 rvm:
-  - 2.0.0
   - 2.1.5
   - 2.1.7
   - 2.2.2
   - 2.2.3
 script:
+  - bundle exec rubocop lib
   - bundle exec rubocop spec
   - bundle exec rubocop examples
   - bundle exec rubocop benchmarks

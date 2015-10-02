@@ -9,7 +9,7 @@ class Klass
       alias #{method}_without_aspect #{method}
 
       define_method :#{method} do
-        return #{method}_without_aspect if aspect.disabled?
+        return #{method}_without_aspect unless _aspect.enabled?
         before_#{method}
         #{method}_without_aspect
       end
@@ -26,14 +26,10 @@ end
 
 instance = Klass.new
 
-RubyProf.start
-ITERATIONS.times { instance.test_no_aspect }
-result = RubyProf.stop
+benchmark 'instance.test_no_aspect' do
+  instance.test_no_aspect
+end
 
-print_result(result, 'instance.test_no_aspect')
-
-RubyProf.start
-ITERATIONS.times { instance.test }
-result = RubyProf.stop
-
-print_result(result, 'instance.test')
+benchmark 'instance.test' do
+  instance.test
+end

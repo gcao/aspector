@@ -30,31 +30,33 @@ RSpec.describe 'Aspector::Base class methods' do
   describe '.default' do
     context 'when there are no default options' do
       let(:options) { { rand => rand } }
+      let(:storage) { subject.send(:storage) }
 
       before do
-        subject.instance_variable_set(:'@default_options', nil)
+        storage.default_options = {}
       end
 
       it 'should assign provided options' do
         subject.send(:default, options)
 
-        expect(subject.instance_variable_get(:'@default_options')).to eq options
+        expect(storage.default_options).to eq options
       end
     end
 
     context 'when there are default options' do
       let(:options) { { rand => rand } }
       let(:default_options) { { rand => rand } }
+      let(:storage) { subject.send(:storage) }
 
       before do
-        subject.instance_variable_set(:'@default_options', default_options)
+        storage.default_options = default_options
       end
 
       it 'should merge with existing options' do
         subject.send(:default, options)
 
         defaults = options.merge(default_options)
-        expect(subject.instance_variable_get(:'@default_options')).to eq defaults
+        expect(storage.default_options).to eq defaults
       end
     end
   end
@@ -66,11 +68,11 @@ RSpec.describe 'Aspector::Base class methods' do
       end
     end
 
-    let(:advices) { subject.send(:advices) }
+    let(:advices) { subject.send(:storage).advices }
     let(:advice) { advices.first }
 
     it 'should create an advice' do
-      expect(subject.send(:advices).size).to eq 1
+      expect(subject.send(:storage).advices.size).to eq 1
     end
 
     it 'created advice should be a before one' do
@@ -97,11 +99,11 @@ RSpec.describe 'Aspector::Base class methods' do
       end
     end
 
-    let(:advices) { subject.send(:advices) }
+    let(:advices) { subject.send(:storage).advices }
     let(:advice) { advices.first }
 
     it 'should create an advice' do
-      expect(subject.send(:advices).size).to eq 1
+      expect(subject.send(:storage).advices.size).to eq 1
     end
 
     it 'created advice should be only a before one' do
@@ -124,11 +126,11 @@ RSpec.describe 'Aspector::Base class methods' do
       end
     end
 
-    let(:advices) { subject.send(:advices) }
+    let(:advices) { subject.send(:storage).advices }
     let(:advice) { advices.first }
 
     it 'should create an advice' do
-      expect(subject.send(:advices).size).to eq 1
+      expect(subject.send(:storage).advices.size).to eq 1
     end
 
     it 'created advice should be a before one' do
@@ -155,11 +157,11 @@ RSpec.describe 'Aspector::Base class methods' do
       end
     end
 
-    let(:advices) { subject.send(:advices) }
+    let(:advices) { subject.send(:storage).advices }
     let(:advice) { advices.first }
 
     it 'should create an advice' do
-      expect(subject.send(:advices).size).to eq 1
+      expect(subject.send(:storage).advices.size).to eq 1
     end
 
     it 'created advice should be a around one' do
@@ -186,11 +188,11 @@ RSpec.describe 'Aspector::Base class methods' do
       end
     end
 
-    let(:advices) { subject.send(:advices) }
+    let(:advices) { subject.send(:storage).advices }
     let(:advice) { advices.first }
 
     it 'should create an advice' do
-      expect(subject.send(:advices).size).to eq 1
+      expect(subject.send(:storage).advices.size).to eq 1
     end
 
     it 'created advice should be a around one' do
@@ -210,13 +212,14 @@ RSpec.describe 'Aspector::Base class methods' do
     context 'when there is no code and no block' do
       let(:code) { nil }
 
-      it 'should raise ArgumentError' do
-        expect { subject.send(:target, code) }.to raise_error(ArgumentError)
+      it 'should raise a proper error' do
+        error = Aspector::Errors::CodeBlockRequired
+        expect { subject.send(:target, code) }.to raise_error(error)
       end
     end
 
     context 'when there is code and no block given' do
-      let(:code) { true }
+      let(:code) { -> {} }
 
       it 'should not raise ArgumentError' do
         expect { subject.send(:target, code) {} }.not_to raise_error
@@ -232,31 +235,11 @@ RSpec.describe 'Aspector::Base class methods' do
     end
 
     context 'when there is code and block given' do
-      let(:code) { true }
+      let(:code) { -> {} }
 
       it 'should not raise ArgumentError' do
         expect { subject.send(:target, code) {} }.not_to raise_error
       end
     end
-  end
-
-  describe '.options' do
-    it 'should return DeferredOptions instance' do
-      expect(subject.send(:options)).to be_kind_of Aspector::DeferredOption
-    end
-  end
-
-  describe '._deferred_logics_' do
-    context 'when there is nothing in @deferred_logics' do
-      pending
-    end
-
-    context 'when there is value in @deferred_logics' do
-      pending
-    end
-  end
-
-  describe '._create_advice_' do
-    pending
   end
 end

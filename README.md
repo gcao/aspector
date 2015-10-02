@@ -19,7 +19,8 @@ Aspector allows adding additional behavior to existing code (an advice) without 
 * Small codebase, intuitive API
 * Conditional aspects disabling/enabling
 * Standarized logging API
-
+* Aspects are applicable to both classes/modules and instances
+* Object extensions for easier usage
 
 ## Example usages
 
@@ -76,7 +77,7 @@ end
 aspect.apply(ExampleClass)
 element = ExampleClass.new
 element.test
-aspect.disable
+aspect.disable!
 element.test
 
 # Expected output

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Aspector::DeferredLogic do
+RSpec.describe Aspector::Deferred::Logic do
   describe '.new' do
     pending
   end

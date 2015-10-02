@@ -8,14 +8,14 @@ module Aspector
       # @return [Aspector::Logger, Logger] aspector logger that logs in a given context
       #   or provided logger
       # @example Create a logger instance inside Aspector::Base
-      #   @logger ||= Aspector::Logging.get_logger(self)
-      def get_logger(context)
+      #   @logger ||= Aspector::Logging.build(self)
+      def build(context)
         (deconstantize(ENV['ASPECTOR_LOGGER'] || 'Aspector::Logger')).new(context)
       end
 
       private
 
-      # @param [String, Symbol] stringified class/module name that we want to convert
+      # @param klass_name [String, Symbol] stringified class/module name that we want to convert
       #   to a real working class/module instance
       # @return [Class] class/module that was fetched from its string version
       # @note If it cannot detect a valid class based on the name,

@@ -184,7 +184,7 @@ RSpec.describe 'Before advices' do
     end
 
     before do
-      aspect.disable
+      aspect.disable!
     end
 
     context 'when we define an aspect and we disable it' do
@@ -198,7 +198,7 @@ RSpec.describe 'Before advices' do
       it 'should not work' do
         subject.exec
         expect(subject.values).to eq %w( exec-result )
-        aspect.enable
+        aspect.enable!
         subject.exec
         expect(subject.values).to eq %w( exec-result before-exec exec-result )
       end

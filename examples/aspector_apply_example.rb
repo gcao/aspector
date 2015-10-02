@@ -25,5 +25,5 @@ end
 aspect.apply(ExampleClass)
 element = ExampleClass.new
 element.test
-aspect.disable
+aspect.disable!
 element.test

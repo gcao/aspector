@@ -1,8 +1,12 @@
 # Aspector
 
-[<img src="https://secure.travis-ci.org/gcao/aspector.png" />](http://travis-ci.org/gcao/aspector) [![Gem Version](https://badge.fury.io/rb/aspector.svg)](http://badge.fury.io/rb/aspector)
-
 Aspector = ASPECT Oriented Ruby programming
+
+## Deprecated
+
+Aspector is deprecated.
+
+We recommend Ruby native [Module#prepend](https://ruby-doc.org/core-2.5.0/Module.html) functionality to build up aspects.
 
 ## About
 
